@@ -162,18 +162,21 @@ function HowItWorks() {
       title: 'Describe Your Vision',
       desc: 'Type anything: "a cyberpunk cat on Mars" or "watercolor mountain landscape." The more creative, the better.',
       image: '/images/step1-describe-vision.png',
+      color: '#3b82f6',
     },
     {
       num: '02',
       title: 'AI Generates Designs',
       desc: 'Our AI instantly creates 4 unique designs. Pick your favorite, tweak the style, or regenerate for fresh ideas.',
       image: '/images/step2-ai-generates.png',
+      color: '#8b5cf6',
     },
     {
       num: '03',
       title: 'We Print & Ship',
       desc: 'Choose your product and size. We print with premium quality and ship directly to your door — anywhere worldwide.',
       image: '/images/step3-print-ship.png',
+      color: '#f97316',
     },
   ];
 
