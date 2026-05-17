@@ -32,7 +32,7 @@ export default function ParticleBackground({
       this.size = Math.random() * 20 + 10;
       this.speedX = (Math.random() - 0.5) * 0.5;
       this.speedY = (Math.random() - 0.5) * 0.5;
-      this.opacity = Math.random() * 0.3 + 0.3; // 0.3-0.6 for white bg
+      this.opacity = Math.random() * 0.4 + 0.5; // 0.5-0.9 for white bg (increased visibility)
       this.pulse = Math.random() * Math.PI * 2;
       this.currentSize = this.size;
     }
