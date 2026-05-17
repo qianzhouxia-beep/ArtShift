@@ -78,7 +78,7 @@ function FloatingIcon({ icon, x, y, delay, opacity = 0.12 }: {
 // ─── Hero Section ──────────────────────────────────────────────────────────
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col overflow-hidden bg-white">
+    <section className="relative min-h-screen flex flex-col overflow-hidden bg-white/95">
       {/* Floating Lucide icons — crisp vector, not emoji */}
       <FloatingIcon icon={<Palette size={56} strokeWidth={1.5} color="#3b82f6" />} x="8%" y="18%" delay="0s" size={56} opacity={0.10} />
       <FloatingIcon icon={<Package size={72} strokeWidth={1.5} color="#8b5cf6" />} x="78%" y="60%" delay="2s" size={72} opacity={0.08} />
