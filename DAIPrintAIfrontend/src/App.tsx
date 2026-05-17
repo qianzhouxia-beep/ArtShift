@@ -5,6 +5,7 @@ import {
   Palette, Truck, CreditCard, Check, Menu, X,
   Package, Smartphone, Image, Layers, Wand2,
 } from 'lucide-react';
+import ParticleBackground from './ParticleBackground';
 
 // ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
 function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
@@ -161,25 +162,22 @@ function HowItWorks() {
       num: '01',
       title: 'Describe Your Vision',
       desc: 'Type anything: "a cyberpunk cat on Mars" or "watercolor mountain landscape." The more creative, the better.',
-      icon: <Palette size={24} />,
+      image: '/images/step1-describe-vision.png',
       color: '#3b82f6',
-      bg: '#eff6ff',
     },
     {
       num: '02',
       title: 'AI Generates Designs',
       desc: 'Our AI instantly creates 4 unique designs. Pick your favorite, tweak the style, or regenerate for fresh ideas.',
-      icon: <Sparkles size={24} />,
+      image: '/images/step2-ai-generates.png',
       color: '#8b5cf6',
-      bg: '#f5f3ff',
     },
     {
       num: '03',
       title: 'We Print & Ship',
       desc: 'Choose your product and size. We print with premium quality and ship directly to your door — anywhere worldwide.',
-      icon: <Truck size={24} />,
+      image: '/images/step3-print-ship.png',
       color: '#f97316',
-      bg: '#fff7ed',
     },
   ];
 
@@ -203,9 +201,8 @@ function HowItWorks() {
           {steps.map((step, i) => (
             <div key={i}
               className="rounded-3xl p-8 sm:p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-white border border-gray-100">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                style={{ backgroundColor: step.bg, color: step.color }}>
-                {step.icon}
+              <div className="rounded-2xl overflow-hidden mb-6 bg-gray-50">
+                <img src={step.image} alt={step.title} className="w-full h-auto object-cover" loading="lazy" />
               </div>
               <div className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: step.color }}>
                 {step.num}
@@ -765,6 +762,7 @@ function Footer() {
 export default function App() {
   return (
     <div className="min-h-screen bg-white">
+      <ParticleBackground />
       <Navbar />
       <HeroSection />
       <HowItWorks />
