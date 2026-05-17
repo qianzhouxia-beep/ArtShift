@@ -5,6 +5,7 @@ import {
   Palette, Truck, CreditCard, Check, Menu, X,
   Package, Smartphone, Image, Layers, Wand2,
 } from 'lucide-react';
+import ParticleBackground from './ParticleBackground';
 
 // ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
 function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
@@ -761,6 +762,7 @@ function Footer() {
 export default function App() {
   return (
     <div className="min-h-screen bg-white">
+      <ParticleBackground />
       <Navbar />
       <HeroSection />
       <HowItWorks />
