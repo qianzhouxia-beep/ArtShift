@@ -1,84 +1,73 @@
-# ArtShift - AI Art Style Transfer + Print on Demand
+# React + TypeScript + Vite
 
-**Domain**: artshift.api-tokenmaster.com
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## What is ArtShift?
+Currently, two official plugins are available:
 
-Upload a photo or describe your idea. AI transforms it into stunning art — then we print it on T-shirts, hoodies, mugs, phone cases, and ship it worldwide.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-**Core differentiator**: Photo-to-art style transfer (not just text-to-image). Upload your pet's photo → AI turns it into a Van Gogh painting → Print on a hoodie.
+## React Compiler
 
-## Tech Stack
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Backend**: Python Flask + SQLite
-- **AI**: OpenAI DALL-E 3 / DeepSeek
-- **Print on Demand**: Printful API
-- **Payments**: Stripe
-- **Hosting**: Zeabur (Tencent Cloud Singapore)
-- **Domain**: `artshift.api-tokenmaster.com`
+## Expanding the ESLint configuration
 
-## Project Structure
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```
-ArtShift/
-├── frontend/          # React SPA source code
-│   ├── src/
-│   │   └── App.tsx    # Main component
-│   ├── dist/          # Built static files
-│   └── ...
-├── backend/
-│   ├── main.py        # Flask API server
-│   ├── requirements.txt
-│   ├── static/        # Frontend build output (served by Flask)
-│   └── artshift.db    # SQLite database (auto-created)
-├── nginx/             # Nginx config (if needed)
-└── README.md
-```
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-## API Endpoints
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Serve landing page |
-| POST | `/api/waitlist` | Join waitlist (email) |
-| POST | `/api/generate` | AI image generation |
-| GET | `/api/products` | Product catalog |
-| GET | `/api/stats` | Public stats |
-| GET | `/api/health` | Health check |
-
-## Environment Variables
-
-```env
-FLASK_ENV=production
-PORT=8080
-
-# AI Provider (choose one)
-OPENAI_API_KEY=sk-...
-DEEPSEEK_API_KEY=sk-...
-
-# Optional
-AI_PROVIDER=openai          # openai | deepseek
-OPENAI_API_BASE=https://api.openai.com/v1
-DEEPSEEK_API_BASE=https://api.deepseek.com/v1
-AI_MODEL=dall-e-3
-PRINTFUL_API_KEY=
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-## Deployment (Zeabur)
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-1. Push this repo to GitHub
-2. Create new service in Zeabur
-3. Link Git repository
-4. Set environment variables in Zeabur dashboard
-5. Deploy!
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## Roadmap
-
-- [x] Landing page with waitlist
-- [ ] AI image generation integration
-- [ ] Photo upload + style transfer UI
-- [ ] Printful product catalog sync
-- [ ] Stripe checkout
-- [ ] User accounts & order history
-- [ ] Admin dashboard
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```

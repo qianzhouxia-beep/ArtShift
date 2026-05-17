@@ -6,21 +6,10 @@ import {
   Package, Smartphone, Image, Layers, Wand2,
 } from 'lucide-react';
 
-// ─── Logo SVG ───────────────────────────────────────────────────────────────
+// ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
 function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <rect width="32" height="32" rx="8" fill="url(#logoGrad)" />
-      <text x="50%" y="50%" dominantBaseline="central" textAnchor="middle"
-        fontSize="14" fontWeight="900" fontFamily="Plus Jakarta Sans, sans-serif"
-        fill="white">AS</text>
-      <defs>
-        <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32">
-          <stop offset="0%" stopColor="#3b82f6" />
-          <stop offset="100%" stopColor="#8b5cf6" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <img src="/logo.png" alt="ArtShift Logo" className={className} style={{ objectFit: 'contain' }} />
   );
 }
 
