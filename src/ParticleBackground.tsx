@@ -32,7 +32,7 @@ export default function ParticleBackground({
       this.size = Math.random() * 20 + 10;
       this.speedX = (Math.random() - 0.5) * 0.5;
       this.speedY = (Math.random() - 0.5) * 0.5;
-      this.opacity = Math.random() * 0.4 + 0.5; // 0.5-0.9 for white bg (increased visibility)
+      this.opacity = Math.random() * 0.4 + 0.6; // 0.6-1.0 for white bg (increased visibility)
       this.pulse = Math.random() * Math.PI * 2;
       this.currentSize = this.size;
     }
@@ -149,8 +149,12 @@ export default function ParticleBackground({
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed top-0 left-0 w-full h-full -z-10 ${className}`}
-      style={{ pointerEvents: 'none' }}
+      className={`fixed top-0 left-0 w-full h-full ${className}`}
+      style={{ 
+        pointerEvents: 'none',
+        zIndex: -10,
+        position: 'fixed'
+      }}
     />
   );
 }
