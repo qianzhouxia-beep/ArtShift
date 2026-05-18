@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Sparkles, Zap, Globe, ShieldCheck, Star, ArrowRight,
   ChevronDown,
-  Palette, Truck, CreditCard, Check, Menu, X,
+  Palette, Truck, CreditCard, Menu, X,
   Package, Smartphone, Image, Layers, Wand2,
 } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
@@ -237,9 +237,8 @@ function AIDemo() {
             Powered by ChatGPT Image Generation
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            Your photo.{' '}
-            <span className="gradient-text">Any style.</span>
-            <br />One product.
+            <span className="gradient-text">Watch AI Create</span>
+            <br />in Real Time
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
             Upload your photo or describe a scene. ArtShift AI transforms it into any art style — and prints it on anything.
@@ -479,38 +478,6 @@ function Testimonials() {
 
 // ─── Pricing ────────────────────────────────────────────────────────────────
 function Pricing() {
-  const plans = [
-    {
-      name: 'Free',
-      price: '$0',
-      desc: 'Perfect for trying ArtShift',
-      features: ['3 AI generations per day', 'Standard print quality', 'Basic product selection', 'Email support'],
-      cta: 'Get Started',
-      ctaStyle: 'outline',
-      popular: false,
-    },
-    {
-      name: 'Pro',
-      price: '$9.99',
-      period: '/month',
-      desc: 'For creators who want more',
-      features: ['Unlimited AI generations', 'HD downloads (no watermark)', 'Full product catalog', 'Priority support', 'Exclusive styles'],
-      cta: 'Start Free Trial',
-      ctaStyle: 'gradient',
-      popular: true,
-    },
-    {
-      name: 'Business',
-      price: '$29',
-      period: '/month',
-      desc: 'For teams and bulk orders',
-      features: ['Everything in Pro', 'Bulk order discounts', 'API access', 'Dedicated account manager', 'Custom branding'],
-      cta: 'Contact Sales',
-      ctaStyle: 'outline',
-      popular: false,
-    },
-  ];
-
   return (
     <section id="pricing" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
@@ -519,59 +486,16 @@ function Pricing() {
             Pricing
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            Simple, transparent{' '}
-            <span className="gradient-text">pricing</span>
+            <span className="gradient-text">Coming Soon</span>
           </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            Start free. Upgrade when you need more.
+          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mb-8">
+            Join the waitlist to get early bird pricing when we launch.
           </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-start">
-          {plans.map((plan, i) => (
-            <div key={i}
-              className="rounded-3xl p-8 transition-all duration-300 hover:shadow-xl"
-              style={
-                plan.popular
-                  ? { background: 'linear-gradient(135deg, #1e1b4b, #312e81)', boxShadow: '0 20px 60px rgba(59,130,246,0.2)' }
-                  : { backgroundColor: 'white', border: '1px solid #f3f4f6' }
-              }>
-              {plan.popular && (
-                <div className="text-[10px] font-bold uppercase tracking-widest mb-4 px-3 py-1 rounded-full inline-block bg-blue-500/30 text-blue-300">
-                  Most Popular
-                </div>
-              )}
-              <div className="text-sm font-bold mb-1" style={{ color: plan.popular ? '#a78bfa' : '#3b82f6' }}>
-                {plan.name}
-              </div>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-4xl font-extrabold" style={{ color: plan.popular ? 'white' : '#111827' }}>
-                  {plan.price}
-                </span>
-                {plan.period && <span className="text-sm text-gray-400">{plan.period}</span>}
-              </div>
-              <p className="text-sm mb-6" style={{ color: plan.popular ? 'rgba(255,255,255,0.6)' : '#4b5563' }}>
-                {plan.desc}
-              </p>
-              <div className="space-y-3 mb-8">
-                {plan.features.map((f, j) => (
-                  <div key={j} className="flex items-center gap-3 text-sm">
-                    <Check size={15} style={{ color: plan.popular ? '#60a5fa' : '#3b82f6', flexShrink: 0 }} />
-                    <span style={{ color: plan.popular ? 'rgba(255,255,255,0.85)' : '#1f2937' }}>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <button
-                className="w-full rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-200 hover:scale-[1.02]"
-                style={
-                  plan.ctaStyle === 'gradient'
-                    ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', color: 'white' }
-                    : { backgroundColor: 'transparent', border: `1px solid ${plan.popular ? 'rgba(255,255,255,0.3)' : '#e5e7eb'}`, color: plan.popular ? 'white' : '#374151' }
-                }>
-                {plan.cta}
-              </button>
-            </div>
-          ))}
+          <a href="#waitlist"
+            className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
+            style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
+            Get Early Bird Pricing <ArrowRight size={16} />
+          </a>
         </div>
       </div>
     </section>
@@ -597,9 +521,8 @@ function Waitlist() {
   return (
     <section id="waitlist" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28" style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81, #1e1b4b)' }}>
       <div className="max-w-2xl mx-auto text-center">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-extrabold text-2xl mx-auto mb-8"
-          style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-          P
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-8 bg-white/10 backdrop-blur-sm">
+          <ArtShiftLogo className="w-10 h-10" />
         </div>
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-5">
           Be the{' '}
@@ -758,9 +681,7 @@ function Footer() {
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-white/10">
           <p className="text-[11px] text-gray-600 uppercase tracking-widest">© 2026 ArtShift. All rights reserved.</p>
           <div className="flex items-center gap-5">
-            {['𝕏', 'IG', 'TK', 'PI'].map(s => (
-              <a key={s} href="#" className="text-gray-600 hover:text-white transition-colors text-sm">{s}</a>
-            ))}
+            {/* Social links will be added when accounts are set up */}
           </div>
         </div>
       </div>
