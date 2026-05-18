@@ -30,7 +30,7 @@ export default function ParticleBackground() {
         this.size = Math.random() * 20 + 10;
         this.speedX = (Math.random() - 0.5) * 0.5;
         this.speedY = (Math.random() - 0.5) * 0.5;
-        this.opacity = Math.random() * 0.4 + 0.6;
+        this.opacity = Math.random() * 0.2 + 0.8; // 0.8-1.0 (darker, more visible)
         this.pulse = Math.random() * Math.PI * 2;
         this.currentSize = this.size;
       }
@@ -67,8 +67,9 @@ export default function ParticleBackground() {
           this.x, this.y,
           this.x + this.currentSize, this.y + this.currentSize
         );
-        gradient.addColorStop(0, `rgba(139, 92, 246, ${this.opacity})`);
-        gradient.addColorStop(1, `rgba(59, 130, 246, ${this.opacity})`);
+        // Deeper purple-blue (more saturated)
+        gradient.addColorStop(0, `rgba(124, 58, 237, ${this.opacity})`); // #7C3AED
+        gradient.addColorStop(1, `rgba(37, 99, 235, ${this.opacity})`); // #2563EB
 
         ctx!.fillStyle = gradient;
 
@@ -108,7 +109,7 @@ export default function ParticleBackground() {
 
     function animate() {
       // Subtle fade (much lighter so particles stay visible on white)
-      ctx!.fillStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx!.fillStyle = 'rgba(255, 255, 255, 0.02)'; // Lighter fade = particles stay longer
       ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
 
       particles.forEach((p) => {
