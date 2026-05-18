@@ -7,6 +7,16 @@ import {
 } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
 
+// ─── Style Gallery Data ───────────────────────────────────────────────────────
+const styleGallery = [
+  { src: '/images/styles/style-oil-painting.png', title: 'Oil Painting', desc: 'Van Gogh & Monet' },
+  { src: '/images/styles/style-pixel-art.png', title: 'Pixel Art', desc: '8-bit Retro' },
+  { src: '/images/styles/style-anime.png', title: 'Anime', desc: 'Studio Ghibli' },
+  { src: '/images/styles/style-cyberpunk.png', title: 'Cyberpunk', desc: 'Neon Futurism' },
+  { src: '/images/styles/style-pencil-sketch.png', title: 'Pencil Sketch', desc: 'Graphite Drawing' },
+  { src: '/images/styles/style-watercolor.png', title: 'Watercolor', desc: 'Soft & Ethereal' },
+];
+
 // ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
 function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
   return (
@@ -758,6 +768,40 @@ function Footer() {
   );
 }
 
+// ─── Style Gallery ─────────────────────────────────────────────────────────
+function StyleGallery() {
+  return (
+    <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
+      <div className="max-w-6xl mx-auto text-center">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          Any Style You Can Imagine
+        </h2>
+        <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
+          From classic oil paintings to cyberpunk — our AI transforms your photo into the style you choose.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+          {styleGallery.map((style) => (
+            <div
+              key={style.title}
+              className="group cursor-pointer"
+            >
+              <div className="aspect-square rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300 mb-3">
+                <img
+                  src={style.src}
+                  alt={style.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <h3 className="font-semibold text-gray-900 text-sm">{style.title}</h3>
+              <p className="text-gray-400 text-xs">{style.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
@@ -766,6 +810,7 @@ export default function App() {
       <Navbar />
       <HeroSection />
       <HowItWorks />
+      <StyleGallery />
       <AIDemo />
       <Products />
       <WhyArtShift />
