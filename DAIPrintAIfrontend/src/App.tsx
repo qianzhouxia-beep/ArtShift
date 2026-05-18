@@ -521,7 +521,7 @@ function Waitlist() {
   return (
     <section id="waitlist" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28" style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81, #1e1b4b)' }}>
       <div className="max-w-2xl mx-auto text-center">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-8 bg-white/10 backdrop-blur-sm">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-8 bg-white shadow-lg">
           <ArtShiftLogo className="w-10 h-10" />
         </div>
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-5">
@@ -694,7 +694,7 @@ function StyleGallery() {
   return (
     <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
           Any Style You Can Imagine
         </h2>
         <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
