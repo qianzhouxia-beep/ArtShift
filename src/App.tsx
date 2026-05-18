@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Sparkles, Zap, Globe, ShieldCheck, Star, ArrowRight,
   ChevronDown,
   Palette, Truck, CreditCard, Menu, X,
   Package, Smartphone, Image, Layers, Wand2,
+  ArrowUp,
 } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
 
@@ -29,7 +30,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = ['How It Works', 'Products', 'Pricing', 'FAQ'];
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center pt-4 sm:pt-6 px-4 sm:px-8">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center bg-white/25 backdrop-blur-xl border-b border-white/20 shadow-lg" style={{ backdropFilter: 'blur(20px)' }}>
       <div className="flex items-center gap-3">
         <div className="flex items-center justify-center rounded-full w-10 h-10 sm:w-11 sm:h-11 shadow-sm bg-white">
           <ArtShiftLogo className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -725,6 +726,20 @@ function StyleGallery() {
 
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <ParticleBackground />
@@ -740,6 +755,15 @@ export default function App() {
       <Waitlist />
       <FAQ />
       <Footer />
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 p-4 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+          style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+        >
+          <ArrowUp size={20} />
+        </button>
+      )}
     </div>
   );
 }
