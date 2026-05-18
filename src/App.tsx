@@ -695,7 +695,7 @@ function StyleGallery() {
     <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-          Any Style You Can Imagine
+          <span className="gradient-text">Any Style</span> You Can Imagine
         </h2>
         <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
           From classic oil paintings to cyberpunk — our AI transforms your photo into the style you choose.
