@@ -1,159 +1,79 @@
 import { useEffect, useRef } from 'react';
 
-interface ParticleBackgroundProps {
-  particleCount?: number;
-  repelRadius?: number;
-  className?: string;
-}
-
-export default function ParticleBackground({
-  particleCount = 40,
-  repelRadius = 100,
-  className = ''
-}: ParticleBackgroundProps) {
+export default function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particlesRef = useRef<Particle[]>([]);
-  const mouseRef = useRef({ x: 0, y: 0 });
-  const animationRef = useRef<number>(0);
-
-  class Particle {
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    opacity: number;
-    pulse: number;
-    currentSize: number;
-
-    constructor(width: number, height: number) {
-      this.x = Math.random() * width;
-      this.y = Math.random() * height;
-      this.size = Math.random() * 20 + 10;
-      this.speedX = (Math.random() - 0.5) * 0.5;
-      this.speedY = (Math.random() - 0.5) * 0.5;
-      this.opacity = Math.random() * 0.4 + 0.6; // 0.6-1.0 for white bg (increased visibility)
-      this.pulse = Math.random() * Math.PI * 2;
-      this.currentSize = this.size;
-    }
-
-    update(width: number, height: number, mouseX: number, mouseY: number, radius: number) {
-      this.x += this.speedX;
-      this.y += this.speedY;
-
-      // Mouse interaction (repel)
-      const dx = mouseX - this.x;
-      const dy = mouseY - this.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < radius && mouseX > 0 && mouseY > 0) {
-        const force = (radius - distance) / radius;
-        this.x -= (dx / distance) * force * 3;
-        this.y -= (dy / distance) * force * 3;
-      }
-
-      // Wrap around edges
-      if (this.x < -this.size) this.x = width + this.size;
-      if (this.x > width + this.size) this.x = -this.size;
-      if (this.y < -this.size) this.y = height + this.size;
-      if (this.y > height + this.size) this.y = -this.size;
-
-      // Pulsing effect
-      this.pulse += 0.02;
-      this.currentSize = this.size + Math.sin(this.pulse) * 2;
-    }
-
-    draw(ctx: CanvasRenderingContext2D) {
-      const gradient = ctx.createLinearGradient(
-        this.x, this.y,
-        this.x + this.currentSize, this.y + this.currentSize
-      );
-      gradient.addColorStop(0, `rgba(139, 92, 246, ${this.opacity})`);
-      gradient.addColorStop(1, `rgba(59, 130, 246, ${this.opacity})`);
-
-      ctx.fillStyle = gradient;
-
-      // Draw rounded rectangle
-      const radius = 4;
-      ctx.beginPath();
-      ctx.moveTo(this.x + radius, this.y);
-      ctx.lineTo(this.x + this.currentSize - radius, this.y);
-      ctx.quadraticCurveTo(this.x + this.currentSize, this.y, this.x + this.currentSize, this.y + radius);
-      ctx.lineTo(this.x + this.currentSize, this.y + this.currentSize - radius);
-      ctx.quadraticCurveTo(this.x + this.currentSize, this.y + this.currentSize, this.x + this.currentSize - radius, this.y + this.currentSize);
-      ctx.lineTo(this.x + radius, this.y + this.currentSize);
-      ctx.quadraticCurveTo(this.x, this.y + this.currentSize, this.x, this.y + this.currentSize - radius);
-      ctx.lineTo(this.x, this.y + radius);
-      ctx.quadraticCurveTo(this.x, this.y, this.x + radius, this.y);
-      ctx.closePath();
-      ctx.fill();
-    }
-  }
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    // Full screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    // Initialize particles
-    particlesRef.current = Array.from({ length: particleCount }, () => new Particle(width, height));
+    // Simple particle: position, velocity, color
+    const particles = Array.from({ length: 30 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 8 + 4,
+      speedX: (Math.random() - 0.5) * 1.2,
+      speedY: (Math.random() - 0.5) * 1.2,
+      // HIGHLY VISIBLE on white: dark colors
+      color: ['#1e1b4b', '#312e81', '#4c1d95', '#1e40af'][Math.floor(Math.random() * 4)],
+    }));
 
-    // Mouse move handler
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current.x = e.clientX;
-      mouseRef.current.y = e.clientY;
-    };
-    window.addEventListener('mousemove', handleMouseMove);
+    let frameId: number;
 
-    // Resize handler
+    function draw() {
+      // NO FADE — clear each frame so particles stay visible on white bg
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+
+      particles.forEach((p) => {
+        // Move
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        // Bounce off edges
+        if (p.x < 0 || p.x > canvas!.width) p.speedX *= -1;
+        if (p.y < 0 || p.y > canvas!.height) p.speedY *= -1;
+
+        // Draw circle with dark color (visible on white)
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx!.fillStyle = p.color;
+        ctx!.fill();
+      });
+
+      frameId = requestAnimationFrame(draw);
+    }
+
+    draw();
+
     const handleResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     };
     window.addEventListener('resize', handleResize);
 
-    // Animation loop
-    const animate = () => {
-      // White fade trail
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.fillRect(0, 0, width, height);
-
-      // Update and draw particles
-      particlesRef.current.forEach(particle => {
-        particle.update(width, height, mouseRef.current.x, mouseRef.current.y, repelRadius);
-        particle.draw(ctx);
-      });
-
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    // Cleanup
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(frameId);
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationRef.current);
     };
-  }, [particleCount, repelRadius]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed top-0 left-0 w-full h-full ${className}`}
-      style={{ 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
         pointerEvents: 'none',
-        zIndex: -10,
-        position: 'fixed'
       }}
     />
   );
