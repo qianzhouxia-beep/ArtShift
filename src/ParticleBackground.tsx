@@ -27,10 +27,10 @@ export default function ParticleBackground() {
       constructor() {
         this.x = Math.random() * canvas!.width;
         this.y = Math.random() * canvas!.height;
-        this.size = Math.random() * 20 + 10;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.opacity = 1.0; // Full opacity for maximum visibility
+        this.size = Math.random() * 14 + 6; // 6-20px (smaller)
+        this.speedX = (Math.random() - 0.5) * 0.3; // Slower
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.12 + 0.12; // 0.12-0.24 (subtle overlay)
         this.pulse = Math.random() * Math.PI * 2;
         this.currentSize = this.size;
       }
@@ -43,12 +43,12 @@ export default function ParticleBackground() {
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const repelRadius = 150;
+        const repelRadius = 120;
 
         if (dist < repelRadius && dist > 0) {
           const force = (repelRadius - dist) / repelRadius;
-          this.x -= (dx / dist) * force * 3;
-          this.y -= (dy / dist) * force * 3;
+          this.x -= (dx / dist) * force * 2;
+          this.y -= (dy / dist) * force * 2;
         }
 
         // Wrap edges
@@ -58,8 +58,8 @@ export default function ParticleBackground() {
         if (this.y > canvas!.height + this.size) this.y = -this.size;
 
         // Pulse
-        this.pulse += 0.02;
-        this.currentSize = this.size + Math.sin(this.pulse) * 2;
+        this.pulse += 0.015;
+        this.currentSize = this.size + Math.sin(this.pulse) * 1.5;
       }
 
       draw() {
@@ -67,14 +67,13 @@ export default function ParticleBackground() {
           this.x, this.y,
           this.x + this.currentSize, this.y + this.currentSize
         );
-        // Even deeper purple-blue
         gradient.addColorStop(0, `rgba(109, 40, 217, ${this.opacity})`); // #6D28D9
-        gradient.addColorStop(1, `rgba(29, 78, 216, ${this.opacity})`); // #1D4ED8
+        gradient.addColorStop(1, `rgba(37, 99, 235, ${this.opacity})`);  // #2563EB
 
         ctx!.fillStyle = gradient;
 
         // Rounded rectangle (pixel block)
-        const r = 4;
+        const r = 3;
         const s = this.currentSize;
         ctx!.beginPath();
         ctx!.moveTo(this.x + r, this.y);
@@ -91,7 +90,7 @@ export default function ParticleBackground() {
       }
     }
 
-    const particles = Array.from({ length: 40 }, () => new Particle());
+    const particles = Array.from({ length: 35 }, () => new Particle());
     let frameId: number;
 
     const onMouseMove = (e: MouseEvent) => {
@@ -108,9 +107,8 @@ export default function ParticleBackground() {
     window.addEventListener('resize', onResize);
 
     function animate() {
-      // Subtle fade (much lighter so particles stay visible on white)
-      ctx!.fillStyle = 'rgba(255, 255, 255, 0.02)'; // Lighter fade = particles stay longer
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+      // Clear fully each frame — no trail accumulation
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
 
       particles.forEach((p) => {
         p.update();
@@ -138,7 +136,7 @@ export default function ParticleBackground() {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: 0,
+        zIndex: 1,
         pointerEvents: 'none',
       }}
     />
