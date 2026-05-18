@@ -30,7 +30,7 @@ export default function ParticleBackground() {
         this.size = Math.random() * 20 + 10;
         this.speedX = (Math.random() - 0.5) * 0.5;
         this.speedY = (Math.random() - 0.5) * 0.5;
-        this.opacity = Math.random() * 0.2 + 0.8; // 0.8-1.0 (darker, more visible)
+        this.opacity = 1.0; // Full opacity for maximum visibility
         this.pulse = Math.random() * Math.PI * 2;
         this.currentSize = this.size;
       }
@@ -67,9 +67,9 @@ export default function ParticleBackground() {
           this.x, this.y,
           this.x + this.currentSize, this.y + this.currentSize
         );
-        // Deeper purple-blue (more saturated)
-        gradient.addColorStop(0, `rgba(124, 58, 237, ${this.opacity})`); // #7C3AED
-        gradient.addColorStop(1, `rgba(37, 99, 235, ${this.opacity})`); // #2563EB
+        // Even deeper purple-blue
+        gradient.addColorStop(0, `rgba(109, 40, 217, ${this.opacity})`); // #6D28D9
+        gradient.addColorStop(1, `rgba(29, 78, 216, ${this.opacity})`); // #1D4ED8
 
         ctx!.fillStyle = gradient;
 
