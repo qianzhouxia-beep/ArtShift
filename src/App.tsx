@@ -628,7 +628,7 @@ function Pricing() {
 }
 
 // ─── API Config ─────────────────────────────────────────────────────────────
-const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://artshift-api.zeabur.app/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
 
 // ─── Waitlist ────────────────────────────────────────────────────────────────
 function Waitlist() {
@@ -637,11 +637,6 @@ function Waitlist() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-<<<<<<< HEAD
-=======
-  const [loading, setLoading] = useState(false);
-
->>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
@@ -650,15 +645,8 @@ function Waitlist() {
     }
     setError('');
     setLoading(true);
-<<<<<<< HEAD
     try {
       const res = await fetch(`${API_URL}/waitlist`, {
-=======
-
-    try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'https://artshift-api.zeabur.app/api';
-      const res = await fetch(`${API_BASE}/waitlist`, {
->>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -667,13 +655,9 @@ function Waitlist() {
       if (!res.ok) throw new Error(data.error || 'Failed to join');
       setSubmitted(true);
     } catch (err: any) {
-<<<<<<< HEAD
       // API 失败时仍然显示成功（降级体验）
       console.warn('Waitlist API fallback:', err.message);
       setSubmitted(true);
-=======
-      setError(err.message || 'Something went wrong. Please try again.');
->>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
     } finally {
       setLoading(false);
     }
@@ -710,11 +694,7 @@ function Waitlist() {
             />
             {error && <p className="text-red-400 text-sm text-left pl-2">{error}</p>}
             <button type="submit" disabled={loading}
-<<<<<<< HEAD
-              className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-60"
-=======
               className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
->>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
               {loading ? 'Joining...' : 'Join Waitlist →'}
             </button>
