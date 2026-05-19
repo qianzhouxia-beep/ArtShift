@@ -521,7 +521,7 @@ function Waitlist() {
     setLoading(true);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'https://artshift-api.zeabur.app/api';
+      const API_BASE = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
       const res = await fetch(`${API_BASE}/waitlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
