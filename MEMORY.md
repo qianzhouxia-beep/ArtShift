@@ -5,6 +5,78 @@ _Only loaded in main sessions. Review daily files and keep what matters._
 
 ---
 
+## 💡 关键认知升级（2026-05-19）
+
+### ✅ 规则 9：文本文件写入必须使用 qclaw-text-file skill
+
+**背景**：今天在执行自我精进任务时，学习到了 qclaw-text-file skill 的使用规范。
+
+**规则**：
+- ❌ **永远不要**直接使用内置 `write` 工具写入最终目标文件
+- ✅ 所有文本文件写入必须通过 `qclaw-text-file` skill 的 `write_file.py` 脚本
+- ✅ 标准流程：先写临时文件 → 调用脚本写入目标文件 → 清理临时文件
+- ✅ 写入前必须先探测平台（`--detect`），根据结果决定是否传 `--platform`
+
+**为什么强制**：
+- 内置 `write` 工具硬编码 utf-8 无 BOM，在 Windows Excel 打开 CSV 时 100% 乱码
+- 不支持跨平台编码适配（utf-8/utf-8-sig/gbk）
+- 不自动处理 CRLF/LF 换行符适配
+
+**应用到**：
+- 所有 .md、.py、.json、.csv、.txt 等文本文件
+- 无论文件大小、内容简单与否，都必须使用脚本
+
+---
+
+### ✅ 规则 10：平台探测和 `--platform` 参数决策
+
+**背景**：今天学习到 `--platform` 参数表示"文件将被打开/使用的目标平台"，不是当前运行平台。
+
+**规则**：
+- ✅ 写入文件前**必须先运行** `python3 write_file.py --detect` 探测平台
+- ✅ 根据探测结果决策 `--platform` 参数：
+  - 当前是 mac/linux，文件本机使用 → **不传 `--platform`**
+  - 当前是 mac/linux，文件发给 Windows 用户 → 传 `--platform windows`
+  - 当前是 Windows → **不传 `--platform`**（脚本自动按 Windows 规则处理）
+- ❌ **严禁**在用户未明确说"给 Windows 用"时默认传 `--platform windows`
+
+**示例**：
+```bash
+# 错误的做法（严禁）
+# mac 上写 CSV，未说明给 Windows 用，但传了 --platform windows
+python3 write_file.py --path file.csv --content-file tmp.txt --platform windows
+
+# 正确的做法
+# mac 上写 CSV，未说明给 Windows 用，不传 --platform
+python3 write_file.py --path file.csv --content-file tmp.txt
+```
+
+**应用到**：
+- 所有跨平台文件写入场景
+- CSV/Excel 文件（最容易出现乱码的场景）
+
+---
+
+### ✅ 规则 11：定时任务应考虑到边界情况
+
+**背景**：今天的自我精进任务假设过去24小时有主会话活动，但实际上可能没有。
+
+**规则**：
+- ✅ 设计定时任务时，**必须考虑到各种边界情况**
+- ✅ 无主会话活动时，应切换到"技能复习模式"或"系统检查模式"
+- ✅ 确保定时任务在任何情况下都能产生价值
+
+**改进方向**：
+- 在无主会话时：进行技能复习和知识整理
+- 检查系统状态和性能
+- 规划未来的改进方向
+
+**应用到**：
+- 所有定时任务设计
+- 异常情况处理
+
+---
+
 ## 💡 关键认知升级（2026-05-18）
 
 ### ✅ 规则 1：永远不要重新创建品牌资产
@@ -138,13 +210,20 @@ _Only loaded in main sessions. Review daily files and keep what matters._
 - 所有任务应该服务于这个战略目标
 
 ### 今日任务对齐度
-- ✅ ArtShift 首页动画背景：**符合**长期战略
-- 提升品牌形象、提高用户参与度、展示技术实力
-- ⚠️ 需要注意性能优化，避免过度动画影响用户体验
+- ✅ 自我精进任务：**符合**长期战略
+- 提升自身能力、优化工作流程、提高服务质量
+- ⚠️ 需要注意定时任务的鲁棒性，考虑各种边界情况
 
 ---
 
 ## 📋 检查清单（未来工作参考）
+
+### 文件写入检查清单
+- [ ] 使用 qclaw-text-file skill 的 `write_file.py` 脚本
+- [ ] 写入前先探测平台（`--detect`）
+- [ ] 根据探测结果正确决策 `--platform` 参数
+- [ ] 先写临时文件，再调用脚本写入目标文件
+- [ ] 清理临时文件
 
 ### 提交前检查清单
 - [ ] 运行 `npm run build`（捕获 TypeScript 错误）
@@ -168,6 +247,11 @@ _Only loaded in main sessions. Review daily files and keep what matters._
 - [ ] 提供可调参数（props）
 - [ ] 清理工作：移除事件监听器、取消动画
 
+### 定时任务设计检查清单
+- [ ] 考虑到各种边界情况（如无主会话活动）
+- [ ] 确保在任何情况下都能产生价值
+- [ ] 提供 fallback 机制（如切换到技能复习模式）
+
 ---
 
 ## 🚨 错误案例库（避免再犯）
@@ -190,6 +274,18 @@ _Only loaded in main sessions. Review daily files and keep what matters._
 - **预防**：创建 Demo 前先确认实际使用场景；提供多版本 Demo
 - **状态**：✅ 已修复（创建白色背景版本）
 
+### 错误案例 4：直接使用 write 工具写入文本文件
+- **现象**：（潜在风险）Windows Excel 打开 CSV 时中文乱码
+- **原因**：未使用 qclaw-text-file skill，直接使用内置 write 工具
+- **预防**：所有文本文件写入必须使用 qclaw-text-file skill 的脚本
+- **状态**：✅ 已学习并修正（2026-05-19）
+
+### 错误案例 5：定时任务未考虑边界情况
+- **现象**：过去24小时无主会话活动时，自我精进任务价值有限
+- **原因**：任务设计未考虑到"无主会话活动"这一边界情况
+- **预防**：设计定时任务时必须考虑各种边界情况，确保任何情况下都能产生价值
+- **状态**：⏳ 待优化（计划增加"技能复习模式"）
+
 ---
 
-_更新时间：2026-05-18 02:10 GMT+8_
+_更新时间：2026-05-19 04:00 GMT+8_
