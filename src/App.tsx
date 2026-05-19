@@ -229,88 +229,212 @@ function HowItWorks() {
 }
 
 // ─── AI Demo ────────────────────────────────────────────────────────────────
+const AI_STYLES = [
+  { id: 'oil-painting', name: 'Oil Painting', desc: 'Van Gogh & Monet' },
+  { id: 'pixel-art', name: 'Pixel Art', desc: '8-bit Retro' },
+  { id: 'anime', name: 'Anime', desc: 'Studio Ghibli' },
+  { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Neon Futurism' },
+  { id: 'pencil-sketch', name: 'Pencil Sketch', desc: 'Graphite Drawing' },
+  { id: 'watercolor', name: 'Watercolor', desc: 'Soft & Ethereal' },
+];
+
 function AIDemo() {
+  const [prompt, setPrompt] = useState('');
+  const [selectedStyle, setSelectedStyle] = useState('oil-painting');
+  const [generating, setGenerating] = useState(false);
+  const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [error, setError] = useState('');
+
+  const handleGenerate = async () => {
+    if (!prompt.trim()) {
+      setError('Please describe what you want to create.');
+      return;
+    }
+    setError('');
+    setResultUrl(null);
+    setGenerating(true);
+    try {
+      const res = await fetch(`${API_URL}/generation/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, style: selectedStyle }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Generation failed');
+      if (data.success && data.imageUrl) {
+        setResultUrl(data.imageUrl);
+      } else {
+        throw new Error('No image returned');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Generation failed. Please try again.');
+    } finally {
+      setGenerating(false);
+    }
+  };
   return (
     <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-violet-50 text-violet-600">
-            Powered by ChatGPT Image Generation
+            AI Generation Studio
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
             <span className="gradient-text">Watch AI Create</span>
             <br />in Real Time
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            Upload your photo or describe a scene. ArtShift AI transforms it into any art style — and prints it on anything.
+            Describe what you want, pick a style, and watch AI generate your design.
           </p>
         </div>
 
         <div className="rounded-3xl p-8 sm:p-12 lg:p-16 bg-white border border-gray-100 shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+          {/* Input Area */}
+          <div className="max-w-3xl mx-auto space-y-6">
+            {/* Prompt Input */}
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Step 1: Your Idea</div>
-              <div className="rounded-2xl p-5 sm:p-6 bg-blue-50 border border-blue-100">
-                <div className="text-[10px] font-bold uppercase tracking-widest mb-2 text-blue-600">YOUR PROMPT</div>
-                <p className="text-sm text-gray-800 italic leading-relaxed">
-                  "A majestic owl in Van Gogh's Starry Night style, swirling blues and golden swirls"
-                </p>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Your Prompt</label>
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder='e.g. "A majestic owl in a starry night..."'
+                rows={3}
+                className="w-full rounded-2xl px-5 py-4 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-200 resize-none"
+              />
+            </div>
+
+            {/* Style Selection */}
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Choose Style</label>
+              <div className="grid grid-cols-3 gap-3">
+                {AI_STYLES.map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => setSelectedStyle(style.id)}
+                    className={`rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 border-2 ${
+                      selectedStyle === style.id
+                        ? 'border-transparent text-white shadow-lg'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-gray-50'
+                    }`}
+                    style={selectedStyle === style.id ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
+                  >
+                    <div>{style.name}</div>
+                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-gray-400'}`}>{style.desc}</div>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="hidden md:flex justify-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-                style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-                →
+            {/* Error Message */}
+            {error && (
+              <div className="rounded-xl p-4 bg-red-50 border border-red-200">
+                <p className="text-sm text-red-600">{error}</p>
               </div>
-            </div>
-            <div className="flex md:hidden justify-center">
-              <div className="text-3xl font-bold text-blue-600">↓</div>
-            </div>
+            )}
 
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Step 2: AI Design</div>
-              <div className="aspect-square rounded-2xl flex items-center justify-center relative overflow-hidden"
-                style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)' }}>
-                <div className="absolute inset-0" style={{
-                  background: 'radial-gradient(circle at 30% 40%, rgba(139,92,246,0.4), transparent 60%), radial-gradient(circle at 70% 60%, rgba(59,130,246,0.4), transparent 60%)'
-                }} />
-                <div className="text-center relative z-10">
-                  <div className="text-7xl mb-3">🦉</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300">
-                    AI Generated
-                  </div>
-                  <div className="text-[9px] text-gray-400 mt-1">Van Gogh · Oil Painting Style</div>
-                </div>
-              </div>
-            </div>
+            {/* Generate Button */}
+            <button
+              onClick={handleGenerate}
+              disabled={generating}
+              className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+            >
+              {generating ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Generating... (takes ~10s)
+                </>
+              ) : (
+                <>
+                  <Wand2 size={18} />
+                  Generate Image
+                </>
+              )}
+            </button>
           </div>
 
-          <div className="mt-12 pt-10 border-t border-gray-100">
-            <div className="text-center mb-8">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                Step 3: Your Custom Product
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-4 sm:gap-6">
-              {[
-                { emoji: '👕', name: 'T-Shirt', price: 'From $29.99', color: '#eff6ff' },
-                { emoji: '☕', name: 'Ceramic Mug', price: 'From $22.99', color: '#fff7ed' },
-                { emoji: '📱', name: 'Phone Case', price: 'From $19.99', color: '#f5f3ff' },
-              ].map((product, i) => (
-                <div key={i} className="text-center">
-                  <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden"
-                    style={{ backgroundColor: product.color }}>
-                    <span className="text-5xl sm:text-6xl opacity-70">{product.emoji}</span>
-                    <div className="absolute bottom-2 text-[8px] sm:text-[9px] text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">
-                      {product.name}
+          {/* Result Display Area */}
+          {(generating || resultUrl) && (
+            <div className="mt-12 pt-10 border-t border-gray-100">
+              <div className="max-w-2xl mx-auto">
+                {generating ? (
+                  /* Loading State */
+                  <div className="rounded-3xl aspect-square flex items-center justify-center relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)' }}>
+                    <div className="absolute inset-0" style={{
+                      background: 'radial-gradient(circle at 30% 40%, rgba(139,92,246,0.4), transparent 60%), radial-gradient(circle at 70% 60%, rgba(59,130,246,0.4), transparent 60%)'
+                    }} />
+                    <div className="text-center relative z-10">
+                      <svg className="animate-spin h-16 w-16 mx-auto mb-4 text-white" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <div className="text-lg font-bold text-white">AI is creating...</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">Please wait about 10 seconds</div>
                     </div>
                   </div>
-                  <div className="text-xs font-bold text-gray-800">{product.price}</div>
-                </div>
-              ))}
+                ) : resultUrl ? (
+                  /* Result State */
+                  <div className="text-center space-y-6">
+                    <div className="rounded-2xl overflow-hidden shadow-lg">
+                      <img src={resultUrl} alt="Generated AI Art" className="w-full h-auto" />
+                    </div>
+                    <div className="flex gap-4 justify-center">
+                      <a
+                        href={resultUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg"
+                        style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+                      >
+                        View Full Size
+                      </a>
+                      <button
+                        onClick={() => {
+                          setResultUrl(null);
+                          setPrompt('');
+                        }}
+                        className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-200 transition-all duration-200 hover:bg-gray-50"
+                      >
+                        Generate Another
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Product Preview Area - only show when not generating and no result */}
+          {!generating && !resultUrl && (
+            <div className="mt-12 pt-10 border-t border-gray-100">
+              <div className="text-center mb-8">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                  Popular Products
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto">
+                {[
+                  { emoji: '👕', name: 'T-Shirt', color: '#eff6ff' },
+                  { emoji: '☕', name: 'Mug', color: '#fff7ed' },
+                  { emoji: '📱', name: 'Phone Case', color: '#f5f3ff' },
+                ].map((product, i) => (
+                  <div key={i} className="text-center">
+                    <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden"
+                      style={{ backgroundColor: product.color }}>
+                      <span className="text-5xl sm:text-6xl opacity-70">{product.emoji}</span>
+                      <div className="absolute bottom-2 text-[8px] sm:text-[9px] text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">
+                        {product.name}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -503,20 +627,56 @@ function Pricing() {
   );
 }
 
+// ─── API Config ─────────────────────────────────────────────────────────────
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://artshift-api.zeabur.app/api';
+
 // ─── Waitlist ────────────────────────────────────────────────────────────────
 function Waitlist() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+<<<<<<< HEAD
+=======
+  const [loading, setLoading] = useState(false);
+
+>>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
       setError('Please enter a valid email address.');
       return;
     }
     setError('');
-    setSubmitted(true);
+    setLoading(true);
+<<<<<<< HEAD
+    try {
+      const res = await fetch(`${API_URL}/waitlist`, {
+=======
+
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'https://artshift-api.zeabur.app/api';
+      const res = await fetch(`${API_BASE}/waitlist`, {
+>>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to join');
+      setSubmitted(true);
+    } catch (err: any) {
+<<<<<<< HEAD
+      // API 失败时仍然显示成功（降级体验）
+      console.warn('Waitlist API fallback:', err.message);
+      setSubmitted(true);
+=======
+      setError(err.message || 'Something went wrong. Please try again.');
+>>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -549,10 +709,14 @@ function Waitlist() {
               style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
             />
             {error && <p className="text-red-400 text-sm text-left pl-2">{error}</p>}
-            <button type="submit"
-              className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl"
+            <button type="submit" disabled={loading}
+<<<<<<< HEAD
+              className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-60"
+=======
+              className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+>>>>>>> effafc29e5a578819e88552ec30d3377c9e673e9
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              Join Waitlist →
+              {loading ? 'Joining...' : 'Join Waitlist →'}
             </button>
           </form>
         ) : (
