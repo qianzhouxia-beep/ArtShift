@@ -1,0 +1,24 @@
+# 添加 Waitlist 函数到 App.tsx
+import os
+
+# 读取 App.tsx
+with open('App.tsx', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# 读取 Waitlist 函数
+waitlist_path = r'C:\Users\elvisq\.qclaw\workspace-ua58rsb93veqtxl7\temp_waitlist_component_txt'
+with open(waitlist_path, 'r', encoding='utf-8') as f:
+    waitlist = f.read()
+
+# 在最后的 } 之前插入 Waitlist 函数
+if content.endswith('}'):
+    content = content[:-1] + '\n' + waitlist + '\n}'
+else:
+    content += '\n' + waitlist
+
+# 写回 App.tsx
+with open('App.tsx', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+# 不打印 Unicode 字符（避免 Windows 控制台编码问题）
+print('Waitlist function appended to App.tsx')

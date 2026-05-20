@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+生成正确的 i18n.ts（内联翻译对象，避免 JSON 解析问题）
+"""
+
+import json
+import os
+
+# 读取英文翻译
+en_path = '../public/locales/en/translation.json'
+en_translation = {}
+if os.path.exists(en_path):
+    with open(en_path, 'r', encoding='utf-8') as f:
+        en_translation = json.load(f)
+    print('English translation loaded')
+else:
+    print('WARNING: English translation file not found')
+
+# 读取中文翻译
+zh_path = '../public/locales/zh/translation.json'
+zh_translation = {}
+if os.path.exists(zh_path):
+    with open(zh_path, 'r', encoding='utf-8') as f:
+        zh_translation = json.load(f)
+    print('Chinese translation loaded')
+else:
+    print('WARNING: Chinese translation file not found')
+
+# 生成 i18n.ts 内容
+content = f"""import i18n from 'i18next';
+import {{ initReactI18next }} from 'react-i18next';
+
+// English translations
+const enTranslation = {json.dumps(en_translation, ensure_ascii=False, indent=2)};
+
+// Chinese translations
+const zhTranslation = {json.dumps(zh_translation, ensure_ascii=False, indent=2)};
+
+// Resources
+const resources = {{
+  en: {{
+    translation: enTranslation
+  }},
+  zh: {{
+    translation: zhTranslation
+  }}
+}};
+
+i18n
+  .use(initReactI18next)
+  .init({{
+    resources,
+    lng: 'en',
+    fallbackLng: 'en',
+    interpolation: {{
+      escapeValue: false
+    }}
+  }});
+
+export default i18n;
+"""
+
+# 写入 i18n.ts
+output_path = 'i18n.ts'
+with open(output_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f'i18n.ts generated successfully')
+print(f'File size: {len(content)} bytes')

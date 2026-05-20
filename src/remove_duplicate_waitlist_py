@@ -1,0 +1,37 @@
+# 删除 App.tsx 中重复的 Waitlist 函数（保留第一个）
+with open('App.tsx', 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# 找到所有包含 'function Waitlist()' 的行号
+waitlist_lines = [i for i, line in enumerate(lines) if 'function Waitlist()' in line]
+
+if len(waitlist_lines) >= 2:
+    # 删除最后一个（我们刚刚添加的）
+    last_idx = waitlist_lines[-1]
+    
+    # 找到函数结束的 }（简单方法：从函数开始行向后找第一个顶格的 }）
+    end_idx = last_idx
+    brace_count = 0
+    found_start = False
+    
+    for i in range(last_idx, len(lines)):
+        if 'function Waitlist()' in lines[i]:
+            found_start = True
+            brace_count = 1
+            continue
+        if found_start:
+            brace_count += lines[i].count('{') - lines[i].count('}')
+            if brace_count == 0:
+                end_idx = i
+                break
+    
+    # 删除从 last_idx 到 end_idx 的行（包含）
+    del lines[last_idx:end_idx+1]
+    
+    # 写回文件
+    with open('App.tsx', 'w', encoding='utf-8') as f:
+        f.writelines(lines)
+    
+    print(f'✅ 已删除重复的 Waitlist 函数（第 {last_idx+1} 行）')
+else:
+    print('⚠️ 没有找到重复的 Waitlist 函数')

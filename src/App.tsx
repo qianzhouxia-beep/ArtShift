@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Sparkles, Zap, Globe, ShieldCheck, Star, ArrowRight,
   ChevronDown,
@@ -10,12 +11,12 @@ import ParticleBackground from './ParticleBackground';
 
 // ─── Style Gallery Data ───────────────────────────────────────────────────────
 const styleGallery = [
-  { src: '/images/styles/style-oil-painting.png', title: 'Oil Painting', desc: 'Van Gogh & Monet' },
-  { src: '/images/styles/style-pixel-art.png', title: 'Pixel Art', desc: '8-bit Retro' },
-  { src: '/images/styles/style-anime.png', title: 'Anime', desc: 'Studio Ghibli' },
-  { src: '/images/styles/style-cyberpunk.png', title: 'Cyberpunk', desc: 'Neon Futurism' },
-  { src: '/images/styles/style-pencil-sketch.png', title: 'Pencil Sketch', desc: 'Graphite Drawing' },
-  { src: '/images/styles/style-watercolor.png', title: 'Watercolor', desc: 'Soft & Ethereal' },
+  { src: '/images/styles/style-oil-painting.png', titleKey: 'styleGallery.oil_painting', descKey: 'styleGallery.oil_painting_desc' },
+  { src: '/images/styles/style-pixel-art.png', titleKey: 'styleGallery.pixel_art', descKey: 'styleGallery.pixel_art_desc' },
+  { src: '/images/styles/style-anime.png', titleKey: 'styleGallery.anime', descKey: 'styleGallery.anime_desc' },
+  { src: '/images/styles/style-cyberpunk.png', titleKey: 'styleGallery.cyberpunk', descKey: 'styleGallery.cyberpunk_desc' },
+  { src: '/images/styles/style-pencil-sketch.png', titleKey: 'styleGallery.pencil_sketch', descKey: 'styleGallery.pencil_sketch_desc' },
+  { src: '/images/styles/style-watercolor.png', titleKey: 'styleGallery.watercolor', descKey: 'styleGallery.watercolor_desc' },
 ];
 
 // ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
@@ -28,7 +29,19 @@ function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
 // ─── Navbar ────────────────────────────────────────────────────────────────
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = ['How It Works', 'Products', 'Pricing', 'FAQ'];
+  const { t, i18n } = useTranslation();
+  
+  const links = [
+    { key: 'navbar.howItWorks', id: 'how-it-works' },
+    { key: 'navbar.products', id: 'products' },
+    { key: 'navbar.pricing', id: 'pricing' },
+    { key: 'navbar.faq', id: 'faq' },
+  ];
+  
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+  
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center bg-white/25 backdrop-blur-xl border-b border-white/20 shadow-lg" style={{ backdropFilter: 'blur(20px)' }}>
       <div className="flex items-center gap-3">
@@ -37,16 +50,33 @@ function Navbar() {
         </div>
         <div className="flex items-center gap-4 sm:gap-8 rounded-2xl px-5 sm:px-8 py-2.5 sm:py-3 shadow-sm bg-white">
           {links.map(l => (
-            <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
+            <a key={l.key} href={`#${l.id}`}
               className="text-[12px] sm:text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors duration-200 hidden sm:block">
-              {l}
+              {t(l.key)}
             </a>
           ))}
           <a href="#waitlist"
             className="text-[12px] sm:text-[13px] font-semibold text-white rounded-full px-5 py-1.5 transition-all duration-200"
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-            Join Waitlist
+            {t('navbar.joinWaitlist')}
           </a>
+          {/* Language Switcher */}
+          <div className="flex items-center gap-2 ml-4">
+            <button
+              onClick={() => changeLanguage('en')}
+              className="text-[11px] font-semibold px-2 py-1 rounded-md transition-all duration-200 hover:bg-gray-100"
+              style={{ color: i18n.language === 'en' ? '#3b82f6' : '#9ca3af' }}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => changeLanguage('zh')}
+              className="text-[11px] font-semibold px-2 py-1 rounded-md transition-all duration-200 hover:bg-gray-100"
+              style={{ color: i18n.language === 'zh' ? '#3b82f6' : '#9ca3af' }}
+            >
+              中文
+            </button>
+          </div>
           <button className="sm:hidden text-gray-500" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -55,10 +85,10 @@ function Navbar() {
       {menuOpen && (
         <div className="absolute top-full mt-2 left-0 right-0 flex flex-col items-center gap-3 p-4 rounded-2xl shadow-lg bg-white">
           {links.map(l => (
-            <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
+            <a key={l.key} href={`#${l.id}`}
               className="text-[13px] font-medium text-gray-600 hover:text-gray-900 transition-colors"
               onClick={() => setMenuOpen(false)}>
-              {l}
+              {t(l.key)}
             </a>
           ))}
         </div>
@@ -66,10 +96,13 @@ function Navbar() {
     </nav>
   );
 }
-
 // ─── Floating Icon Component ────────────────────────────────────────────────
 function FloatingIcon({ icon, x, y, delay, opacity = 0.12 }: {
-  icon: React.ReactNode; x: string; y: string; delay: string; size?: number; opacity?: number;
+  icon: React.ReactNode;
+  x: string; y: string;
+  delay: string;
+  size?: number;
+  opacity?: number;
 }) {
   return (
     <div
@@ -88,6 +121,8 @@ function FloatingIcon({ icon, x, y, delay, opacity = 0.12 }: {
 
 // ─── Hero Section ──────────────────────────────────────────────────────────
 function HeroSection() {
+  const { t } = useTranslation();
+  
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden bg-white/95">
       {/* Floating Lucide icons — crisp vector, not emoji */}
@@ -119,44 +154,41 @@ function HeroSection() {
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-1.5 mb-5 text-[12px] font-semibold rounded-full px-4 py-1.5 bg-blue-50 text-blue-600">
             <Sparkles size={13} />
-            Launching Soon — US · Europe · Worldwide
+            {t('hero.badge')}
           </div>
 
           <h1 className="text-[2rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3.5rem] leading-[1.1] font-extrabold tracking-tight mb-5">
-            <span className="text-gray-900">Shift Your </span>
-            <span className="gradient-text">Photos Into</span>
+            <span className="text-gray-900">{t('hero.title_1')} </span>
+            <span className="gradient-text">{t('hero.title_2')}</span>
             <br />
-            <span className="text-gray-900">Wearables </span>
-            <span className="text-gradient-warm">In Seconds</span>
+            <span className="text-gray-900">{t('hero.title_3')} </span>
+            <span className="text-gradient-warm">{t('hero.title_4')}</span>
           </h1>
 
           <p className="text-[15px] sm:text-[16px] text-gray-700 font-normal mb-8 max-w-lg leading-relaxed">
-            Upload a photo or describe your idea. AI transforms it into{' '}
-            <span className="font-semibold text-gray-900">stunning art</span>{' '}
-            — then we print it on T-shirts, hoodies, mugs &amp; phone cases.
-            Zero design skills. Shipped worldwide.
+            {t('hero.subtitle')}
           </p>
 
           <div className="flex flex-wrap gap-4 items-center mb-10">
             <a href="#waitlist"
               className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105 hover:shadow-xl"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              Get Early Access <ArrowRight size={16} />
+              {t('hero.cta_primary')} <ArrowRight size={16} />
             </a>
             <a href="#how-it-works"
               className="inline-flex items-center gap-2 text-[14px] font-semibold text-gray-700 border border-gray-200 rounded-full px-8 py-4 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 bg-white">
-              See How It Works <ChevronDown size={15} />
+              {t('hero.cta_secondary')} <ChevronDown size={15} />
             </a>
           </div>
 
           <div className="flex flex-wrap gap-6 text-[11px] text-gray-400 font-medium">
             {[
-              { icon: '✓', text: 'Upload photo or describe idea' },
-              { icon: '✓', text: 'AI art in 10+ styles' },
-              { icon: '✓', text: 'Ships to 30+ countries' },
+              { icon: '✓', textKey: 'hero.feature_1' },
+              { icon: '✓', textKey: 'hero.feature_2' },
+              { icon: '✓', textKey: 'hero.feature_3' },
             ].map(item => (
-              <span key={item.text} className="flex items-center gap-1.5">
-                <span style={{ color: '#3b82f6' }}>{item.icon}</span> {item.text}
+              <span key={item.textKey} className="flex items-center gap-1.5">
+                <span style={{ color: '#3b82f6' }}>{item.icon}</span> {t(item.textKey)}
               </span>
             ))}
           </div>
@@ -168,25 +200,26 @@ function HeroSection() {
 
 // ─── How It Works ──────────────────────────────────────────────────────────
 function HowItWorks() {
+  const { t } = useTranslation();
   const steps = [
     {
       num: '01',
-      title: 'Describe Your Vision',
-      desc: 'Type anything: "a cyberpunk cat on Mars" or "watercolor mountain landscape." The more creative, the better.',
+      titleKey: 'howItWorks.step_1_title',
+      descKey: 'howItWorks.step_1_desc',
       image: '/images/step1-describe-vision.png',
       color: '#3b82f6',
     },
     {
       num: '02',
-      title: 'AI Generates Designs',
-      desc: 'Our AI instantly creates 4 unique designs. Pick your favorite, tweak the style, or regenerate for fresh ideas.',
+      titleKey: 'howItWorks.step_2_title',
+      descKey: 'howItWorks.step_2_desc',
       image: '/images/step2-ai-generates.png',
       color: '#8b5cf6',
     },
     {
       num: '03',
-      title: 'We Print & Ship',
-      desc: 'Choose your product and size. We print with premium quality and ship directly to your door — anywhere worldwide.',
+      titleKey: 'howItWorks.step_3_title',
+      descKey: 'howItWorks.step_3_desc',
       image: '/images/step3-print-ship.png',
       color: '#f97316',
     },
@@ -197,14 +230,14 @@ function HowItWorks() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            The Process
+            {t('howItWorks.badge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            Three steps.{' '}
-            <span className="gradient-text">Infinite designs.</span>
+            {t('howItWorks.title_1')}{' '}
+            <span className="gradient-text">{t('howItWorks.title_2')}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            From idea to your doorstep in days. No design skills. No complicated tools.
+            {t('howItWorks.subtitle')}
           </p>
         </div>
 
@@ -213,13 +246,13 @@ function HowItWorks() {
             <div key={i}
               className="rounded-3xl p-8 sm:p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-white border border-gray-100">
               <div className="rounded-2xl overflow-hidden mb-6 bg-gray-50">
-                <img src={step.image} alt={step.title} className="w-full h-auto object-cover" loading="lazy" />
+                <img src={step.image} alt={t(step.titleKey)} className="w-full h-auto object-cover" loading="lazy" />
               </div>
               <div className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: step.color }}>
                 {step.num}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{t(step.titleKey)}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{t(step.descKey)}</p>
             </div>
           ))}
         </div>
@@ -228,14 +261,50 @@ function HowItWorks() {
   );
 }
 
+// ─── Style Gallery ─────────────────────────────────────────────────────────
+function StyleGallery() {
+  const { t } = useTranslation();
+  
+  return (
+    <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
+      <div className="max-w-6xl mx-auto text-center">
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
+          <span className="gradient-text">{t('styleGallery.title_1')}</span>{' '}
+          {t('styleGallery.title_2')}
+        </h2>
+        <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
+          {t('styleGallery.subtitle')}
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+          {styleGallery.map((style) => (
+            <div
+              key={style.titleKey}
+              className="group cursor-pointer"
+            >
+              <div className="aspect-square rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300 mb-3">
+                <img
+                  src={style.src}
+                  alt={t(style.titleKey)}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <h3 className="font-semibold text-gray-900 text-sm">{t(style.titleKey)}</h3>
+              <p className="text-gray-400 text-xs">{t(style.descKey)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 // ─── AI Demo ────────────────────────────────────────────────────────────────
 const AI_STYLES = [
-  { id: 'oil-painting', name: 'Oil Painting', desc: 'Van Gogh & Monet' },
-  { id: 'pixel-art', name: 'Pixel Art', desc: '8-bit Retro' },
-  { id: 'anime', name: 'Anime', desc: 'Studio Ghibli' },
-  { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Neon Futurism' },
-  { id: 'pencil-sketch', name: 'Pencil Sketch', desc: 'Graphite Drawing' },
-  { id: 'watercolor', name: 'Watercolor', desc: 'Soft & Ethereal' },
+  { id: 'oil-painting', nameKey: 'styleGallery.oil_painting', descKey: 'styleGallery.oil_painting_desc' },
+  { id: 'pixel-art', nameKey: 'styleGallery.pixel_art', descKey: 'styleGallery.pixel_art_desc' },
+  { id: 'anime', nameKey: 'styleGallery.anime', descKey: 'styleGallery.anime_desc' },
+  { id: 'cyberpunk', nameKey: 'styleGallery.cyberpunk', descKey: 'styleGallery.cyberpunk_desc' },
+  { id: 'pencil-sketch', nameKey: 'styleGallery.pencil_sketch', descKey: 'styleGallery.pencil_sketch_desc' },
+  { id: 'watercolor', nameKey: 'styleGallery.watercolor', descKey: 'styleGallery.watercolor_desc' },
 ];
 
 function AIDemo() {
@@ -244,10 +313,11 @@ function AIDemo() {
   const [generating, setGenerating] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      setError('Please describe what you want to create.');
+      setError(t('aiDemo.error_no_prompt'));
       return;
     }
     setError('');
@@ -272,19 +342,20 @@ function AIDemo() {
       setGenerating(false);
     }
   };
+  
   return (
     <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-violet-50 text-violet-600">
-            AI Generation Studio
+            {t('aiDemo.badge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            <span className="gradient-text">Watch AI Create</span>
-            <br />in Real Time
+            <span className="gradient-text">{t('aiDemo.title')}</span>
+            <br />{t('aiDemo.title_suffix')}
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            Describe what you want, pick a style, and watch AI generate your design.
+            {t('aiDemo.subtitle')}
           </p>
         </div>
 
@@ -293,11 +364,11 @@ function AIDemo() {
           <div className="max-w-3xl mx-auto space-y-6">
             {/* Prompt Input */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Your Prompt</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t('aiDemo.prompt_label')}</label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder='e.g. "A majestic owl in a starry night..."'
+                placeholder={t('aiDemo.prompt_placeholder')}
                 rows={3}
                 className="w-full rounded-2xl px-5 py-4 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-200 resize-none"
               />
@@ -305,7 +376,7 @@ function AIDemo() {
 
             {/* Style Selection */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Choose Style</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">{t('aiDemo.style_label')}</label>
               <div className="grid grid-cols-3 gap-3">
                 {AI_STYLES.map((style) => (
                   <button
@@ -318,8 +389,8 @@ function AIDemo() {
                     }`}
                     style={selectedStyle === style.id ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
                   >
-                    <div>{style.name}</div>
-                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-gray-400'}`}>{style.desc}</div>
+                    <div>{t(style.nameKey)}</div>
+                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-gray-400'}`}>{t(style.descKey)}</div>
                   </button>
                 ))}
               </div>
@@ -345,12 +416,12 @@ function AIDemo() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Generating... (takes ~10s)
+                  {t('aiDemo.generating_text')}
                 </>
               ) : (
                 <>
                   <Wand2 size={18} />
-                  Generate Image
+                  {t('aiDemo.generate_button')}
                 </>
               )}
             </button>
@@ -372,8 +443,8 @@ function AIDemo() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <div className="text-lg font-bold text-white">AI is creating...</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">Please wait about 10 seconds</div>
+                      <div className="text-lg font-bold text-white">{t('aiDemo.generating_title')}</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">{t('aiDemo.generating_hint')}</div>
                     </div>
                   </div>
                 ) : resultUrl ? (
@@ -390,7 +461,7 @@ function AIDemo() {
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg"
                         style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
                       >
-                        View Full Size
+                        {t('aiDemo.view_full_size')}
                       </a>
                       <button
                         onClick={() => {
@@ -399,7 +470,7 @@ function AIDemo() {
                         }}
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-200 transition-all duration-200 hover:bg-gray-50"
                       >
-                        Generate Another
+                        {t('aiDemo.generate_another')}
                       </button>
                     </div>
                   </div>
@@ -413,21 +484,21 @@ function AIDemo() {
             <div className="mt-12 pt-10 border-t border-gray-100">
               <div className="text-center mb-8">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                  Popular Products
+                  {t('aiDemo.popular_products')}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto">
                 {[
-                  { emoji: '👕', name: 'T-Shirt', color: '#eff6ff' },
-                  { emoji: '☕', name: 'Mug', color: '#fff7ed' },
-                  { emoji: '📱', name: 'Phone Case', color: '#f5f3ff' },
+                  { emoji: '👕', nameKey: 'aiDemo.t_shirt', color: '#3b82f6' },
+                  { emoji: '☕', nameKey: 'aiDemo.mug', color: '#8b5cf6' },
+                  { emoji: '📱', nameKey: 'aiDemo.phone_case', color: '#10b981' },
                 ].map((product, i) => (
                   <div key={i} className="text-center">
                     <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden"
                       style={{ backgroundColor: product.color }}>
                       <span className="text-5xl sm:text-6xl opacity-70">{product.emoji}</span>
                       <div className="absolute bottom-2 text-[8px] sm:text-[9px] text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">
-                        {product.name}
+                        {t(product.nameKey)}
                       </div>
                     </div>
                   </div>
@@ -440,15 +511,15 @@ function AIDemo() {
     </section>
   );
 }
-
-// ─── Products ────────────────────────────────────────────────────────────────
+// ─── Products ─────────────────────────────────────────────────────────────
 function Products() {
+  const { t } = useTranslation();
   const products = [
-    { emoji: '👕', name: 'T-Shirt', desc: 'Premium cotton, multiple colors', price: 'From $29.99', badge: 'Most Popular', badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
-    { emoji: '🧥', name: 'Hoodie', desc: 'Soft fleece, Unisex fit', price: 'From $44.99', badge: 'Cozy', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
-    { emoji: '☕', name: 'Mug', desc: '11oz ceramic, dishwasher safe', price: 'From $22.99', badge: null, colors: ['bg-white', 'bg-gray-900'] },
-    { emoji: '📱', name: 'Phone Case', desc: 'Snap & clear, all models', price: 'From $19.99', badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
-    { emoji: '🧢', name: 'Cap', desc: 'Adjustable, premium weave', price: 'From $24.99', badge: 'New', badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
+    { emoji: '👕', nameKey: 'products.t_shirt_name', descKey: 'products.t_shirt_desc', priceKey: 'products.t_shirt_price', badgeKey: 'products.t_shirt_badge', badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
+    { emoji: '🧥', nameKey: 'products.hoodie_name', descKey: 'products.hoodie_desc', priceKey: 'products.hoodie_price', badgeKey: 'products.hoodie_badge', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
+    { emoji: '☕', nameKey: 'products.mug_name', descKey: 'products.mug_desc', priceKey: 'products.mug_price', badge: null, colors: ['bg-white', 'bg-gray-900'] },
+    { emoji: '📱', nameKey: 'products.phone_case_name', descKey: 'products.phone_case_desc', priceKey: 'products.phone_case_price', badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
+    { emoji: '🧢', nameKey: 'products.cap_name', descKey: 'products.cap_desc', priceKey: 'products.cap_price', badgeKey: 'products.cap_badge', badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
   ];
 
   return (
@@ -456,14 +527,14 @@ function Products() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-orange-50 text-orange-600">
-            Product Line
+            {t('products.badge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            Your art.{' '}
-            <span className="gradient-text">Any surface.</span>
+            {t('products.title_1')}{' '}
+            <span className="gradient-text">{t('products.title_2')}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            5 premium products. Printed with care. Shipped worldwide from local warehouses.
+            {t('products.subtitle')}
           </p>
         </div>
 
@@ -471,20 +542,20 @@ function Products() {
           {products.map((p, i) => (
             <div key={i}
               className="rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer bg-white border border-gray-100">
-              {p.badge && (
+              {p.badgeKey && (
                 <div className="text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 text-center"
                   style={{ backgroundColor: p.badgeBg, color: p.badgeColor }}>
-                  {p.badge}
+                  {t(p.badgeKey)}
                 </div>
               )}
               <div className="aspect-square flex items-center justify-center bg-slate-50">
                 <span className="text-6xl sm:text-7xl">{p.emoji}</span>
               </div>
               <div className="p-4 sm:p-5">
-                <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">{p.name}</h4>
-                <p className="text-[10px] sm:text-[11px] text-gray-500 mb-3">{p.desc}</p>
+                <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">{t(p.nameKey)}</h4>
+                <p className="text-[10px] sm:text-[11px] text-gray-500 mb-3">{t(p.descKey)}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-blue-600">{p.price}</span>
+                  <span className="text-sm font-bold text-blue-600">{t(p.priceKey)}</span>
                   <div className="flex gap-1">
                     {p.colors.map((c, j) => (
                       <div key={j} className={`w-3 h-3 rounded-full ${c} border border-gray-200`} />
@@ -502,13 +573,14 @@ function Products() {
 
 // ─── Why ArtShift ─────────────────────────────────────────────────────────────
 function WhyArtShift() {
+  const { t } = useTranslation();
   const features = [
-    { icon: <Sparkles size={20} />, title: 'ChatGPT Image Generation powered', desc: 'The world\'s most advanced AI models, fine-tuned for design generation', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: <Layers size={20} />, title: '10+ art styles', desc: 'Photorealistic, anime, oil painting, cyberpunk, minimalism, and more', color: '#8b5cf6', bg: '#f5f3ff' },
-    { icon: <Zap size={20} />, title: 'One order. No minimum.', desc: 'Print on demand. No inventory, no waste, no commitment', color: '#f97316', bg: '#fff7ed' },
-    { icon: <Globe size={20} />, title: 'Global production network', desc: 'Printful\'s local warehouses in US, UK, EU & Australia for fastest delivery', color: '#10b981', bg: '#ecfdf5' },
-    { icon: <ShieldCheck size={20} />, title: 'Premium print quality', desc: 'DTG (Direct-to-Garment) printing for vibrant, durable designs', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: <CreditCard size={20} />, title: 'Secure payments', desc: 'Stripe-powered. All major cards, PayPal, Apple Pay & Google Pay accepted', color: '#8b5cf6', bg: '#f5f3ff' },
+    { icon: <Sparkles size={20} />, titleKey: 'whyArtShift.feature_1_title', descKey: 'whyArtShift.feature_1_desc', color: '#3b82f6', bg: '#eff6ff' },
+    { icon: <Layers size={20} />, titleKey: 'whyArtShift.feature_2_title', descKey: 'whyArtShift.feature_2_desc', color: '#8b5cf6', bg: '#f5f3ff' },
+    { icon: <Zap size={20} />, titleKey: 'whyArtShift.feature_3_title', descKey: 'whyArtShift.feature_3_desc', color: '#f97316', bg: '#fff7ed' },
+    { icon: <Globe size={20} />, titleKey: 'whyArtShift.feature_4_title', descKey: 'whyArtShift.feature_4_desc', color: '#10b981', bg: '#ecfdf5' },
+    { icon: <ShieldCheck size={20} />, titleKey: 'whyArtShift.feature_5_title', descKey: 'whyArtShift.feature_5_desc', color: '#3b82f6', bg: '#eff6ff' },
+    { icon: <CreditCard size={20} />, titleKey: 'whyArtShift.feature_6_title', descKey: 'whyArtShift.feature_6_desc', color: '#8b5cf6', bg: '#f5f3ff' },
   ];
 
   return (
@@ -517,20 +589,20 @@ function WhyArtShift() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
             <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-              Why ArtShift
+              {t('whyArtShift.badge')}
             </span>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
-              Not a{' '}
-              <span className="gradient-text">designer?</span>
-              <br />No problem.
+              {t('whyArtShift.title_1')}{' '}
+              <span className="gradient-text">{t('whyArtShift.title_2')}</span>
+              <br />{t('whyArtShift.title_3')}
             </h2>
             <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">
-              Traditional custom printing requires design skills or expensive tools. ArtShift puts creative power in everyone's hands — with the most advanced AI image generation.
+              {t('whyArtShift.subtitle')}
             </p>
             <a href="#waitlist"
               className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              Start Creating Free <ArrowRight size={16} />
+              {t('hero.cta_primary')} <ArrowRight size={16} />
             </a>
           </div>
 
@@ -542,8 +614,8 @@ function WhyArtShift() {
                   style={{ color: f.color }}>
                   {f.icon}
                 </div>
-                <div className="font-bold text-gray-900 text-sm mb-1">{f.title}</div>
-                <div className="text-xs text-gray-600 leading-relaxed">{f.desc}</div>
+                <div className="font-bold text-gray-900 text-sm mb-1">{t(f.titleKey)}</div>
+                <div className="text-xs text-gray-600 leading-relaxed">{t(f.descKey)}</div>
               </div>
             ))}
           </div>
@@ -552,13 +624,17 @@ function WhyArtShift() {
     </section>
   );
 }
-
 // ─── Testimonials ──────────────────────────────────────────────────────────
 function Testimonials() {
+  const { t } = useTranslation();
   const reviews = [
-    { name: 'Alex M.', country: '🇺🇸 USA', text: 'I had zero design skills. Printed a custom hoodie with my cat in Van Gogh style. It looks incredible.', rating: 5 },
-    { name: 'Sophie L.', country: '🇩🇪 Germany', text: 'Ordered from Germany, arrived in 5 days. The print quality is better than any store-bought shirt.', rating: 5 },
-    { name: 'James K.', country: '🇬🇧 UK', text: 'Made personalized mugs for my entire team. They loved it. Will order again for sure.', rating: 5 },
+    { nameKey: 'testimonials.review_1_name', countryKey: 'testimonials.review_1_country', textKey: 'testimonials.review_1_text', rating: 5 },
+    { nameKey: 'testimonials.review_2_name', countryKey: 'testimonials.review_2_country', textKey: 'testimonials.review_2_text', rating: 5 },
+    { nameKey: 'testimonials.review_3_name', countryKey: 'testimonials.review_3_country', textKey: 'testimonials.review_3_text', rating: 5 },
+    // P1 优化：扩充到 8-12 条（这里先加 3 条示例）
+    { nameKey: 'testimonials.review_4_name', countryKey: 'testimonials.review_4_country', textKey: 'testimonials.review_4_text', rating: 5 },
+    { nameKey: 'testimonials.review_5_name', countryKey: 'testimonials.review_5_country', textKey: 'testimonials.review_5_text', rating: 5 },
+    { nameKey: 'testimonials.review_6_name', countryKey: 'testimonials.review_6_country', textKey: 'testimonials.review_6_text', rating: 5 },
   ];
 
   return (
@@ -566,11 +642,11 @@ function Testimonials() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600">
-            Real Reviews
+            {t('testimonials.badge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
-            Loved by{' '}
-            <span className="gradient-text">early testers</span>
+            {t('testimonials.title_1')}{' '}
+            <span className="gradient-text">{t('testimonials.title_2')}</span>
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -582,15 +658,15 @@ function Testimonials() {
                   <Star key={j} size={14} fill="#f97316" color="#f97316" />
                 ))}
               </div>
-              <p className="text-gray-700 text-sm leading-relaxed mb-5 italic">"{r.text}"</p>
+              <p className="text-gray-700 text-sm leading-relaxed mb-5 italic">"{t(r.textKey)}"</p>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
                   style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-                  {r.name[0]}
+                  {t(r.nameKey)[0]}
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 text-sm">{r.name}</div>
-                  <div className="text-xs text-gray-500">{r.country}</div>
+                  <div className="font-semibold text-gray-900 text-sm">{t(r.nameKey)}</div>
+                  <div className="text-xs text-gray-500">{t(r.countryKey)}</div>
                 </div>
               </div>
             </div>
@@ -603,124 +679,25 @@ function Testimonials() {
 
 // ─── Pricing ────────────────────────────────────────────────────────────────
 function Pricing() {
+  const { t } = useTranslation();
   return (
     <section id="pricing" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            Pricing
+            {t('pricing.badge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            <span className="gradient-text">Coming Soon</span>
+            <span className="gradient-text">{t('pricing.title')}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mb-8">
-            Join the waitlist to get early bird pricing when we launch.
+            {t('pricing.subtitle')}
           </p>
           <a href="#waitlist"
             className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-            Get Early Bird Pricing <ArrowRight size={16} />
+            {t('pricing.cta')} <ArrowRight size={16} />
           </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── API Config ─────────────────────────────────────────────────────────────
-const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
-
-// ─── Waitlist ────────────────────────────────────────────────────────────────
-function Waitlist() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !email.includes('@')) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-    setError('');
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_URL}/waitlist`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to join');
-      setSubmitted(true);
-    } catch (err: any) {
-      // API 失败时仍然显示成功（降级体验）
-      console.warn('Waitlist API fallback:', err.message);
-      setSubmitted(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <section id="waitlist" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28" style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81, #1e1b4b)' }}>
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-8 bg-white shadow-lg">
-          <ArtShiftLogo className="w-10 h-10" />
-        </div>
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-5">
-          Be the{' '}
-          <span style={{ background: 'linear-gradient(135deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            first
-          </span>
-          {' '}to create.
-        </h2>
-        <p className="text-gray-300 text-base sm:text-lg mb-10 max-w-lg mx-auto leading-relaxed">
-          Join the waitlist and get{' '}
-          <span className="font-bold text-white">early access</span> when we launch — plus an exclusive{' '}
-          <span style={{ color: '#fbbf24' }} className="font-bold">20% off</span> on your first order.
-        </p>
-
-        {!submitted ? (
-          <form onSubmit={handleSubmit} className="space-y-3 max-w-md mx-auto">
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="w-full rounded-2xl px-6 py-4 text-sm text-white placeholder-gray-400 outline-none transition-all duration-200"
-              style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
-            />
-            {error && <p className="text-red-400 text-sm text-left pl-2">{error}</p>}
-            <button type="submit" disabled={loading}
-              className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              {loading ? 'Joining...' : 'Join Waitlist →'}
-            </button>
-          </form>
-        ) : (
-          <div className="rounded-2xl p-6 max-w-md mx-auto"
-            style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <div className="text-4xl mb-3">🎉</div>
-            <p className="text-white font-semibold text-lg mb-1">You're in!</p>
-            <p className="text-gray-300 text-sm">We'll notify you when we launch. Check your inbox for a confirmation.</p>
-          </div>
-        )}
-
-        <p className="text-gray-500 text-[11px] mt-5">No spam. Unsubscribe anytime. We respect your inbox.</p>
-
-        <div className="mt-12 pt-10 grid grid-cols-3 gap-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          {[
-            { num: '500+', label: 'On Waitlist' },
-            { num: '30+', label: 'Countries' },
-            { num: '5', label: 'Product Types' },
-          ].map((s, i) => (
-            <div key={i}>
-              <div className="text-3xl sm:text-4xl font-extrabold text-white mb-1">{s.num}</div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-400">{s.label}</div>
-            </div>
-          ))}
         </div>
       </div>
     </section>
@@ -730,13 +707,14 @@ function Waitlist() {
 // ─── FAQ ────────────────────────────────────────────────────────────────────
 function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const { t } = useTranslation();
   const faqs = [
-    { q: 'How does the AI design generation work?', a: 'Simply describe what you want in plain English. Our AI — powered by ChatGPT Image Generation and Stable Diffusion XL — generates 4 unique designs based on your description. You can regenerate, adjust styles, or pick your favorite.' },
-    { q: 'Where do you ship to?', a: 'We ship to 30+ countries worldwide via Printful\'s global production network. This includes the United States, Canada, all EU countries, UK, Australia, Japan, and more. US/EU typically 3-7 business days, other regions 7-14 business days.' },
-    { q: 'How long does production and shipping take?', a: 'Production typically takes 2-5 business days. Shipping adds 2-7 business days depending on location. You\'ll receive a tracking number via email as soon as your order ships.' },
-    { q: 'What payment methods do you accept?', a: 'We accept all major credit cards (Visa, Mastercard, Amex), PayPal, Apple Pay, Google Pay, and Shop Pay. All transactions are processed securely via Stripe.' },
-    { q: 'Can I upload my own photo?', a: 'Yes! You can upload JPG, PNG, or WebP files up to 20MB. Our AI will transform your photo into various artistic styles — cartoon, anime, oil painting, sketch — and then apply it to any product.' },
-    { q: 'What\'s your return policy?', a: 'Since all products are custom-printed specifically for you, we cannot accept returns for changed minds. However, if your item arrives damaged or defective, we\'ll replace it at no cost. Contact us within 7 days of delivery with photos.' },
+    { qKey: 'faq.q_1', aKey: 'faq.a_1' },
+    { qKey: 'faq.q_2', aKey: 'faq.a_2' },
+    { qKey: 'faq.q_3', aKey: 'faq.a_3' },
+    { qKey: 'faq.q_4', aKey: 'faq.a_4' },
+    { qKey: 'faq.q_5', aKey: 'faq.a_5' },
+    { qKey: 'faq.q_6', aKey: 'faq.a_6' },
   ];
 
   return (
@@ -744,11 +722,11 @@ function FAQ() {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            FAQ
+            {t('faq.badge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
-            Questions,{' '}
-            <span className="gradient-text">answered</span>
+            {t('faq.title_1')}{' '}
+            <span className="gradient-text">{t('faq.title_2')}</span>
           </h2>
         </div>
 
@@ -759,7 +737,7 @@ function FAQ() {
               <button
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
                 className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left">
-                <span className="font-semibold text-gray-900 text-sm sm:text-base">{faq.q}</span>
+                <span className="font-semibold text-gray-900 text-sm sm:text-base">{t(faq.qKey)}</span>
                 <span className="text-lg font-light transition-transform duration-200 flex-shrink-0 text-blue-500"
                   style={{ transform: openIdx === i ? 'rotate(45deg)' : 'rotate(0deg)' }}>
                   +
@@ -767,7 +745,7 @@ function FAQ() {
               </button>
               {openIdx === i && (
                 <div className="px-6 pb-5">
-                  <p className="text-gray-600 text-sm leading-relaxed">{faq.a}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">{t(faq.aKey)}</p>
                 </div>
               )}
             </div>
@@ -780,6 +758,7 @@ function FAQ() {
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="py-16 px-6 sm:px-12 md:px-20 lg:px-28 bg-gray-950">
       <div className="max-w-6xl mx-auto">
@@ -790,32 +769,32 @@ function Footer() {
               <span className="font-extrabold text-white tracking-tight text-lg">ArtShift</span>
             </div>
             <p className="text-gray-500 text-sm max-w-xs">
-              AI-powered custom products. Turn your imagination into wearable art.
+              {t('footer.description')}
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Platform</div>
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t('footer.platform')}</div>
               <div className="space-y-3">
-                {['How It Works', 'Products', 'Pricing'].map(l => (
+                {[t('footer.howItWorks'), t('footer.products'), t('footer.pricing')].map(l => (
                   <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Company</div>
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t('footer.company')}</div>
               <div className="space-y-3">
-                {['About', 'Blog', 'Contact'].map(l => (
+                {[t('footer.about'), t('footer.blog'), t('footer.contact')].map(l => (
                   <a key={l} href="#"
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Legal</div>
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t('footer.legal')}</div>
               <div className="space-y-3">
-                {['Privacy Policy', 'Terms of Service', 'Refund Policy'].map(l => (
+                {[t('footer.privacyPolicy'), t('footer.termsOfService'), t('footer.refundPolicy')].map(l => (
                   <a key={l} href="#"
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
@@ -824,7 +803,7 @@ function Footer() {
           </div>
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-white/10">
-          <p className="text-[11px] text-gray-600 uppercase tracking-widest">© 2026 ArtShift. All rights reserved.</p>
+          <p className="text-[11px] text-gray-600 uppercase tracking-widest">{t('footer.copyright')}</p>
           <div className="flex items-center gap-5">
             {/* Social links will be added when accounts are set up */}
           </div>
@@ -833,40 +812,8 @@ function Footer() {
     </footer>
   );
 }
-
-// ─── Style Gallery ─────────────────────────────────────────────────────────
-function StyleGallery() {
-  return (
-    <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
-      <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-          <span className="gradient-text">Any Style</span> You Can Imagine
-        </h2>
-        <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
-          From classic oil paintings to cyberpunk — our AI transforms your photo into the style you choose.
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-          {styleGallery.map((style) => (
-            <div
-              key={style.title}
-              className="group cursor-pointer"
-            >
-              <div className="aspect-square rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300 mb-3">
-                <img
-                  src={style.src}
-                  alt={style.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <h3 className="font-semibold text-gray-900 text-sm">{style.title}</h3>
-              <p className="text-gray-400 text-xs">{style.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+// ─── API Config ─────────────────────────────────────────────────────────────
+const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
 
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
@@ -911,3 +858,106 @@ export default function App() {
     </div>
   );
 }
+
+
+// ─── Waitlist Component ─────────────────────────────────────────────────
+function Waitlist() {
+  const { t } = useTranslation();
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus('loading');
+    setMessage('');
+
+    try {
+      const response = await fetch(`${API_URL}/waitlist/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus('success');
+        setMessage(t('waitlist.success_text'));
+        setEmail('');
+      } else {
+        setStatus('error');
+        setMessage(data.error || 'Something went wrong');
+      }
+    } catch (error) {
+      setStatus('error');
+      setMessage('Network error. Please try again.');
+    }
+  };
+
+  return (
+    <section id="waitlist" className="py-20 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-sm font-medium mb-6">
+          {t('waitlist.title_1')} <span className="text-blue-400">{t('waitlist.title_2')}</span> {t('waitlist.title_3')}
+        </div>
+
+        <h2 className="text-4xl sm:text-5xl font-extrabold mb-6">
+          {t('waitlist.title_1')} <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{t('waitlist.title_2')}</span> {t('waitlist.title_3')}
+        </h2>
+
+        <p className="text-lg text-gray-300 mb-10 max-w-xl mx-auto">
+          {t('waitlist.subtitle')}
+        </p>
+
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+          <div className="flex gap-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t('waitlist.email_placeholder')}
+              className="flex-1 px-5 py-3.5 rounded-full text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={status === 'loading' || status === 'success'}
+            />
+            <button
+              type="submit"
+              disabled={status === 'loading' || status === 'success'}
+              className="px-8 py-3.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50"
+            >
+              {status === 'loading' ? t('waitlist.loading') : t('waitlist.button')}
+            </button>
+          </div>
+        </form>
+
+        {message && (
+          <div className={`mt-4 text-sm ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+            {message}
+          </div>
+        )}
+
+        <div className="flex justify-center gap-8 mt-10 text-sm text-gray-400">
+          <div>
+            <span className="text-2xl font-bold text-white">{t('waitlist.stat_1_num')}</span>
+            <span className="ml-2">{t('waitlist.stat_1_label')}</span>
+          </div>
+          <div>
+            <span className="text-2xl font-bold text-white">{t('waitlist.stat_2_num')}</span>
+            <span className="ml-2">{t('waitlist.stat_2_label')}</span>
+          </div>
+          <div>
+            <span className="text-2xl font-bold text-white">{t('waitlist.stat_3_num')}</span>
+            <span className="ml-2">{t('waitlist.stat_3_label')}</span>
+          </div>
+        </div>
+
+        <p className="text-xs text-gray-500 mt-8">{t('waitlist.footer')}</p>
+      </div>
+    </section>
+  );
+}
+
+
+// ─── Waitlist Component ─────────────────────────────────────────────────
