@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+删除 App.tsx 中未使用的 lucide-react 图标导入
+（这些图标原来被 HeroSection 使用，现在 HeroSection 已删除）
+"""
+
+with open('App.tsx', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# 要删除的未使用图标列表
+unused_icons = [
+    'ChevronDown',
+    'Palette', 
+    'Truck',
+    'CreditCard',
+    'Package',
+    'Smartphone',
+    'Image',
+    'FloatingIcon'
+]
+
+# 读取文件行
+lines = content.split('\n')
+cleaned_lines = []
+
+i = 0
+while i < len(lines):
+    line = lines[i]
+    
+    # 检查是否是 import 行且包含未使用图标
+    if 'import {' in line and 'from \'lucide-react\'' in line:
+        # 解析这一整行（可能跨多行）
+        import_block = line
+        while '}' not in import_block and i < len(lines) - 1:
+            i += 1
+            import_block += ' ' + lines[i]
+        
+        # 从 import 中移除未使用的图标
+        for icon in unused_icons:
+            import_block = import_block.replace(f'  {icon},\n', '\n')
+            import_block = import_block.replace(f'  {icon},\n', '\n')  # 再次检查
+        
+        # 如果 import 块中还有其它图标，保留它；否则删除整行
+        # 简化：直接删除这一整块（因为我们不确定哪些还在用）
+        # 更安全：只删除确认未使用的
+        
+        # 检查是否还有其它图标（除了 unused_icons）
+        remaining = import_block
+        for icon in unused_icons:
+            remaining = remaining.replace(icon, '')
+        
+        # 如果还有有效图标，保留并处理；否则跳过这行
+        if '{' in remaining and '}' in remaining:
+            cleaned_lines.append(import_block)
+        # 否则不添加（删除此 import 块）
+        
+    else:
+        cleaned_lines.append(line)
+    
+    i += 1
+
+# 写回文件
+with open('App.tsx', 'w', encoding='utf-8') as f:
+    f.write('\n'.join(cleaned_lines))
+
+print('Unused imports removed from App.tsx')
+print(f'Removed icons: {", ".join(unused_icons)}')

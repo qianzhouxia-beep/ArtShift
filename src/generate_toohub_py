@@ -1,0 +1,368 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+生成 TOONHUBHero.tsx 组件
+"""
+
+content = '''import { useState, useEffect, useCallback, useMemo } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+
+// ─── Google Fonts (load in index.html head) ─────────────────────────
+// <link rel="preconnect" href="https://fonts.googleapis.com" />
+// <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+// <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+// ─── Image Data ───────────────────────────────────────────────────────
+const IMAGES = [
+  {
+    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/1.02464a56.png',
+    bg: '#F4845F',
+    panel: '#F79B7F',
+  },
+  {
+    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/2.b977faab.png',
+    bg: '#6BBF7A',
+    panel: '#85CC92',
+  },
+  {
+    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/3.4df853b4.png',
+    bg: '#E882B4',
+    panel: '#ED9DC4',
+  },
+  {
+    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/4.4457fbce.png',
+    bg: '#6EB5FF',
+    panel: '#8DC4FF',
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────
+export default function TOONHUBHero() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+
+  // Preload images on mount
+  useEffect(() => {
+    IMAGES.forEach((img) => {
+      const image = new Image();
+      image.src = img.src;
+    });
+  }, []);
+
+  // Handle resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Navigation
+  const navigate = useCallback(
+    (direction: 'next' | 'prev') => {
+      if (isAnimating) return;
+      setIsAnimating(true);
+      setActiveIndex((prev) => {
+        if (direction === 'next') return (prev + 1) % 4;
+        return (prev + 3) % 4; // +3 instead of -1 to avoid negative
+      });
+      setTimeout(() => setIsAnimating(false), 650);
+    },
+    [isAnimating]
+  );
+
+  // Derived roles
+  const roles = useMemo(() => {
+    const center = activeIndex;
+    const left = (activeIndex + 3) % 4;
+    const right = (activeIndex + 1) % 4;
+    const back = (activeIndex + 2) % 4;
+    return { center, left, right, back };
+  }, [activeIndex]);
+
+  return (
+    <div
+      style={{
+        backgroundColor: IMAGES[activeIndex].bg,
+        transition: 'background-color 650ms cubic-bezier(0.4, 0, 0.2, 1)',
+        fontFamily: "'Inter', sans-serif",
+      }}
+      className="relative w-full overflow-hidden"
+    >
+      <div className="relative w-full" style={{ height: '100vh', overflow: 'hidden' }}>
+        {/* 1. Rain Overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ zIndex: 50 }}
+        >
+          <svg
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              opacity: 0.4,
+              backgroundSize: '200px 200px',
+              backgroundRepeat: 'repeat',
+            }}
+          >
+            <filter id="noiseFilter">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.9"
+                numOctaves="4"
+                stitchTiles="stitch"
+              />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noiseFilter)" opacity="0.08" />
+          </svg>
+        </div>
+
+        {/* 2. Giant Ghost Text "3D SHAPE" */}
+        <div
+          className="absolute inset-x-0 flex items-center justify-center pointer-events-none select-none"
+          style={{
+            top: '18%',
+            zIndex: 2,
+            fontSize: 'clamp(90px, 28vw, 380px)',
+            fontWeight: 900,
+            color: 'white',
+            opacity: 1,
+            lineHeight: 1,
+            textTransform: 'uppercase',
+            letterSpacing: '-0.02em',
+            whiteSpace: 'nowrap',
+            fontFamily: "'Anton', sans-serif",
+          }}
+        >
+          3D SHAPE
+        </div>
+
+        {/* 3. Top-left Brand Label */}
+        <div
+          className="absolute top-6 left-4 sm:left-8"
+          style={{
+            zIndex: 60,
+            fontSize: '12px',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            color: 'white',
+            opacity: 0.9,
+            letterSpacing: '0.18em',
+          }}
+        >
+          TOONHUB
+        </div>
+
+        {/* 4. Carousel */}
+        <div className="absolute inset-0" style={{ zIndex: 3 }}>
+          {IMAGES.map((image, index) => {
+            // Determine role
+            let role = '';
+            if (index === roles.center) role = 'center';
+            else if (index === roles.left) role = 'left';
+            else if (index === roles.right) role = 'right';
+            else role = 'back';
+
+            // Role-based styles
+            let style: React.CSSProperties = {
+              position: 'absolute',
+              aspectRatio: '0.6 / 1',
+              transition: `
+                transform 650ms cubic-bezier(0.4, 0, 0.2, 1),
+                filter 650ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 650ms cubic-bezier(0.4, 0, 0.2, 1),
+                left 650ms cubic-bezier(0.4, 0, 0.2, 1)
+              `,
+              willChange: 'transform, filter, opacity',
+            };
+
+            if (role === 'center') {
+              style = {
+                ...style,
+                transform: `translateX(-50%) scale(${isMobile ? 1.25 : 1.68})`,
+                filter: 'blur(0px)',
+                opacity: 1,
+                zIndex: 20,
+                left: '50%',
+                height: isMobile ? '60%' : '92%',
+                bottom: isMobile ? '22%' : 0,
+              };
+            } else if (role === 'left') {
+              style = {
+                ...style,
+                transform: 'translateX(-50%) scale(1)',
+                filter: 'blur(2px)',
+                opacity: 0.85,
+                zIndex: 10,
+                left: isMobile ? '20%' : '30%',
+                height: isMobile ? '16%' : '28%',
+                bottom: isMobile ? '32%' : '12%',
+              };
+            } else if (role === 'right') {
+              style = {
+                ...style,
+                transform: 'translateX(-50%) scale(1)',
+                filter: 'blur(2px)',
+                opacity: 0.85,
+                zIndex: 10,
+                left: isMobile ? '80%' : '70%',
+                height: isMobile ? '16%' : '28%',
+                bottom: isMobile ? '32%' : '12%',
+              };
+            } else {
+              // back
+              style = {
+                ...style,
+                transform: 'translateX(-50%) scale(1)',
+                filter: 'blur(4px)',
+                opacity: 1,
+                zIndex: 5,
+                left: '50%',
+                height: isMobile ? '13%' : '22%',
+                bottom: isMobile ? '32%' : '12%',
+              };
+            }
+
+            return (
+              <div key={index} style={style}>
+                <img
+                  src={image.src}
+                  alt={`TOONHUB Figurine ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    objectPosition: 'bottom center',
+                  }}
+                  draggable={false}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 5. Bottom-left Text + Nav Buttons */}
+        <div
+          className="absolute bottom-6 left-4 sm:bottom-20 sm:left-24"
+          style={{
+            zIndex: 60,
+            maxWidth: '320px',
+          }}
+        >
+          <p
+            style={{
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.18em',
+              marginBottom: '8px',
+              fontSize: '14px',
+              color: 'white',
+              opacity: 0.95,
+            }}
+            className="sm:mb-3 sm:text-base sm:text-[22px]"
+          >
+            TOONHUB FIGURINES
+          </p>
+
+          <p
+            className="hidden sm:block"
+            style={{
+              fontSize: '12px',
+              color: 'white',
+              opacity: 0.85,
+              lineHeight: 1.6,
+              marginBottom: '16px',
+            }}
+            className="sm:mb-5 sm:text-sm"
+          >
+            The artwork is stunning, shipped fully prepared. The finish is a vision, the 3D craft is flawless. Many thanks! Wishing you the win. Order now.
+          </p>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => navigate('prev')}
+              className="flex items-center justify-center transition-all duration-150 hover:scale-108"
+              style={{
+                width: isMobile ? '48px' : '64px',
+                height: isMobile ? '48px' : '64px',
+                borderRadius: '50%',
+                backgroundColor: 'transparent',
+                border: '2px solid white',
+                color: 'white',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <ArrowLeft size={isMobile ? 20 : 26} strokeWidth={2.25} />
+            </button>
+
+            <button
+              onClick={() => navigate('next')}
+              className="flex items-center justify-center transition-all duration-150 hover:scale-108"
+              style={{
+                width: isMobile ? '48px' : '64px',
+                height: isMobile ? '48px' : '64px',
+                borderRadius: '50%',
+                backgroundColor: 'transparent',
+                border: '2px solid white',
+                color: 'white',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <ArrowRight size={isMobile ? 20 : 26} strokeWidth={2.25} />
+            </button>
+          </div>
+        </div>
+
+        {/* 6. Bottom-right Link "DISCOVER IT" */}
+        <div
+          className="absolute bottom-6 right-4 sm:bottom-20 sm:right-10"
+          style={{ zIndex: 60 }}
+        >
+          <a
+            href="#"
+            className="flex items-center transition-opacity duration-200 hover:opacity-100"
+            style={{
+              fontFamily: "'Anton', sans-serif",
+              fontSize: 'clamp(20px, 4vw, 56px)',
+              fontWeight: 400,
+              color: 'white',
+              opacity: 0.95,
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+            }}
+          >
+            DISCOVER IT
+            <ArrowRight
+              className="ml-2"
+              style={{ width: isMobile ? '20px' : '32px', height: isMobile ? '20px' : '32px' }}
+              strokeWidth={2.25}
+            />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+'''
+
+# 写入文件
+with open('TOONHUBHero.tsx', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('TOONHUBHero.tsx generated successfully')
+print(f'File size: {len(content)} bytes')

@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+终极修复：删除 HeroSection 函数（Line 123-863，1-indexed）
+然后添加 TOONHUBHero 导入并替换使用
+"""
+
+with open('App.tsx', 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# 1. 删除 Line 123-863 (1-indexed) = lines[122:863] (0-indexed)
+# 注意：Python slice 是 [start:end)，end 不包含
+# Line 123 → index 122, Line 863 → index 862
+# 所以要删除 lines[122:863] (863 是 Waitlist 的开始索引)
+print(f'Total lines before: {len(lines)}')
+print(f'Deleting lines 123-863 (0-indexed: 122-862)')
+
+# 删除 HeroSection 函数
+del lines[122:863]
+
+print(f'Total lines after deletion: {len(lines)}')
+
+# 2. 添加 TOONHUBHero 导入（在 lucide-react 导入之后）
+content = ''.join(lines)
+import_stmt = "import TOONHUBHero from './TOONHUBHero';\n"
+
+lucide_end = content.find("from 'lucide-react';")
+if lucide_end != -1:
+    line_end = content.find('\n', lucide_end)
+    if line_end != -1:
+        content = content[:line_end+1] + import_stmt + content[line_end+1:]
+
+# 3. 替换 <HeroSection /> 为 <TOONHUBHero />
+content = content.replace('<HeroSection />', '<TOONHUBHero />')
+
+# 写回文件
+with open('App.tsx', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('SUCCESS:')
+print('  - Deleted HeroSection function (lines 123-863)')
+print('  - Added TOONHUBHero import')
+print('  - Replaced <HeroSection /> with <TOONHUBHero />')

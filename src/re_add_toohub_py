@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+重新添加 TOONHUBHero 导入和使用到 App.tsx
+（在删除 HeroSection 函数之后）
+"""
+
+with open('App.tsx', 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# 1. 添加 TOONHUBHero 导入（在 lucide-react 导入之后）
+import_stmt = "import TOONHUBHero from './TOONHUBHero';\n"
+
+# 找到 lucide-react 导入的位置
+lucide_import_end = content.find("from 'lucide-react';")
+if lucide_import_end != -1:
+    # 找到该行末尾
+    line_end = content.find('\n', lucide_import_end)
+    if line_end != -1:
+        content = content[:line_end+1] + import_stmt + content[line_end+1:]
+
+# 2. 替换 <HeroSection /> 为 <TOONHUBHero />
+content = content.replace('<HeroSection />', '<TOONHUBHero />')
+
+# 写回文件
+with open('App.tsx', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('App.tsx updated successfully')
+print('  - Added TOONHUBHero import')
+print('  - Replaced <HeroSection /> with <TOONHUBHero />')
