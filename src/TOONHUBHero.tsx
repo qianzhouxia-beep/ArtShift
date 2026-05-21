@@ -114,7 +114,7 @@ export default function TOONHUBHero() {
           </svg>
         </div>
 
-        {/* 2. Giant Ghost Text "3D SHAPE" */}
+        {/* 2. Giant Ghost Text "AI ART" */}
         <div
           className="absolute inset-x-0 flex items-center justify-center pointer-events-none select-none"
           style={{
@@ -131,7 +131,7 @@ export default function TOONHUBHero() {
             fontFamily: "'Anton', sans-serif",
           }}
         >
-          3D SHAPE
+          AI ART
         </div>
 
         {/* 3. Top-left Brand Label */}
@@ -147,7 +147,7 @@ export default function TOONHUBHero() {
             letterSpacing: '0.18em',
           }}
         >
-          TOONHUB
+          ARTSHIFT
         </div>
 
         {/* 4. Carousel */}
@@ -258,7 +258,7 @@ export default function TOONHUBHero() {
             }}
             className="sm:mb-3 sm:text-base sm:text-[22px]"
           >
-            TOONHUB FIGURINES
+            ARTSHIFT COLLECTION
           </p>
 
           <p
@@ -271,7 +271,7 @@ export default function TOONHUBHero() {
               marginBottom: '16px',
             }}
           >
-            The artwork is stunning, shipped fully prepared. The finish is a vision, the 3D craft is flawless. Many thanks! Wishing you the win. Order now.
+            Transform your ideas into stunning AI art. Print on premium products. Ships worldwide. Join our waitlist for early access.
           </p>
 
           <div className="flex gap-4">
@@ -319,17 +319,17 @@ export default function TOONHUBHero() {
           </div>
         </div>
 
-        {/* 6. Bottom-right Link "DISCOVER IT" */}
+        {/* 6. Bottom-right CTA "JOIN WAITLIST" */}
         <div
           className="absolute bottom-6 right-4 sm:bottom-20 sm:right-10"
           style={{ zIndex: 60 }}
         >
           <a
-            href="#"
+            href="#waitlist"
             className="flex items-center transition-opacity duration-200 hover:opacity-100"
             style={{
               fontFamily: "'Anton', sans-serif",
-              fontSize: 'clamp(20px, 4vw, 56px)',
+              fontSize: 'clamp(18px, 3.5vw, 48px)',
               fontWeight: 400,
               color: 'white',
               opacity: 0.95,
@@ -339,10 +339,10 @@ export default function TOONHUBHero() {
               textDecoration: 'none',
             }}
           >
-            DISCOVER IT
+            JOIN WAITLIST
             <ArrowRight
               className="ml-2"
-              style={{ width: isMobile ? '20px' : '32px', height: isMobile ? '20px' : '32px' }}
+              style={{ width: isMobile ? '18px' : '28px', height: isMobile ? '18px' : '28px' }}
               strokeWidth={2.25}
             />
           </a>

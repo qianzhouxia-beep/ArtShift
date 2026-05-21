@@ -405,33 +405,8 @@ function AIDemo() {
             </div>
           )}
 
-          {/* Product Preview Area */}
-          {!generating && !resultUrl && (
-            <div className="mt-12 pt-10 border-t border-gray-100">
-              <div className="text-center mb-8">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                  {t('aiDemo.popular_products')}
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto">
-                {[
-                  { emoji: '👕', nameKey: 'aiDemo.t_shirt', color: '#3b82f6' },
-                  { emoji: '☕', nameKey: 'aiDemo.mug', color: '#8b5cf6' },
-                  { emoji: '📱', nameKey: 'aiDemo.phone_case', color: '#10b981' },
-                ].map((product, i) => (
-                  <div key={i} className="text-center">
-                    <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden"
-                      style={{ backgroundColor: product.color }}>
-                      <span className="text-5xl sm:text-6xl opacity-70">{product.emoji}</span>
-                      <div className="absolute bottom-2 text-[8px] sm:text-[9px] text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">
-                        {t(product.nameKey)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Product Preview Area - removed emoji placeholders for cleaner look */}
+          {!generating && !resultUrl && null}
         </div>
       </div>
     </section>
