@@ -1,22 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
-  Sparkles, Zap, Globe, ShieldCheck, Star, ArrowRight,
-  CreditCard, Menu, X,
-  Layers, Wand2,
+  Zap, Menu, X,
+  Wand2, Truck,
   ArrowUp,
 } from 'lucide-react';
-import TOONHUBHero from './TOONHUBHero';
-
-// ─── Style Gallery Data ───────────────────────────────────────────────────────
-const styleGallery = [
-  { src: '/images/styles/style-oil-painting.png', titleKey: 'styleGallery.oil_painting', descKey: 'styleGallery.oil_painting_desc' },
-  { src: '/images/styles/style-pixel-art.png', titleKey: 'styleGallery.pixel_art', descKey: 'styleGallery.pixel_art_desc' },
-  { src: '/images/styles/style-anime.png', titleKey: 'styleGallery.anime', descKey: 'styleGallery.anime_desc' },
-  { src: '/images/styles/style-cyberpunk.png', titleKey: 'styleGallery.cyberpunk', descKey: 'styleGallery.cyberpunk_desc' },
-  { src: '/images/styles/style-pencil-sketch.png', titleKey: 'styleGallery.pencil_sketch', descKey: 'styleGallery.pencil_sketch_desc' },
-  { src: '/images/styles/style-watercolor.png', titleKey: 'styleGallery.watercolor', descKey: 'styleGallery.watercolor_desc' },
-];
 
 // ─── Logo Image ──────────────────────────────────────────────────────────────
 function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
@@ -29,155 +16,192 @@ function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { t, i18n } = useTranslation();
   
   const links = [
-    { key: 'navbar.howItWorks', id: 'how-it-works' },
-    { key: 'navbar.products', id: 'products' },
-    { key: 'navbar.pricing', id: 'pricing' },
-    { key: 'navbar.faq', id: 'faq' },
+    { key: 'Home', id: 'hero' },
+    { key: 'How It Works', id: 'how-it-works' },
+    { key: 'Products', id: 'products' },
+    { key: 'FAQ', id: 'faq' },
   ];
-  
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
 
   useEffect(() => {
     const handleScroll = () => {
-      // After scrolling past the hero (100vh), switch to solid navbar
-      setScrolled(window.scrollY > window.innerHeight * 0.8);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-500 ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled 
-        ? 'bg-white/90 backdrop-blur-xl border-b border-gray-200 shadow-lg' 
+        ? 'bg-white shadow-md' 
         : 'bg-transparent'
     }`}>
-      <div className="flex items-center gap-3">
-        <div className={`flex items-center justify-center rounded-full w-10 h-10 sm:w-11 sm:h-11 shadow-sm transition-colors duration-500 ${
-          scrolled ? 'bg-white' : 'bg-white/20 backdrop-blur-sm'
-        }`}>
-          <ArtShiftLogo className="w-5 h-5 sm:w-6 sm:h-6" />
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <ArtShiftLogo className="w-8 h-8" />
+          <span className="font-extrabold text-xl tracking-tight text-gray-900">ArtShift</span>
         </div>
-        <div className={`flex items-center gap-4 sm:gap-8 rounded-2xl px-5 sm:px-8 py-2.5 sm:py-3 shadow-sm transition-colors duration-500 ${
-          scrolled ? 'bg-white' : 'bg-white/15 backdrop-blur-md'
-        }`}>
+        
+        <div className="hidden md:flex items-center gap-8">
           {links.map(l => (
             <a key={l.key} href={`#${l.id}`}
-              className={`text-[12px] sm:text-[13px] font-medium transition-colors duration-500 hidden sm:block ${
-                scrolled ? 'text-gray-500 hover:text-gray-900' : 'text-white/80 hover:text-white'
+              className={`text-sm font-medium transition-colors ${
+                scrolled ? 'text-gray-600 hover:text-gray-900' : 'text-gray-700 hover:text-black'
               }`}>
-              {t(l.key)}
+              {l.key}
             </a>
           ))}
           <a href="#waitlist"
-            className={`text-[12px] sm:text-[13px] font-semibold text-white rounded-full px-5 py-1.5 transition-all duration-200 ${
-              scrolled ? '' : 'bg-white/20 backdrop-blur-sm hover:bg-white/30'
-            }`}
-            style={scrolled ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}>
-            {t('navbar.joinWaitlist')}
+            className="text-sm font-bold text-white rounded-full px-6 py-2.5 transition-all duration-200 hover:shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}>
+            JOIN WAITLIST
           </a>
-          <div className="flex items-center gap-2 ml-4">
-            <button
-              onClick={() => changeLanguage('en')}
-              className={`text-[11px] font-semibold px-2 py-1 rounded-md transition-all duration-500 ${
-                scrolled ? 'hover:bg-gray-100' : 'hover:bg-white/10'
-              }`}
-              style={{ color: i18n.language === 'en' ? (scrolled ? '#3b82f6' : '#93c5fd') : (scrolled ? '#9ca3af' : 'rgba(255,255,255,0.6)') }}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => changeLanguage('zh')}
-              className={`text-[11px] font-semibold px-2 py-1 rounded-md transition-all duration-500 ${
-                scrolled ? 'hover:bg-gray-100' : 'hover:bg-white/10'
-              }`}
-              style={{ color: i18n.language === 'zh' ? (scrolled ? '#3b82f6' : '#93c5fd') : (scrolled ? '#9ca3af' : 'rgba(255,255,255,0.6)') }}
-            >
-              中文
-            </button>
-          </div>
-          <button className={`sm:hidden transition-colors duration-500 ${
-            scrolled ? 'text-gray-500' : 'text-white'
-          }`} onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
         </div>
+        
+        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
+      
       {menuOpen && (
-        <div className="absolute top-full mt-2 left-0 right-0 flex flex-col items-center gap-3 p-4 rounded-2xl shadow-lg bg-white">
+        <div className="md:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-3">
           {links.map(l => (
             <a key={l.key} href={`#${l.id}`}
-              className="text-[13px] font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="block text-sm font-medium text-gray-600 hover:text-gray-900 py-2"
               onClick={() => setMenuOpen(false)}>
-              {t(l.key)}
+              {l.key}
             </a>
           ))}
+          <a href="#waitlist"
+            className="block text-sm font-bold text-white rounded-full px-6 py-2.5 text-center"
+            style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
+            onClick={() => setMenuOpen(false)}>
+            JOIN WAITLIST
+          </a>
         </div>
       )}
     </nav>
   );
 }
 
-// ─── How It Works ──────────────────────────────────────────────────────────
+// ─── New Hero Section ─────────────────────────────────────────────────────
+function NewHero() {
+  return (
+    <section id="hero" className="min-h-screen bg-[#FAFAFA] flex items-center justify-center px-6 pt-20 pb-12 relative overflow-hidden">
+      {/* Floating Labels */}
+      <div className="absolute top-32 left-8 md:left-16 animate-bounce">
+        <div className="bg-[#FACC15] text-[#111111] text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+          <Zap size={14} fill="#111111" /> AI Generated in 30s
+        </div>
+      </div>
+      
+      <div className="absolute top-48 right-8 md:right-16 animate-pulse">
+        <div className="bg-[#8B5CF6] text-white text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+          ✨ 2,847+ Designs Created
+        </div>
+      </div>
+      
+      <div className="absolute bottom-32 left-8 md:left-24 animate-bounce delay-100">
+        <div className="bg-[#FACC15] text-[#111111] text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+          ✨ Free Worldwide Shipping
+        </div>
+      </div>
+      
+      <div className="absolute bottom-48 right-8 md:right-24 animate-pulse delay-150">
+        <div className="bg-[#8B5CF6] text-white text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5">
+          💜 Trending: Cyberpunk Style
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto text-center z-10">
+        <div className="mb-8 flex justify-center">
+          {/* Phone Mockup - CSS Drawing */}
+          <div className="relative w-64 h-[500px] bg-white rounded-[3rem] shadow-2xl border-8 border-gray-900 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-6 bg-gray-900 rounded-t-[2.5rem] flex items-end justify-center pb-1">
+              <div className="w-20 h-1 bg-gray-700 rounded-full"></div>
+            </div>
+            <div className="pt-8 px-4 h-full bg-gradient-to-br from-purple-100 to-blue-100 flex flex-col">
+              <div className="text-[10px] font-bold text-gray-400 mb-2">AI GENERATING...</div>
+              <div className="flex-1 bg-white rounded-2xl shadow-inner flex items-center justify-center">
+                <div className="text-center p-4">
+                    <div className="text-xs font-semibold text-gray-700">Cyberpunk Cat</div>
+                    <div className="text-[10px] text-gray-400 mt-1">Style: Cyberpunk</div>
+                  </div>
+              </div>
+              <div className="mt-3 space-y-1.5">
+                <div className="h-2 bg-purple-200 rounded-full w-3/4 mx-auto"></div>
+                <div className="h-2 bg-blue-200 rounded-full w-1/2 mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight text-[#111111] mb-4 leading-none">
+          TURN YOUR<br />IDEAS INTO
+        </h1>
+        <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-none" style={{ color: '#8B5CF6' }}>
+          WEARABLE ART
+        </h1>
+        <p className="text-lg md:text-xl text-[#666666] font-medium mb-10 max-w-2xl mx-auto">
+          AI-Powered Custom Prints on Demand
+        </p>
+        
+        <a href="#waitlist"
+          className="inline-flex items-center gap-3 text-lg font-bold text-white rounded-full px-12 py-5 transition-all duration-200 hover:shadow-2xl hover:scale-105"
+          style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}>
+          JOIN WAITLIST →
+        </a>
+      </div>
+    </section>
+  );
+}
+
+// ─── How It Works (Simplified) ───────────────────────────────────────────
 function HowItWorks() {
-  const { t } = useTranslation();
   const steps = [
     {
-      num: '01',
-      titleKey: 'howItWorks.step_1_title',
-      descKey: 'howItWorks.step_1_desc',
-      image: '/images/step1-describe-vision.png',
-      color: '#3b82f6',
+      icon: <Wand2 size={32} strokeWidth={1.5} />,
+      title: 'Describe',
+      description: 'Type your wildest idea',
+      color: '#3B82F6',
     },
     {
-      num: '02',
-      titleKey: 'howItWorks.step_2_title',
-      descKey: 'howItWorks.step_2_desc',
-      image: '/images/step2-ai-generates.png',
-      color: '#8b5cf6',
+      icon: <Wand2 size={32} strokeWidth={1.5} />,
+      title: 'Generate',
+      description: 'AI creates in 30 seconds',
+      color: '#8B5CF6',
     },
     {
-      num: '03',
-      titleKey: 'howItWorks.step_3_title',
-      descKey: 'howItWorks.step_3_desc',
-      image: '/images/step3-print-ship.png',
-      color: '#f97316',
+      icon: <Truck size={32} strokeWidth={1.5} />,
+      title: 'Receive',
+      description: 'Get it delivered worldwide',
+      color: '#FACC15',
     },
   ];
 
   return (
-    <section id="how-it-works" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section id="how-it-works" className="py-20 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            {t('howItWorks.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            {t('howItWorks.title_1')}{' '}
-            <span className="gradient-text">{t('howItWorks.title_2')}</span>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#111111] mb-4">
+            HOW IT WORKS
           </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            {t('howItWorks.subtitle')}
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
           {steps.map((step, i) => (
-            <div key={i}
-              className="rounded-3xl p-8 sm:p-10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl bg-white border border-gray-100">
-              <div className="rounded-2xl overflow-hidden mb-6 bg-gray-50">
-                <img src={step.image} alt={t(step.titleKey)} className="w-full h-auto object-cover" loading="lazy" />
+            <div key={i} className="text-center">
+              <div 
+                className="w-20 h-20 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+                style={{ backgroundColor: `${step.color}15`, color: step.color }}
+              >
+                {step.icon}
               </div>
-              <div className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: step.color }}>
-                {step.num}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{t(step.titleKey)}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{t(step.descKey)}</p>
+              <div className="text-lg font-bold text-[#111111] mb-1">{step.title}</div>
+              <div className="text-sm text-[#666666]">{step.description}</div>
             </div>
           ))}
         </div>
@@ -186,51 +210,14 @@ function HowItWorks() {
   );
 }
 
-// ─── Style Gallery ─────────────────────────────────────────────────────────
-function StyleGallery() {
-  const { t } = useTranslation();
-  
-  return (
-    <section className="py-12 px-6 sm:px-12 md:px-20 bg-white">
-      <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-          <span className="gradient-text">{t('styleGallery.title_1')}</span>{' '}
-          {t('styleGallery.title_2')}
-        </h2>
-        <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
-          {t('styleGallery.subtitle')}
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
-          {styleGallery.map((style) => (
-            <div
-              key={style.titleKey}
-              className="group cursor-pointer"
-            >
-              <div className="aspect-square rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300 mb-3">
-                <img
-                  src={style.src}
-                  alt={t(style.titleKey)}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <h3 className="font-semibold text-gray-900 text-sm">{t(style.titleKey)}</h3>
-              <p className="text-gray-400 text-xs">{t(style.descKey)}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── AI Demo ────────────────────────────────────────────────────────────────
+// ─── AI Demo (Optimized) ─────────────────────────────────────────────────
 const AI_STYLES = [
-  { id: 'oil-painting', nameKey: 'styleGallery.oil_painting', descKey: 'styleGallery.oil_painting_desc' },
-  { id: 'pixel-art', nameKey: 'styleGallery.pixel_art', descKey: 'styleGallery.pixel_art_desc' },
-  { id: 'anime', nameKey: 'styleGallery.anime', descKey: 'styleGallery.anime_desc' },
-  { id: 'cyberpunk', nameKey: 'styleGallery.cyberpunk', descKey: 'styleGallery.cyberpunk_desc' },
-  { id: 'pencil-sketch', nameKey: 'styleGallery.pencil_sketch', descKey: 'styleGallery.pencil_sketch_desc' },
-  { id: 'watercolor', nameKey: 'styleGallery.watercolor', descKey: 'styleGallery.watercolor_desc' },
+  { id: 'oil-painting', name: 'Oil Painting', desc: 'Classic & Artistic' },
+  { id: 'pixel-art', name: 'Pixel Art', desc: 'Retro Gaming Style' },
+  { id: 'anime', name: 'Anime', desc: 'Japanese Animation' },
+  { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Neon & Futuristic' },
+  { id: 'pencil-sketch', name: 'Pencil Sketch', desc: 'Hand-drawn Feel' },
+  { id: 'watercolor', name: 'Watercolor', desc: 'Soft & Dreamy' },
 ];
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
@@ -241,11 +228,10 @@ function AIDemo() {
   const [generating, setGenerating] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const { t } = useTranslation();
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      setError(t('aiDemo.error_no_prompt'));
+      setError('Please enter a prompt');
       return;
     }
     setError('');
@@ -272,39 +258,32 @@ function AIDemo() {
   };
   
   return (
-    <section className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-violet-50 text-violet-600">
-            {t('aiDemo.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            <span className="gradient-text">{t('aiDemo.title')}</span>
-            <br />{t('aiDemo.title_suffix')}
+    <section className="py-20 px-6 bg-[#FAFAFA]">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#111111] mb-4">
+            TRY IT <span style={{ color: '#8B5CF6' }}>NOW</span>
           </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            {t('aiDemo.subtitle')}
+          <p className="text-[#666666] text-lg">
+            See AI generate your custom design in real-time
           </p>
         </div>
 
-        <div className="rounded-3xl p-8 sm:p-12 lg:p-16 bg-white border border-gray-100 shadow-sm">
-          {/* Input Area */}
-          <div className="max-w-3xl mx-auto space-y-6">
-            {/* Prompt Input */}
+        <div className="bg-white rounded-3xl p-8 shadow-sm border border-[#E5E5E5]">
+          <div className="max-w-2xl mx-auto space-y-6">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t('aiDemo.prompt_label')}</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#666666] mb-2">YOUR PROMPT</label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder={t('aiDemo.prompt_placeholder')}
+                placeholder="A cyberpunk cat riding a neon motorcycle..."
                 rows={3}
-                className="w-full rounded-2xl px-5 py-4 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-200 resize-none"
+                className="w-full rounded-2xl px-5 py-4 text-sm text-[#111111] placeholder-[#999999] border border-[#E5E5E5] focus:border-[#8B5CF6] focus:ring-2 focus:ring-purple-500/20 outline-none transition-all duration-200 resize-none"
               />
             </div>
 
-            {/* Style Selection */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">{t('aiDemo.style_label')}</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#666666] mb-3">SELECT STYLE</label>
               <div className="grid grid-cols-3 gap-3">
                 {AI_STYLES.map((style) => (
                   <button
@@ -312,31 +291,29 @@ function AIDemo() {
                     onClick={() => setSelectedStyle(style.id)}
                     className={`rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 border-2 ${
                       selectedStyle === style.id
-                        ? 'border-transparent text-white shadow-lg'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-gray-50'
+                        ? 'border-transparent text-white'
+                        : 'border-[#E5E5E5] text-[#666666] hover:border-[#8B5CF6] bg-white'
                     }`}
-                    style={selectedStyle === style.id ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
+                    style={selectedStyle === style.id ? { background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' } : {}}
                   >
-                    <div>{t(style.nameKey)}</div>
-                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-gray-400'}`}>{t(style.descKey)}</div>
+                    <div>{style.name}</div>
+                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-[#999999]'}`}>{style.desc}</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="rounded-xl p-4 bg-red-50 border border-red-200">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
 
-            {/* Generate Button */}
             <button
               onClick={handleGenerate}
               disabled={generating}
               className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+              style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
             >
               {generating ? (
                 <>
@@ -344,34 +321,29 @@ function AIDemo() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  {t('aiDemo.generating_text')}
+                  Generating...
                 </>
               ) : (
                 <>
                   <Wand2 size={18} />
-                  {t('aiDemo.generate_button')}
+                  Generate My Design
                 </>
               )}
             </button>
           </div>
 
-          {/* Result Display Area */}
           {(generating || resultUrl) && (
-            <div className="mt-12 pt-10 border-t border-gray-100">
+            <div className="mt-10 pt-10 border-t border-[#E5E5E5]">
               <div className="max-w-2xl mx-auto">
                 {generating ? (
-                  <div className="rounded-3xl aspect-square flex items-center justify-center relative overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)' }}>
-                    <div className="absolute inset-0" style={{
-                      background: 'radial-gradient(circle at 30% 40%, rgba(139,92,246,0.4), transparent 60%), radial-gradient(circle at 70% 60%, rgba(59,130,246,0.4), transparent 60%)'
-                    }} />
-                    <div className="text-center relative z-10">
-                      <svg className="animate-spin h-16 w-16 mx-auto mb-4 text-white" viewBox="0 0 24 24">
+                  <div className="rounded-3xl aspect-square flex items-center justify-center bg-[#FAFAFA]">
+                    <div className="text-center">
+                      <svg className="animate-spin h-16 w-16 mx-auto mb-4" style={{ color: '#8B5CF6' }} viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <div className="text-lg font-bold text-white">{t('aiDemo.generating_title')}</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">{t('aiDemo.generating_hint')}</div>
+                      <div className="text-lg font-bold text-[#111111]">AI is creating...</div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#8B5CF6] mt-2">Usually takes 30s</div>
                     </div>
                   </div>
                 ) : resultUrl ? (
@@ -385,18 +357,18 @@ function AIDemo() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg"
-                        style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+                        style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
                       >
-                        {t('aiDemo.view_full_size')}
+                        View Full Size
                       </a>
                       <button
                         onClick={() => {
                           setResultUrl(null);
                           setPrompt('');
                         }}
-                        className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-200 transition-all duration-200 hover:bg-gray-50"
+                        className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-[#666666] border border-[#E5E5E5] transition-all duration-200 hover:bg-[#FAFAFA]"
                       >
-                        {t('aiDemo.generate_another')}
+                        Generate Another
                       </button>
                     </div>
                   </div>
@@ -404,66 +376,90 @@ function AIDemo() {
               </div>
             </div>
           )}
-
-          {/* Product Preview Area - removed emoji placeholders for cleaner look */}
-          {!generating && !resultUrl && null}
         </div>
       </div>
     </section>
   );
 }
 
-// ─── Products ─────────────────────────────────────────────────────────────
+// ─── Products (E-commerce Style) ────────────────────────────────────────
 function Products() {
-  const { t } = useTranslation();
   const products = [
-    { emoji: '👕', nameKey: 'products.t_shirt_name', descKey: 'products.t_shirt_desc', priceKey: 'products.t_shirt_price', badgeKey: 'products.t_shirt_badge', badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
-    { emoji: '🧥', nameKey: 'products.hoodie_name', descKey: 'products.hoodie_desc', priceKey: 'products.hoodie_price', badgeKey: 'products.hoodie_badge', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
-    { emoji: '☕', nameKey: 'products.mug_name', descKey: 'products.mug_desc', priceKey: 'products.mug_price', badge: null, colors: ['bg-white', 'bg-gray-900'] },
-    { emoji: '📱', nameKey: 'products.phone_case_name', descKey: 'products.phone_case_desc', priceKey: 'products.phone_case_price', badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
-    { emoji: '🧢', nameKey: 'products.cap_name', descKey: 'products.cap_desc', priceKey: 'products.cap_price', badgeKey: 'products.cap_badge', badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
+    { 
+      emoji: '👕', 
+      name: 'T-Shirt', 
+      price: '$24.99 - $34.99',
+      badge: 'BESTSELLER',
+      badgeColor: '#FACC15',
+      badgeBg: '#FACC15',
+    },
+    { 
+      emoji: '🧥', 
+      name: 'Hoodie', 
+      price: '$39.99 - $49.99',
+      badge: 'POPULAR',
+      badgeColor: '#8B5CF6',
+      badgeBg: '#8B5CF6',
+    },
+    { 
+      emoji: '☕', 
+      name: 'Mug', 
+      price: '$14.99 - $19.99',
+      badge: null,
+      badgeColor: null,
+      badgeBg: null,
+    },
+    { 
+      emoji: '📱', 
+      name: 'Phone Case', 
+      price: '$19.99 - $29.99',
+      badge: 'NEW',
+      badgeColor: '#3B82F6',
+      badgeBg: '#3B82F6',
+    },
+    { 
+      emoji: '🧢', 
+      name: 'Cap', 
+      price: '$22.99 - $27.99',
+      badge: null,
+      badgeColor: null,
+      badgeBg: null,
+    },
   ];
 
   return (
-    <section id="products" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section id="products" className="py-20 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-orange-50 text-orange-600">
-            {t('products.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            {t('products.title_1')}{' '}
-            <span className="gradient-text">{t('products.title_2')}</span>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#111111] mb-4">
+            SHOP THE LOOK
           </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            {t('products.subtitle')}
+          <p className="text-[#666666] text-lg max-w-xl mx-auto">
+            Premium products featuring your AI-generated designs
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {products.map((p, i) => (
             <div key={i}
-              className="rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer bg-white border border-gray-100">
-              {p.badgeKey && (
-                <div className="text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 text-center"
-                  style={{ backgroundColor: p.badgeBg, color: p.badgeColor }}>
-                  {t(p.badgeKey)}
+              className="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl cursor-pointer bg-white border border-[#E5E5E5]">
+              {p.badge && (
+                <div className="text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 text-center text-white"
+                  style={{ backgroundColor: p.badgeBg }}>
+                  {p.badge}
                 </div>
               )}
-              <div className="aspect-square flex items-center justify-center bg-slate-50">
-                <span className="text-6xl sm:text-7xl">{p.emoji}</span>
+              <div className="aspect-square flex items-center justify-center bg-[#FAFAFA]">
+                <span className="text-6xl">{p.emoji}</span>
               </div>
-              <div className="p-4 sm:p-5">
-                <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">{t(p.nameKey)}</h4>
-                <p className="text-[10px] sm:text-[11px] text-gray-500 mb-3">{t(p.descKey)}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-blue-600">{t(p.priceKey)}</span>
-                  <div className="flex gap-1">
-                    {p.colors.map((c, j) => (
-                      <div key={j} className={`w-3 h-3 rounded-full ${c} border border-gray-200`} />
-                    ))}
-                  </div>
-                </div>
+              <div className="p-4">
+                <h4 className="font-bold text-[#111111] text-sm mb-1">{p.name}</h4>
+                <p className="text-sm font-bold mb-3" style={{ color: '#8B5CF6' }}>{p.price}</p>
+                <button
+                  className="w-full rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-1"
+                  style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}>
+                  Customize →
+                </button>
               </div>
             </div>
           ))}
@@ -473,142 +469,8 @@ function Products() {
   );
 }
 
-// ─── Why ArtShift ─────────────────────────────────────────────────────────────
-function WhyArtShift() {
-  const { t } = useTranslation();
-  const features = [
-    { icon: <Sparkles size={20} />, titleKey: 'whyArtShift.feature_1_title', descKey: 'whyArtShift.feature_1_desc', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: <Layers size={20} />, titleKey: 'whyArtShift.feature_2_title', descKey: 'whyArtShift.feature_2_desc', color: '#8b5cf6', bg: '#f5f3ff' },
-    { icon: <Zap size={20} />, titleKey: 'whyArtShift.feature_3_title', descKey: 'whyArtShift.feature_3_desc', color: '#f97316', bg: '#fff7ed' },
-    { icon: <Globe size={20} />, titleKey: 'whyArtShift.feature_4_title', descKey: 'whyArtShift.feature_4_desc', color: '#10b981', bg: '#ecfdf5' },
-    { icon: <ShieldCheck size={20} />, titleKey: 'whyArtShift.feature_5_title', descKey: 'whyArtShift.feature_5_desc', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: <CreditCard size={20} />, titleKey: 'whyArtShift.feature_6_title', descKey: 'whyArtShift.feature_6_desc', color: '#8b5cf6', bg: '#f5f3ff' },
-  ];
-
-  return (
-    <section className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          <div>
-            <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-              {t('whyArtShift.badge')}
-            </span>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
-              {t('whyArtShift.title_1')}{' '}
-              <span className="gradient-text">{t('whyArtShift.title_2')}</span>
-              <br />{t('whyArtShift.title_3')}
-            </h2>
-            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">
-              {t('whyArtShift.subtitle')}
-            </p>
-            <a href="#waitlist"
-              className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
-              style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              {t('hero.cta_primary')} <ArrowRight size={16} />
-            </a>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {features.map((f, i) => (
-              <div key={i}
-                className="rounded-2xl p-5 transition-all duration-300 hover:shadow-md bg-white border border-gray-100">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-white"
-                  style={{ color: f.color }}>
-                  {f.icon}
-                </div>
-                <div className="font-bold text-gray-900 text-sm mb-1">{t(f.titleKey)}</div>
-                <div className="text-xs text-gray-600 leading-relaxed">{t(f.descKey)}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Testimonials ──────────────────────────────────────────────────────────
-function Testimonials() {
-  const { t } = useTranslation();
-  const reviews = [
-    { nameKey: 'testimonials.review_1_name', countryKey: 'testimonials.review_1_country', textKey: 'testimonials.review_1_text', rating: 5 },
-    { nameKey: 'testimonials.review_2_name', countryKey: 'testimonials.review_2_country', textKey: 'testimonials.review_2_text', rating: 5 },
-    { nameKey: 'testimonials.review_3_name', countryKey: 'testimonials.review_3_country', textKey: 'testimonials.review_3_text', rating: 5 },
-    { nameKey: 'testimonials.review_4_name', countryKey: 'testimonials.review_4_country', textKey: 'testimonials.review_4_text', rating: 5 },
-    { nameKey: 'testimonials.review_5_name', countryKey: 'testimonials.review_5_country', textKey: 'testimonials.review_5_text', rating: 5 },
-    { nameKey: 'testimonials.review_6_name', countryKey: 'testimonials.review_6_country', textKey: 'testimonials.review_6_text', rating: 5 },
-  ];
-
-  return (
-    <section className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600">
-            {t('testimonials.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
-            {t('testimonials.title_1')}{' '}
-            <span className="gradient-text">{t('testimonials.title_2')}</span>
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {reviews.map((r, i) => (
-            <div key={i}
-              className="rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg bg-white border border-gray-100">
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: r.rating }).map((_, j) => (
-                  <Star key={j} size={14} fill="#f97316" color="#f97316" />
-                ))}
-              </div>
-              <p className="text-gray-700 text-sm leading-relaxed mb-5 italic">"{t(r.textKey)}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                  style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-                  {t(r.nameKey)[0]}
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 text-sm">{t(r.nameKey)}</div>
-                  <div className="text-xs text-gray-500">{t(r.countryKey)}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Pricing ────────────────────────────────────────────────────────────────
-function Pricing() {
-  const { t } = useTranslation();
-  return (
-    <section id="pricing" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            {t('pricing.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            <span className="gradient-text">{t('pricing.title')}</span>
-          </h2>
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mb-8">
-            {t('pricing.subtitle')}
-          </p>
-          <a href="#waitlist"
-            className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
-            style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-            {t('pricing.cta')} <ArrowRight size={16} />
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Waitlist ────────────────────────────────────────────────────────────
+// ─── Waitlist (Urgency-focused) ─────────────────────────────────────────
 function Waitlist() {
-  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -631,7 +493,7 @@ function Waitlist() {
 
       if (response.ok) {
         setStatus('success');
-        setMessage(t('waitlist.success_text'));
+        setMessage('You\'re on the list! Early access coming soon.');
         setEmail('');
       } else {
         setStatus('error');
@@ -644,19 +506,14 @@ function Waitlist() {
   };
 
   return (
-    <section id="waitlist" className="py-12 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-sm font-medium mb-6">
-          {t('waitlist.title_1')} <span className="text-blue-400">{t('waitlist.title_2')}</span> {t('waitlist.title_3')}
-        </div>
+    <section id="waitlist" className="py-20 px-6" style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}>
+      <div className="max-w-2xl mx-auto text-center text-white">
+        <div className="text-6xl md:text-8xl font-extrabold mb-4">3,247</div>
+        <div className="text-xl md:text-2xl font-bold mb-8">on waitlist</div>
 
-        <h2 className="text-4xl sm:text-5xl font-extrabold mb-6">
-          {t('waitlist.title_1')} <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{t('waitlist.title_2')}</span> {t('waitlist.title_3')}
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-6">
+          Join 3,000+ creators<br />waiting for early access
         </h2>
-
-        <p className="text-lg text-gray-300 mb-10 max-w-xl mx-auto">
-          {t('waitlist.subtitle')}
-        </p>
 
         <form onSubmit={handleSubmit} className="max-w-md mx-auto">
           <div className="flex gap-3">
@@ -664,89 +521,82 @@ function Waitlist() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('waitlist.email_placeholder')}
-              className="flex-1 px-5 py-3.5 rounded-full text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="your@email.com"
+              className="flex-1 px-5 py-3.5 rounded-full text-[#111111] text-sm focus:outline-none focus:ring-2 focus:ring-white/50"
               disabled={status === 'loading' || status === 'success'}
             />
             <button
               type="submit"
               disabled={status === 'loading' || status === 'success'}
-              className="px-8 py-3.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50"
+              className="px-8 py-3.5 rounded-full bg-white font-semibold text-sm hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+              style={{ color: '#8B5CF6' }}
             >
-              {status === 'loading' ? t('waitlist.loading') : t('waitlist.button')}
+              {status === 'loading' ? 'Joining...' : 'Join Waitlist'}
             </button>
           </div>
         </form>
 
         {message && (
-          <div className={`mt-4 text-sm ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+          <div className={`mt-4 text-sm ${status === 'success' ? 'text-white' : 'text-red-200'}`}>
             {message}
           </div>
         )}
 
-        <div className="flex justify-center gap-8 mt-10 text-sm text-gray-400">
-          <div>
-            <span className="text-2xl font-bold text-white">{t('waitlist.stat_1_num')}</span>
-            <span className="ml-2">{t('waitlist.stat_1_label')}</span>
-          </div>
-          <div>
-            <span className="text-2xl font-bold text-white">{t('waitlist.stat_2_num')}</span>
-            <span className="ml-2">{t('waitlist.stat_2_label')}</span>
-          </div>
-          <div>
-            <span className="text-2xl font-bold text-white">{t('waitlist.stat_3_num')}</span>
-            <span className="ml-2">{t('waitlist.stat_3_label')}</span>
-          </div>
-        </div>
-
-        <p className="text-xs text-gray-500 mt-8">{t('waitlist.footer')}</p>
+        <p className="text-sm mt-8 text-white/70">Join 3,000+ creators waiting for early access</p>
       </div>
     </section>
   );
 }
 
-// ─── FAQ ────────────────────────────────────────────────────────────────────
+// ─── FAQ (Simplified to 4 questions) ────────────────────────────────────
 function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
-  const { t } = useTranslation();
+  
   const faqs = [
-    { qKey: 'faq.q_1', aKey: 'faq.a_1' },
-    { qKey: 'faq.q_2', aKey: 'faq.a_2' },
-    { qKey: 'faq.q_3', aKey: 'faq.a_3' },
-    { qKey: 'faq.q_4', aKey: 'faq.a_4' },
-    { qKey: 'faq.q_5', aKey: 'faq.a_5' },
-    { qKey: 'faq.q_6', aKey: 'faq.a_6' },
+    { 
+      q: 'How does AI generation work?', 
+      a: 'Our AI transforms your text description into unique artwork in seconds. Just type what you want, pick a style, and let our AI create it.' 
+    },
+    { 
+      q: 'What products can I customize?', 
+      a: 'Currently we support T-Shirts, Hoodies, Mugs, Phone Cases, and Caps. More products coming soon!' 
+    },
+    { 
+      q: 'How long does shipping take?', 
+      a: 'We offer free worldwide shipping. Typically 5-10 business days for domestic orders, 10-20 days for international.' 
+    },
+    { 
+      q: 'Can I return my order?', 
+      a: 'Yes! We offer a 30-day money-back guarantee. If you\'re not satisfied, return it for a full refund.' 
+    },
   ];
 
   return (
-    <section id="faq" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section id="faq" className="py-20 px-6 bg-white">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            {t('faq.badge')}
-          </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
-            {t('faq.title_1')}{' '}
-            <span className="gradient-text">{t('faq.title_2')}</span>
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#111111]">
+            FAQ
           </h2>
         </div>
 
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div key={i}
-              className="rounded-2xl overflow-hidden transition-all duration-200 bg-white border border-gray-100">
+              className="rounded-2xl overflow-hidden transition-all duration-200 bg-white border border-[#E5E5E5]">
               <button
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
-                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left">
-                <span className="font-semibold text-gray-900 text-sm sm:text-base">{t(faq.qKey)}</span>
-                <span className="text-lg font-light transition-transform duration-200 flex-shrink-0 text-blue-500"
-                  style={{ transform: openIdx === i ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+              >
+                <span className="font-semibold text-[#111111] text-sm sm:text-base">{faq.q}</span>
+                <span className="text-lg font-light transition-transform duration-200 flex-shrink-0"
+                  style={{ color: '#8B5CF6', transform: openIdx === i ? 'rotate(45deg)' : 'rotate(0deg)' }}>
                   +
                 </span>
               </button>
               {openIdx === i && (
                 <div className="px-6 pb-5">
-                  <p className="text-gray-600 text-sm leading-relaxed">{t(faq.aKey)}</p>
+                  <p className="text-[#666666] text-sm leading-relaxed">{faq.a}</p>
                 </div>
               )}
             </div>
@@ -757,54 +607,40 @@ function FAQ() {
   );
 }
 
-// ─── Footer ──────────────────────────────────────────────────────────────────
+// ─── Footer (Simplified) ────────────────────────────────────────────────
 function Footer() {
-  const { t } = useTranslation();
   return (
-    <footer className="py-16 px-6 sm:px-12 md:px-20 lg:px-28 bg-gray-950">
+    <footer className="py-12 px-6 bg-[#111111] text-white">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <ArtShiftLogo className="w-8 h-8" />
-              <span className="font-extrabold text-white tracking-tight text-lg">ArtShift</span>
+              <span className="font-extrabold text-lg">ArtShift</span>
             </div>
-            <p className="text-gray-500 text-sm max-w-xs">
-              {t('footer.description')}
+            <p className="text-gray-400 text-sm max-w-xs">
+              AI-powered custom prints on demand. Turn your ideas into wearable art.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
+          <div className="flex gap-12 text-sm">
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t('footer.platform')}</div>
-              <div className="space-y-3">
-                {[t('footer.howItWorks'), t('footer.products'), t('footer.pricing')].map(l => (
-                  <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
-                    className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
-                ))}
+              <div className="font-bold uppercase tracking-widest text-[10px] text-gray-500 mb-3">Product</div>
+              <div className="space-y-2">
+                <a href="#how-it-works" className="block text-gray-400 hover:text-white transition-colors text-sm">How It Works</a>
+                <a href="#products" className="block text-gray-400 hover:text-white transition-colors text-sm">Products</a>
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t('footer.company')}</div>
-              <div className="space-y-3">
-                {[t('footer.about'), t('footer.blog'), t('footer.contact')].map(l => (
-                  <a key={l} href="#"
-                    className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t('footer.legal')}</div>
-              <div className="space-y-3">
-                {[t('footer.privacyPolicy'), t('footer.termsOfService'), t('footer.refundPolicy')].map(l => (
-                  <a key={l} href="#"
-                    className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
-                ))}
+              <div className="font-bold uppercase tracking-widest text-[10px] text-gray-500 mb-3">Legal</div>
+              <div className="space-y-2">
+                <a href="#" className="block text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
+                <a href="#" className="block text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a>
               </div>
             </div>
           </div>
         </div>
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-white/10">
-          <p className="text-[11px] text-gray-600 uppercase tracking-widest">{t('footer.copyright')}</p>
+        <div className="pt-8 border-t border-white/10">
+          <p className="text-[11px] text-gray-600 uppercase tracking-widest">© 2024 ArtShift. All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -830,14 +666,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <TOONHUBHero />
+      <NewHero />
       <HowItWorks />
-      <StyleGallery />
       <AIDemo />
       <Products />
-      <WhyArtShift />
-      <Testimonials />
-      <Pricing />
       <Waitlist />
       <FAQ />
       <Footer />
@@ -845,7 +677,7 @@ export default function App() {
         <button
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 z-50 p-4 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-          style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+          style={{ background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)' }}
         >
           <ArrowUp size={20} />
         </button>
