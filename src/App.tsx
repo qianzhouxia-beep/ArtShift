@@ -151,7 +151,7 @@ function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section id="how-it-works" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
@@ -191,7 +191,7 @@ function StyleGallery() {
   const { t } = useTranslation();
   
   return (
-    <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
+    <section className="py-12 px-6 sm:px-12 md:px-20 bg-white">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
           <span className="gradient-text">{t('styleGallery.title_1')}</span>{' '}
@@ -272,7 +272,7 @@ function AIDemo() {
   };
   
   return (
-    <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
+    <section className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-violet-50 text-violet-600">
@@ -425,7 +425,7 @@ function Products() {
   ];
 
   return (
-    <section id="products" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section id="products" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-orange-50 text-orange-600">
@@ -486,7 +486,7 @@ function WhyArtShift() {
   ];
 
   return (
-    <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
+    <section className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
@@ -540,7 +540,7 @@ function Testimonials() {
   ];
 
   return (
-    <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600">
@@ -583,7 +583,7 @@ function Testimonials() {
 function Pricing() {
   const { t } = useTranslation();
   return (
-    <section id="pricing" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
+    <section id="pricing" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
@@ -644,7 +644,7 @@ function Waitlist() {
   };
 
   return (
-    <section id="waitlist" className="py-20 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+    <section id="waitlist" className="py-12 px-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
       <div className="max-w-2xl mx-auto text-center">
         <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-sm font-medium mb-6">
           {t('waitlist.title_1')} <span className="text-blue-400">{t('waitlist.title_2')}</span> {t('waitlist.title_3')}
@@ -719,7 +719,7 @@ function FAQ() {
   ];
 
   return (
-    <section id="faq" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
+    <section id="faq" className="py-12 sm:py-12 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">

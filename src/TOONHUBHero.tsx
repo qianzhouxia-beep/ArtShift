@@ -9,22 +9,22 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 // ─── Image Data ───────────────────────────────────────────────────────
 const IMAGES = [
   {
-    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/1.02464a56.png',
+    src: '/images/toys/1.webp',
     bg: '#F4845F',
     panel: '#F79B7F',
   },
   {
-    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/2.b977faab.png',
+    src: '/images/toys/2.webp',
     bg: '#6BBF7A',
     panel: '#85CC92',
   },
   {
-    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/3.4df853b4.png',
+    src: '/images/toys/3.webp',
     bg: '#E882B4',
     panel: '#ED9DC4',
   },
   {
-    src: 'https://fifth-gentle-45902158.figma.site/_components/v2/4de492f6d9cf8244ad5293233e5c6f52407d42fc/4.4457fbce.png',
+    src: '/images/toys/4.webp',
     bg: '#6EB5FF',
     panel: '#8DC4FF',
   },
