@@ -4,7 +4,7 @@ import {
   ChevronDown,
   Palette, Truck, CreditCard, Menu, X,
   Package, Smartphone, Image, Layers, Wand2,
-  ArrowUp,
+  ArrowUp, Upload, ImagePlus,
 } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
 
@@ -239,32 +239,106 @@ const AI_STYLES = [
 ];
 
 function AIDemo() {
+  // ─── Mode: 'text' or 'image' ───────────────────────────
+  const [mode, setMode] = useState<'text' | 'image'>('text');
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState('oil-painting');
+  const [quality, setQuality] = useState<'standard' | 'premium'>('standard');
   const [generating, setGenerating] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      setError('Please describe what you want to create.');
+  // ─── Image upload state ──────────────────────────────────
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
+  const [strength, setStrength] = useState(0.55);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // ─── Handle file selection ───────────────────────────────
+  const handleFileSelect = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file (JPG, PNG, WebP).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image must be under 10MB.');
       return;
     }
     setError('');
+    setUploadedFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setUploadedPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  // ─── Drag & drop handlers ────────────────────────────────
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  const handleDragLeave = () => setIsDragging(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileSelect(file);
+  };
+
+  // ─── Generate ────────────────────────────────────────────
+  const handleGenerate = async () => {
+    // Validate
+    if (mode === 'text' && !prompt.trim()) {
+      setError('Please describe what you want to create.');
+      return;
+    }
+    if (mode === 'image' && !uploadedFile) {
+      setError('Please upload an image first.');
+      return;
+    }
+
+    setError('');
     setResultUrl(null);
     setGenerating(true);
+
     try {
-      const res = await fetch(`${API_URL}/generation/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, style: selectedStyle }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Generation failed');
-      if (data.success && data.imageUrl) {
-        setResultUrl(data.imageUrl);
+      if (mode === 'text') {
+        // Text-to-Image
+        const res = await fetch(`${API_URL}/generation/text-to-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt,
+            style: selectedStyle,
+            quality,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Generation failed');
+        if (data.success && data.imageUrl) {
+          setResultUrl(data.imageUrl);
+        } else {
+          throw new Error('No image returned');
+        }
       } else {
-        throw new Error('No image returned');
+        // Image-to-Image (style transfer)
+        const formData = new FormData();
+        formData.append('image', uploadedFile!);
+        formData.append('style', selectedStyle);
+        formData.append('quality', quality);
+        formData.append('strength', String(strength));
+        if (prompt.trim()) formData.append('prompt', prompt);
+
+        const res = await fetch(`${API_URL}/generation/image-to-image`, {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Style transfer failed');
+        if (data.success && data.imageUrl) {
+          setResultUrl(data.imageUrl);
+        } else {
+          throw new Error('No image returned');
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Generation failed. Please try again.');
@@ -272,6 +346,21 @@ function AIDemo() {
       setGenerating(false);
     }
   };
+
+  // ─── Reset ───────────────────────────────────────────────
+  const handleReset = () => {
+    setResultUrl(null);
+    setPrompt('');
+    setUploadedFile(null);
+    setUploadedPreview(null);
+    setError('');
+  };
+
+  const QUALITY_TIERS = [
+    { id: 'standard' as const, name: 'Standard', badge: 'FREE', desc: 'Fast, good quality', color: '#10b981' },
+    { id: 'premium' as const, name: 'Premium', badge: 'PRO', desc: 'More detail, better coherence', color: '#8b5cf6' },
+  ];
+
   return (
     <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
@@ -284,28 +373,120 @@ function AIDemo() {
             <br />in Real Time
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            Describe what you want, pick a style, and watch AI generate your design.
+            Describe what you want, upload a photo for style transfer, and watch AI generate your design.
           </p>
         </div>
 
         <div className="rounded-3xl p-8 sm:p-12 lg:p-16 bg-white border border-gray-100 shadow-sm">
-          {/* Input Area */}
           <div className="max-w-3xl mx-auto space-y-6">
-            {/* Prompt Input */}
+
+            {/* ─── Mode Toggle ──────────────────────────── */}
+            <div className="flex rounded-2xl p-1 bg-gray-100">
+              <button
+                onClick={() => { setMode('text'); setError(''); }}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-200 ${
+                  mode === 'text'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <Wand2 size={16} />
+                Text to Image
+              </button>
+              <button
+                onClick={() => { setMode('image'); setError(''); }}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-200 ${
+                  mode === 'image'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <ImagePlus size={16} />
+                Upload & Style Transfer
+              </button>
+            </div>
+
+            {/* ─── Image Upload (img2img mode only) ─────── */}
+            {mode === 'image' && (
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                  Upload Your Image
+                </label>
+                {!uploadedPreview ? (
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById('file-input')?.click()}
+                    className={`rounded-2xl border-2 border-dashed p-10 text-center cursor-pointer transition-all duration-200 ${
+                      isDragging
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400 bg-gray-50'
+                    }`}
+                  >
+                    <Upload size={32} className={`mx-auto mb-3 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
+                    <p className="text-sm font-semibold text-gray-700 mb-1">
+                      {isDragging ? 'Drop your image here' : 'Drag & drop or click to upload'}
+                    </p>
+                    <p className="text-xs text-gray-400">JPG, PNG, WebP — Max 10MB</p>
+                    <input
+                      id="file-input"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileSelect(file);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="relative rounded-2xl overflow-hidden border border-gray-200">
+                    <img
+                      src={uploadedPreview}
+                      alt="Uploaded preview"
+                      className="w-full max-h-64 object-contain bg-gray-50"
+                    />
+                    <button
+                      onClick={() => {
+                        setUploadedFile(null);
+                        setUploadedPreview(null);
+                      }}
+                      className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white shadow flex items-center justify-center text-gray-600 hover:text-gray-900 transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                    <div className="absolute bottom-3 left-3 text-[9px] font-bold uppercase tracking-widest bg-white/90 px-2 py-1 rounded-full text-gray-600">
+                      Original
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ─── Prompt Input ─────────────────────────── */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Your Prompt</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                {mode === 'text' ? 'Your Prompt' : 'Additional Prompt (optional)'}
+              </label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder='e.g. "A majestic owl in a starry night..."'
-                rows={3}
+                placeholder={
+                  mode === 'text'
+                    ? 'e.g. "A majestic owl in a starry night..."'
+                    : 'e.g. "Make it more colorful" or leave blank for pure style transfer'
+                }
+                rows={mode === 'text' ? 3 : 2}
                 className="w-full rounded-2xl px-5 py-4 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-200 resize-none"
               />
             </div>
 
-            {/* Style Selection */}
+            {/* ─── Style Selection ──────────────────────── */}
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Choose Style</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
+                Choose Style
+              </label>
               <div className="grid grid-cols-3 gap-3">
                 {AI_STYLES.map((style) => (
                   <button
@@ -325,14 +506,74 @@ function AIDemo() {
               </div>
             </div>
 
-            {/* Error Message */}
+            {/* ─── Style Strength Slider (img2img mode) ── */}
+            {mode === 'image' && (
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
+                  Style Strength: {Math.round(strength * 100)}%
+                </label>
+                <input
+                  type="range"
+                  min="0.2"
+                  max="0.8"
+                  step="0.05"
+                  value={strength}
+                  onChange={(e) => setStrength(parseFloat(e.target.value))}
+                  className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, #3b82f6 ${Math.round((strength - 0.2) / 0.6 * 100)}%, #e5e7eb ${Math.round((strength - 0.2) / 0.6 * 100)}%)`
+                  }}
+                />
+                <div className="flex justify-between text-[9px] text-gray-400 mt-1">
+                  <span>Subtle</span>
+                  <span>Bold</span>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Quality Tier ─────────────────────────── */}
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
+                Quality
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {QUALITY_TIERS.map((tier) => (
+                  <button
+                    key={tier.id}
+                    onClick={() => setQuality(tier.id)}
+                    className={`rounded-xl px-4 py-3 text-left transition-all duration-200 border-2 ${
+                      quality === tier.id
+                        ? 'border-gray-900 bg-gray-900 text-white'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm">{tier.name}</span>
+                      <span
+                        className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          quality === tier.id ? 'bg-white/20 text-white' : 'text-white'
+                        }`}
+                        style={quality !== tier.id ? { backgroundColor: tier.color } : {}}
+                      >
+                        {tier.badge}
+                      </span>
+                    </div>
+                    <div className={`text-[10px] mt-1 ${quality === tier.id ? 'text-white/60' : 'text-gray-400'}`}>
+                      {tier.desc}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ─── Error Message ────────────────────────── */}
             {error && (
               <div className="rounded-xl p-4 bg-red-50 border border-red-200">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
 
-            {/* Generate Button */}
+            {/* ─── Generate Button ─────────────────────── */}
             <button
               onClick={handleGenerate}
               disabled={generating}
@@ -345,23 +586,23 @@ function AIDemo() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Generating... (takes ~10s)
+                  {mode === 'text' ? 'Generating...' : 'Transforming...'} (takes ~10s)
                 </>
               ) : (
                 <>
-                  <Wand2 size={18} />
-                  Generate Image
+                  {mode === 'text' ? <Wand2 size={18} /> : <ImagePlus size={18} />}
+                  {mode === 'text' ? 'Generate Image' : 'Apply Style Transfer'}
+                  {quality === 'premium' && <span className="ml-1 text-[9px] bg-white/20 px-2 py-0.5 rounded-full">PRO</span>}
                 </>
               )}
             </button>
           </div>
 
-          {/* Result Display Area */}
+          {/* ─── Result Display Area ─────────────────────── */}
           {(generating || resultUrl) && (
             <div className="mt-12 pt-10 border-t border-gray-100">
               <div className="max-w-2xl mx-auto">
                 {generating ? (
-                  /* Loading State */
                   <div className="rounded-3xl aspect-square flex items-center justify-center relative overflow-hidden"
                     style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)' }}>
                     <div className="absolute inset-0" style={{
@@ -372,16 +613,41 @@ function AIDemo() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      <div className="text-lg font-bold text-white">AI is creating...</div>
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">Please wait about 10 seconds</div>
+                      <div className="text-lg font-bold text-white">
+                        {mode === 'text' ? 'AI is creating...' : 'AI is transforming...'}
+                      </div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">
+                        Please wait about 10 seconds
+                      </div>
                     </div>
                   </div>
                 ) : resultUrl ? (
-                  /* Result State */
                   <div className="text-center space-y-6">
-                    <div className="rounded-2xl overflow-hidden shadow-lg">
-                      <img src={resultUrl} alt="Generated AI Art" className="w-full h-auto" />
-                    </div>
+                    {/* Show before/after for img2img */}
+                    {mode === 'image' && uploadedPreview && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="rounded-2xl overflow-hidden border border-gray-200">
+                            <img src={uploadedPreview} alt="Original" className="w-full h-auto" />
+                          </div>
+                          <div className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mt-2">Original</div>
+                        </div>
+                        <div>
+                          <div className="rounded-2xl overflow-hidden shadow-lg">
+                            <img src={resultUrl} alt="Styled" className="w-full h-auto" />
+                          </div>
+                          <div className="text-[9px] font-bold uppercase tracking-widest text-violet-500 mt-2">
+                            {AI_STYLES.find(s => s.id === selectedStyle)?.name} Style
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {/* Single result for text2img */}
+                    {mode === 'text' && (
+                      <div className="rounded-2xl overflow-hidden shadow-lg">
+                        <img src={resultUrl} alt="Generated AI Art" className="w-full h-auto" />
+                      </div>
+                    )}
                     <div className="flex gap-4 justify-center">
                       <a
                         href={resultUrl}
@@ -393,10 +659,7 @@ function AIDemo() {
                         View Full Size
                       </a>
                       <button
-                        onClick={() => {
-                          setResultUrl(null);
-                          setPrompt('');
-                        }}
+                        onClick={handleReset}
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-200 transition-all duration-200 hover:bg-gray-50"
                       >
                         Generate Another
@@ -408,7 +671,7 @@ function AIDemo() {
             </div>
           )}
 
-          {/* Product Preview Area - only show when not generating and no result */}
+          {/* ─── Product Preview Area ────────────────────── */}
           {!generating && !resultUrl && (
             <div className="mt-12 pt-10 border-t border-gray-100">
               <div className="text-center mb-8">
