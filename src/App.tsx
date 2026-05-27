@@ -7,6 +7,7 @@ import {
   ArrowUp, Upload, ImagePlus,
 } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
+import BuyCreditsModal from './components/BuyCreditsModal';
 
 // ─── Style Gallery Data ───────────────────────────────────────────────────────
 const styleGallery = [
@@ -26,7 +27,7 @@ function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
 }
 
 // ─── Navbar ────────────────────────────────────────────────────────────────
-function Navbar() {
+function Navbar({ onOpenModal }: { onOpenModal: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = ['How It Works', 'Products', 'Pricing', 'FAQ'];
   return (
@@ -47,6 +48,12 @@ function Navbar() {
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
             Join Waitlist
           </a>
+          <button
+            onClick={onOpenModal}
+            className="text-[12px] sm:text-[13px] font-semibold text-gray-700 rounded-full px-5 py-1.5 transition-all duration-200 border border-gray-200 hover:bg-gray-50"
+          >
+            Buy Credits
+          </button>
           <button className="sm:hidden text-gray-500" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -1134,6 +1141,7 @@ function StyleGallery() {
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showBuyCredits, setShowBuyCredits] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1150,7 +1158,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white">
       <ParticleBackground />
-      <Navbar />
+      <Navbar onOpenModal={() => setShowBuyCredits(true)} />
+      <BuyCreditsModal isOpen={showBuyCredits} onClose={() => setShowBuyCredits(false)} />
       <HeroSection />
       <HowItWorks />
       <StyleGallery />
