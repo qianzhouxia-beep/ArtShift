@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { X, Zap, Star, Sparkles } from 'lucide-react';
 
 const CREDIT_PACKS = [
