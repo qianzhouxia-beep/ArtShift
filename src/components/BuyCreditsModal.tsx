@@ -160,10 +160,7 @@ export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProp
                   </>
                 ) : (
                   <>
-                    <svg className="w-20 h-5" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M7.076 21.337H2.47a.641.641 0 01-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797H9.38c-.62 0-1.144.45-1.239 1.063l-.002.014-1.063 6.75zM19.825 7.78c-.036-.23-.066-.468-.09-.71a6.02 6.02 0 00-.367-1.488c-.77-1.978-2.425-3.083-4.89-3.582H14.44l.001-.003C13.82 1.998 12.86 1.5 11.46 1.5H5.998c-.352 0-.656.245-.73.59L2.467 20.64a.745.745 0 00.734.857h4.47l1.127-7.152.004-.026c.095-.613.618-1.063 1.238-1.063h1.155c4.298 0 7.664-1.747 8.647-6.797.03-.149.054-.294.077-.437.276-1.763-.022-2.96-.995-4.05z" fill="#fff"/>
-                      <text x="28" y="17" fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fontSize="14" fontWeight="600" letterSpacing="0.5" fill="#fff">PayPal</text>
-                    </svg>
+                    <span className="text-lg font-bold italic tracking-wide">PayPal</span>
                   </>
                 )}
               </button>
