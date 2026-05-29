@@ -1,33 +1,31 @@
 import { X, Zap, Star, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const CREDIT_PACKS = [
   {
     id: 'starter',
-    variantId: '1712203',
     name: 'Starter Pack',
     credits: 10,
     price: '$5',
-    priceCents: 500,
+    priceUsd: 5,
     popular: false,
     description: 'Perfect for trying out ArtShift',
   },
   {
     id: 'popular',
-    variantId: '1712229',
     name: 'Popular Pack',
     credits: 35,
     price: '$15',
-    priceCents: 1500,
+    priceUsd: 15,
     popular: true,
     description: 'Best value for regular users',
   },
   {
     id: 'pro',
-    variantId: '1712238',
     name: 'Pro Pack',
     credits: 80,
     price: '$30',
-    priceCents: 3000,
+    priceUsd: 30,
     popular: false,
     description: 'For power users & professionals',
   },
@@ -39,12 +37,55 @@ interface BuyCreditsModalProps {
 }
 
 export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
+
+  // Load PayPal SDK
+  useEffect(() => {
+    if (!isOpen || paypalLoaded || document.getElementById('paypal-sdk')) return;
+
+    const script = document.createElement('script');
+    script.id = 'paypal-sdk';
+    script.src = `https://www.paypal.com/sdk/js?client-id=AaDu9-BNI0GuaE3Rw_FoVk-J3D9vmnFafp-llIew-nduwODRQlEeyAb3_iN2dV4_L3OIG_skfZeVU&currency=USD`;
+    script.setAttribute('data-sdk-integration-source', 'buttonfactory');
+    script.onload = () => setPaypalLoaded(true);
+    document.head.appendChild(script);
+  }, [isOpen, paypalLoaded]);
+
   if (!isOpen) return null;
 
-  const handleBuy = (variantId: string) => {
-    // Lemon Squeezy checkout URL
-    const checkoutUrl = `https://artshift.lemonsqueezy.com/checkout/buy/${variantId}`;
-    window.open(checkoutUrl, '_blank');
+  const handleBuy = (packId: string, priceUsd: number) => {
+    if (typeof window !== 'undefined' && (window as any).paypal) {
+      const pack = CREDIT_PACKS.find(p => p.id === packId);
+      (window as any).paypal.Buttons({
+        style: {
+          shape: 'rect',
+          color: 'gold',
+          layout: 'vertical',
+          label: 'pay',
+        },
+        createOrder: (_data: any, actions: any) => {
+          return actions.order.create({
+            purchase_units: [{
+              description: `${pack?.name} - ${pack?.credits} AI image generation credits`,
+              amount: {
+                currency_code: 'USD',
+                value: String(priceUsd),
+              },
+              custom_id: packId, // Pass pack ID for webhook processing
+            }],
+          });
+        },
+        onApprove: async (_data: any, actions: any) => {
+          await actions.order.capture();
+          alert(`🎉 Payment successful! ${pack?.credits} credits will be added to your account shortly.`);
+          onClose();
+        },
+        onError: (err: any) => {
+          console.error('PayPal error:', err);
+          alert('Payment failed. Please try again.');
+        },
+      }).render(`#paypal-button-${packId}`);
+    }
   };
 
   return (
@@ -123,24 +164,36 @@ export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProp
                 {pack.description}
               </p>
 
-              {/* Buy Button */}
-              <button
-                onClick={() => handleBuy(pack.variantId)}
-                className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  pack.popular
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-105'
-                    : 'bg-gray-900 text-white hover:bg-gray-800'
-                }`}
-              >
-                Buy Now
-              </button>
+              {/* PayPal Button Container */}
+              {!paypalLoaded ? (
+                <button
+                  disabled
+                  className="w-full py-3 rounded-xl font-semibold bg-gray-200 text-gray-400 cursor-not-allowed"
+                >
+                  Loading PayPal...
+                </button>
+              ) : (
+                <>
+                  <div id={`paypal-button-${pack.id}`} />
+                  <button
+                    onClick={() => handleBuy(pack.id, pack.priceUsd)}
+                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
+                      pack.popular
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-105'
+                        : 'bg-gray-900 text-white hover:bg-gray-800'
+                    }`}
+                  >
+                    Pay with PayPal
+                  </button>
+                </>
+              )}
             </div>
           ))}
         </div>
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>🔒 Secure payment powered by Lemon Squeezy</p>
+          <p>🔒 Secure payment powered by PayPal</p>
           <p className="mt-1">Credits will be added to your account immediately after payment</p>
         </div>
       </div>
