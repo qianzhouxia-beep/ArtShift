@@ -1,5 +1,5 @@
 import { X, Zap, Star, Sparkles } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const CREDIT_PACKS = [
   {
@@ -37,54 +37,30 @@ interface BuyCreditsModalProps {
 }
 
 export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
-  const [paypalLoaded, setPaypalLoaded] = useState(false);
-
-  // Load PayPal SDK
-  useEffect(() => {
-    if (!isOpen || paypalLoaded || document.getElementById('paypal-sdk')) return;
-
-    const script = document.createElement('script');
-    script.id = 'paypal-sdk';
-    script.src = `https://www.paypal.com/sdk/js?client-id=AaDu9-BNI0GuaE3Rw_FoVk-J3D9vmnFafp-llIew-nduwODRQlEeyAb3_iN2dV4_L3OIG_skfZeVU&currency=USD`;
-    script.setAttribute('data-sdk-integration-source', 'buttonfactory');
-    script.onload = () => setPaypalLoaded(true);
-    document.head.appendChild(script);
-  }, [isOpen, paypalLoaded]);
+  const [loadingPack, setLoadingPack] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleBuy = (packId: string, priceUsd: number) => {
-    if (typeof window !== 'undefined' && (window as any).paypal) {
-      const pack = CREDIT_PACKS.find(p => p.id === packId);
-      (window as any).paypal.Buttons({
-        style: {
-          shape: 'rect',
-          color: 'gold',
-          layout: 'vertical',
-          label: 'pay',
-        },
-        createOrder: (_data: any, actions: any) => {
-          return actions.order.create({
-            purchase_units: [{
-              description: `${pack?.name} - ${pack?.credits} AI image generation credits`,
-              amount: {
-                currency_code: 'USD',
-                value: String(priceUsd),
-              },
-              custom_id: packId, // Pass pack ID for webhook processing
-            }],
-          });
-        },
-        onApprove: async (_data: any, actions: any) => {
-          await actions.order.capture();
-          alert(`🎉 Payment successful! ${pack?.credits} credits will be added to your account shortly.`);
-          onClose();
-        },
-        onError: (err: any) => {
-          console.error('PayPal error:', err);
-          alert('Payment failed. Please try again.');
-        },
-      }).render(`#paypal-button-${packId}`);
+  const handleBuy = async (packId: string) => {
+    setLoadingPack(packId);
+    try {
+      // Call backend to create PayPal order and get approval URL
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/payments/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packId }),
+      });
+      const data = await res.json();
+      if (data.approvalUrl) {
+        window.location.href = data.approvalUrl;
+      } else {
+        alert('Failed to create payment. Please try again.');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setLoadingPack(null);
     }
   };
 
@@ -164,29 +140,33 @@ export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProp
                 {pack.description}
               </p>
 
-              {/* PayPal Button Container */}
-              {!paypalLoaded ? (
-                <button
-                  disabled
-                  className="w-full py-3 rounded-xl font-semibold bg-gray-200 text-gray-400 cursor-not-allowed"
-                >
-                  Loading PayPal...
-                </button>
-              ) : (
-                <>
-                  <div id={`paypal-button-${pack.id}`} />
-                  <button
-                    onClick={() => handleBuy(pack.id, pack.priceUsd)}
-                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 ${
-                      pack.popular
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:scale-105'
-                        : 'bg-gray-900 text-white hover:bg-gray-800'
-                    }`}
-                  >
+              {/* Buy Button */}
+              <button
+                onClick={() => handleBuy(pack.id)}
+                disabled={loadingPack === pack.id}
+                className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                  pack.popular
+                    ? 'bg-gradient-to-r from-[#0070ba] to-[#003087] text-white hover:shadow-lg hover:scale-105'
+                    : 'bg-[#0070ba] text-white hover:bg-[#005ea6]'
+                } ${loadingPack === pack.id ? 'opacity-70 cursor-wait' : ''}`}
+              >
+                {loadingPack === pack.id ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797H9.38c-.62 0-1.144.45-1.239 1.063l-.002.014-1.063 6.75zM19.825 7.78c-.036-.23-.066-.468-.09-.71a6.02 6.02 0 0 0-.367-1.488c-.77-1.978-2.425-3.083-4.89-3.582H14.44l.001-.003C13.82 1.998 12.86 1.5 11.46 1.5H5.998c-.352 0-.656.245-.73.59L2.467 20.64a.745.745 0 0 0 .734.857h4.47l1.127-7.152.004-.026c.095-.613.618-1.063 1.238-1.063h1.155c4.298 0 7.664-1.747 8.647-6.797.03-.149.054-.294.077-.437.276-1.763-.022-2.96-.995-4.05z"/>
+                    </svg>
                     Pay with PayPal
-                  </button>
-                </>
-              )}
+                  </>
+                )}
+              </button>
             </div>
           ))}
         </div>
