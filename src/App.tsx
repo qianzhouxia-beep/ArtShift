@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import AuthModal from './components/AuthModal';
 import {
   Sparkles, Zap, Globe, ShieldCheck, Star, ArrowRight,
   ChevronDown,
@@ -27,7 +28,15 @@ function ArtShiftLogo({ className = "w-5 h-5" }: { className?: string }) {
 }
 
 // ─── Navbar ────────────────────────────────────────────────────────────────
-function Navbar({ onOpenModal }: { onOpenModal: () => void }) {
+interface NavbarProps {
+  onOpenModal: () => void;
+  user: { id: string; email: string } | null;
+  credits: number;
+  onOpenAuth: () => void;
+  onLogout: () => void;
+}
+
+function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = ['How It Works', 'Products', 'Pricing', 'FAQ'];
   return (
@@ -48,6 +57,28 @@ function Navbar({ onOpenModal }: { onOpenModal: () => void }) {
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
             Join Waitlist
           </a>
+          {user ? (
+            <>
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 border border-violet-100">
+                <div className="text-[11px] font-bold text-violet-600">{credits}</div>
+                <div className="text-[10px] text-violet-400 font-medium">credits</div>
+              </div>
+              <button
+                onClick={onLogout}
+                className="text-[12px] sm:text-[13px] font-medium text-gray-400 hover:text-gray-600 rounded-full px-3 py-1.5 transition-all duration-200"
+                title="Sign out"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="text-[12px] sm:text-[13px] font-semibold text-violet-600 rounded-full px-5 py-1.5 transition-all duration-200 hover:bg-violet-50 border border-violet-100"
+            >
+              Sign In
+            </button>
+          )}
           <button
             onClick={onOpenModal}
             className="text-[12px] sm:text-[13px] font-semibold text-gray-700 rounded-full px-5 py-1.5 transition-all duration-200 border border-gray-200 hover:bg-gray-50"
@@ -245,7 +276,11 @@ const AI_STYLES = [
   { id: 'watercolor', name: 'Watercolor', desc: 'Soft & Ethereal' },
 ];
 
-function AIDemo() {
+interface AIDemoProps {
+  userId: string | null;
+}
+
+function AIDemo({ userId }: AIDemoProps) {
   // ─── Mode: 'text' or 'image' ───────────────────────────
   const [mode, setMode] = useState<'text' | 'image'>('text');
   const [prompt, setPrompt] = useState('');
@@ -317,6 +352,7 @@ function AIDemo() {
             prompt,
             style: selectedStyle,
             quality,
+            userId: userId || undefined,
           }),
         });
         const data = await res.json();
@@ -335,6 +371,7 @@ function AIDemo() {
         formData.append('strength', String(strength));
         if (prompt.trim()) formData.append('prompt', prompt);
 
+        if (userId) formData.append('userId', userId);
         const res = await fetch(`${API_URL}/generation/image-to-image`, {
           method: 'POST',
           body: formData,
@@ -1142,6 +1179,47 @@ function StyleGallery() {
 export default function App() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [showBuyCredits, setShowBuyCredits] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+  const [credits, setCredits] = useState(0);
+
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('artshift_user');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        setUser(u);
+        fetchCredits(u.id);
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
+
+  const fetchCredits = async (userId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/payments/credits/${userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCredits(data.credits ?? 0);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleAuthSuccess = (u: { id: string; email: string }) => {
+    setUser(u);
+    fetchCredits(u.id);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('artshift_token');
+    localStorage.removeItem('artshift_user');
+    setUser(null);
+    setCredits(0);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1158,12 +1236,27 @@ export default function App() {
   return (
     <div className="min-h-screen bg-white">
       <ParticleBackground />
-      <Navbar onOpenModal={() => setShowBuyCredits(true)} />
-      <BuyCreditsModal isOpen={showBuyCredits} onClose={() => setShowBuyCredits(false)} />
+      <Navbar
+        onOpenModal={() => setShowBuyCredits(true)}
+        user={user}
+        credits={credits}
+        onOpenAuth={() => setShowAuth(true)}
+        onLogout={handleLogout}
+      />
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        onSuccess={handleAuthSuccess}
+      />
+      <BuyCreditsModal
+        isOpen={showBuyCredits}
+        onClose={() => setShowBuyCredits(false)}
+        userId={user?.id}
+      />
       <HeroSection />
       <HowItWorks />
       <StyleGallery />
-      <AIDemo />
+      <AIDemo userId={user?.id || null} />
       <Products />
       <WhyArtShift />
       <Testimonials />

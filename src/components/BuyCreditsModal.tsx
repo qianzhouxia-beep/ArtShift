@@ -1,4 +1,4 @@
-import { X, Zap, Star, Sparkles } from 'lucide-react';
+﻿import { X, Zap, Star, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 const CREDIT_PACKS = [
@@ -34,9 +34,10 @@ const CREDIT_PACKS = [
 interface BuyCreditsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  userId?: string;
 }
 
-export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProps) {
+export default function BuyCreditsModal({ isOpen, onClose, userId }: BuyCreditsModalProps) {
   const [loadingPack, setLoadingPack] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -45,10 +46,11 @@ export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProp
     setLoadingPack(packId);
     try {
       // Call backend to create PayPal order and get approval URL
-      const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/payments/create-order`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
+        const res = await fetch(`${API_URL}/payments/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ packId }),
+        body: JSON.stringify({ packId, userId: userId || undefined }),
       });
       const data = await res.json();
       if (data.approvalUrl) {
@@ -170,7 +172,7 @@ export default function BuyCreditsModal({ isOpen, onClose }: BuyCreditsModalProp
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>🔒 Secure payment powered by PayPal</p>
+          <p>馃敀 Secure payment powered by PayPal</p>
           <p className="mt-1">Credits will be added to your account immediately after payment</p>
         </div>
       </div>
