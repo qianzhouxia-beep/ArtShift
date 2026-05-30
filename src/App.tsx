@@ -81,6 +81,18 @@ const translations: Record<string, Record<string, string>> = {
     footerPlatform: 'Platform', footerCompany: 'Company', footerLegal: 'Legal',
     footerAbout: 'About', footerBlog: 'Blog', footerContact: 'Contact',
     footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service', footerRefund: 'Refund Policy',
+    styleOilPainting: 'Oil Painting',
+    styleOilPaintingDesc: 'Van Gogh & Monet',
+    stylePixelArt: 'Pixel Art',
+    stylePixelArtDesc: '8-bit Retro',
+    styleAnime: 'Anime',
+    styleAnimeDesc: 'Studio Ghibli',
+    styleCyberpunk: 'Cyberpunk',
+    styleCyberpunkDesc: 'Neon Futurism',
+    stylePencilSketch: 'Pencil Sketch',
+    stylePencilSketchDesc: 'Graphite Drawing',
+    styleWatercolor: 'Watercolor',
+    styleWatercolorDesc: 'Soft & Ethereal',
     footerCopyright: '© 2026 ArtShift. All rights reserved.',
     testimonial1Name: 'Alex M.', testimonial1Text: 'I had zero design skills. Printed a custom hoodie with my cat in Van Gogh style. It looks incredible.',
     testimonial2Name: 'Sophie L.', testimonial2Text: 'Ordered from Germany, arrived in 5 days. The print quality is better than any store-bought shirt.',
@@ -154,6 +166,18 @@ const translations: Record<string, Record<string, string>> = {
     footerPlatform: '平台', footerCompany: '公司', footerLegal: '法律',
     footerAbout: '关于我们', footerBlog: '博客', footerContact: '联系我们',
     footerPrivacy: '隐私政策', footerTerms: '服务条款', footerRefund: '退款政策',
+    styleOilPainting: '油画',
+    styleOilPaintingDesc: '梵高与莫奈风格',
+    stylePixelArt: '像素艺术',
+    stylePixelArtDesc: '8位复古风',
+    styleAnime: '动漫',
+    styleAnimeDesc: '吉卜力工作室风格',
+    styleCyberpunk: '赛博朋克',
+    styleCyberpunkDesc: '霓虹未来主义',
+    stylePencilSketch: '铅笔素描',
+    stylePencilSketchDesc: '石墨手绘风格',
+    styleWatercolor: '水彩画',
+    styleWatercolorDesc: '柔和梦幻风格',
     footerCopyright: '© 2026 ArtShift. 保留所有权利。',
     testimonial1Name: 'Alex M.', testimonial1Text: '我完全没有设计技能。用我猫咪的照片印了一件梵高风格的卫衣。效果太惊艳了。',
     testimonial2Name: 'Sophie L.', testimonial2Text: '从德国订货，5天就到了。印刷质量比任何店里买的T恤都好。',
@@ -170,12 +194,12 @@ function useT(lang: string): (key: string) => string {
 
 // ─── Style Gallery Data ───────────────────────────────────────────────────────
 const styleGallery = [
-  { src: '/images/styles/style-oil-painting.png', title: 'Oil Painting', desc: 'Van Gogh & Monet' },
-  { src: '/images/styles/style-pixel-art.png', title: 'Pixel Art', desc: '8-bit Retro' },
-  { src: '/images/styles/style-anime.png', title: 'Anime', desc: 'Studio Ghibli' },
-  { src: '/images/styles/style-cyberpunk.png', title: 'Cyberpunk', desc: 'Neon Futurism' },
-  { src: '/images/styles/style-pencil-sketch.png', title: 'Pencil Sketch', desc: 'Graphite Drawing' },
-  { src: '/images/styles/style-watercolor.png', title: 'Watercolor', desc: 'Soft & Ethereal' },
+  { src: '/images/styles/style-oil-painting.png', titleKey: 'styleOilPainting', descKey: 'styleOilPaintingDesc' },
+  { src: '/images/styles/style-pixel-art.png', titleKey: 'stylePixelArt', descKey: 'stylePixelArtDesc' },
+  { src: '/images/styles/style-anime.png', titleKey: 'styleAnime', descKey: 'styleAnimeDesc' },
+  { src: '/images/styles/style-cyberpunk.png', titleKey: 'styleCyberpunk', descKey: 'styleCyberpunkDesc' },
+  { src: '/images/styles/style-pencil-sketch.png', titleKey: 'stylePencilSketch', descKey: 'stylePencilSketchDesc' },
+  { src: '/images/styles/style-watercolor.png', titleKey: 'styleWatercolor', descKey: 'styleWatercolorDesc' },
 ];
 
 // ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
@@ -1300,18 +1324,18 @@ function StyleGallery({ t }: { t: (key: string) => string }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {styleGallery.map((style) => (
             <div
-              key={style.title}
+              key={style.titleKey}
               className="group cursor-pointer"
             >
               <div className="aspect-square rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300 mb-3">
                 <img
                   src={style.src}
-                  alt={style.title}
+                  alt={t(style.titleKey)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm">{style.title}</h3>
-              <p className="text-gray-400 text-xs">{style.desc}</p>
+              <h3 className="font-semibold text-gray-900 text-sm">{t(style.titleKey)}</h3>
+              <p className="text-gray-400 text-xs">{t(style.descKey)}</p>
             </div>
           ))}
         </div>
@@ -1322,7 +1346,7 @@ function StyleGallery({ t }: { t: (key: string) => string }) {
 
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState('zh');
   const t = useT(lang);
 
   const [showBackToTop, setShowBackToTop] = useState(false);
