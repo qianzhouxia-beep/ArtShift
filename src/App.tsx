@@ -14,94 +14,144 @@ import BuyCreditsModal from './components/BuyCreditsModal';
 // ─── i18n Translations ─────────────────────────────────────────────
 const translations: Record<string, Record<string, string>> = {
   en: {
-    howItWorks: 'How It Works',
-    products: 'Products',
-    pricing: 'Pricing',
-    faq: 'FAQ',
-    joinWaitlist: 'Join Waitlist',
-    logout: 'Logout',
-    signIn: 'Sign In',
-    buyCredits: 'Buy Credits',
-    credits: 'credits',
-    launchingSoon: 'Launching Soon — US · Europe · Worldwide',
-    heroTitle1: 'Shift Your',
-    heroTitle2: 'Photos Into',
-    heroTitle3: 'Wearables',
-    heroTitle4: 'In Seconds',
-    getEarlyAccess: 'Get Early Access',
-    seeHowItWorks: 'See How It Works',
-    theProcess: 'The Process',
-    infiniteDesigns: 'Infinite designs.',
-    step1Title: 'Describe Your Vision',
-    step2Title: 'AI Generates Designs',
-    step3Title: 'We Print & Ship',
-    aiGenerationStudio: 'AI Generation Studio',
-    watchAICreate: 'Watch AI Create',
-    inRealTime: 'in Real Time',
-    textToImage: 'Text to Image',
-    uploadAndStyleTransfer: 'Upload & Style Transfer',
-    yourPrompt: 'Your Prompt',
-    chooseStyle: 'Choose Style',
-    quality: 'Quality',
-    standard: 'Standard',
-    premium: 'Premium',
-    free: 'FREE',
-    pro: 'PRO',
-    generating: 'Generating...',
-    generateImage: 'Generate Image',
-    applyStyleTransfer: 'Apply Style Transfer',
-    comingSoon: 'Coming Soon',
-    beTheFirst: 'Be the',
-    firstToCreate: 'first',
-    toCreate: 'to create.',
-    realReviews: 'Real Reviews',
-    lovedByEarlyTesters: 'Loved by early testers',
-    questionsAnswered: 'Questions, answered',
+    howItWorks: 'How It Works', products: 'Products', pricing: 'Pricing', faq: 'FAQ',
+    joinWaitlist: 'Join Waitlist', logout: 'Logout', signIn: 'Sign In', buyCredits: 'Buy Credits', credits: 'credits',
+    heroBadge: 'Launching Soon — US · Europe · Worldwide',
+    heroTitle1a: 'Shift Your ', heroTitle1b: 'Photos Into', heroTitle2a: 'Wearables ', heroTitle2b: 'In Seconds',
+    heroDesc1: 'Upload a photo or describe your idea. AI transforms it into ',
+    heroDescBold: 'stunning art', heroDesc2: " — then we print it on T-shirts, hoodies, mugs & phone cases. Zero design skills. Shipped worldwide.",
+    btnGetEarlyAccess: 'Get Early Access', btnSeeHowItWorks: 'See How It Works',
+    heroCheck1: 'Upload photo or describe idea', heroCheck2: 'AI art in 10+ styles', heroCheck3: 'Ships to 30+ countries',
+    howItWorksBadge: 'The Process', howItWorksTitle1: 'Three steps.', howItWorksTitle2: 'Infinite designs.',
+    howItWorksDesc: 'From idea to your doorstep in days. No design skills. No complicated tools.',
+    step1Num: '01', step1Title: 'Describe Your Vision', step1Desc: 'Type anything: "a cyberpunk cat on Mars" or "watercolor mountain landscape." The more creative, the better.',
+    step2Num: '02', step2Title: 'AI Generates Designs', step2Desc: 'Our AI instantly creates unique designs. Pick your favorite, tweak the style, or regenerate for fresh ideas.',
+    step3Num: '03', step3Title: 'We Print & Ship', step3Desc: 'Choose your product and size. We print with premium quality and ship directly to your door — anywhere worldwide.',
+    styleGalleryTitle1: 'Any Style', styleGalleryTitle2: 'You Can Imagine', styleGalleryDesc: 'From classic oil paintings to cyberpunk — our AI transforms your photo into the style you choose.',
+    aiDemoBadge: 'AI Generation Studio', aiDemoTitle1: 'Watch AI Create', aiDemoTitle2: 'in Real Time',
+    aiDemoDesc: 'Describe what you want, upload a photo for style transfer, and watch AI generate your design.',
+    modeText: 'Text to Image', modeImage: 'Upload & Style Transfer',
+    labelUploadImage: 'Upload Your Image', dropImageHere: 'Drop your image here', dragDropUpload: 'Drag & drop or click to upload',
+    imageFormatHint: 'JPG, PNG, WebP — Max 10MB', originalLabel: 'Original',
+    labelPrompt: 'Your Prompt', labelAdditionalPrompt: 'Additional Prompt (optional)',
+    placeholderPrompt: 'e.g. "A majestic owl in a starry night..."', placeholderAdditionalPrompt: 'e.g. "Make it more colorful" or leave blank for pure style transfer',
+    labelChooseStyle: 'Choose Style', labelStyleStrength: 'Style Strength', labelQuality: 'Quality',
+    subtleLabel: 'Subtle', boldLabel: 'Bold',
+    btnGenerate: 'Generate', btnGenerating: 'Generating...', btnReset: 'Reset',
+    resultLabel: 'Result', beforeAfterTip: 'Click to toggle before/after',
+    standardName: 'Standard', standardBadge: 'FREE', standardDesc: 'Fast, good quality',
+    premiumName: 'Premium', premiumBadge: 'PRO', premiumDesc: 'More detail, better coherence',
+    errorLoginRequired: 'Please sign in to use Premium quality.',
+    productsBadge: 'Product Line', productsTitle1: 'Your art.', productsTitle2: 'Any surface.',
+    productsDesc: '5 premium products. Printed with care. Shipped worldwide from local warehouses.',
+    whyBadge: 'Why ArtShift', whyTitle1: 'Not a ', whyTitle2: 'designer?', whyTitle3: 'No problem.',
+    whyDesc: "Traditional custom printing requires design skills or expensive tools. ArtShift puts creative power in everyone's hands — with the most advanced AI image generation.",
+    btnStartCreatingFree: 'Start Creating Free',
+    featAiPowered: 'ChatGPT Image Generation powered', featAiPoweredDesc: "The world's most advanced AI models, fine-tuned for design generation",
+    featStyles: '10+ art styles', featStylesDesc: 'Photorealistic, anime, oil painting, cyberpunk, minimalism, and more',
+    featOneOrder: 'One order. No minimum.', featOneOrderDesc: 'Print on demand. No inventory, no waste, no commitment',
+    featGlobalNetwork: 'Global production network', featGlobalNetworkDesc: "Printful's local warehouses in US, UK, EU & Australia for fastest delivery",
+    featPrintQuality: 'Premium print quality', featPrintQualityDesc: 'DTG (Direct-to-Garment) printing for vibrant, durable designs',
+    featSecurePayments: 'Secure payments', featSecurePaymentsDesc: 'PayPal-powered. All major cards, PayPal, Apple Pay & Google Pay accepted',
+    testimonialsBadge: 'Social Proof', testimonialsTitle1: 'Loved by Creators', testimonialsTitle2: 'Worldwide',
+    pricingBadge: 'Pricing', pricingTitle: 'Coming Soon', pricingDesc: 'Join the waitlist to get early bird pricing when we launch.',
+    btnGetEarlyBirdPricing: 'Get Early Bird Pricing',
+    waitlistTitle1: 'Be the ', waitlistTitleHighlight: 'first', waitlistTitle2: 'to create.',
+    waitlistDesc1: 'Join the waitlist and get ', waitlistDescHighlight: 'early access', waitlistDesc2: ' when we launch — plus an exclusive ',
+    waitlistDiscount: '20% off', waitlistDesc3: ' on your first order.',
+    emailPlaceholder: 'your@email.com', errorValidEmail: 'Please enter a valid email address.',
+    btnJoining: 'Joining...', btnJoinWaitlist: 'Join Waitlist →',
+    waitlistSuccessTitle: "You're in!", waitlistSuccessDesc: "We'll notify you when we launch. Check your inbox for a confirmation.",
+    waitlistNoSpam: 'No spam. Unsubscribe anytime. We respect your inbox.',
+    statWaitlist: 'On Waitlist', statCountries: 'Countries', statProducts: 'Product Types',
+    faqBadge: 'FAQ', faqTitle1: 'Questions,', faqTitle2: 'answered',
+    faqQ1: 'How does the AI design generation work?',
+    faqA1: 'Simply describe what you want in plain English. Our AI generates unique designs based on your description. You can regenerate, adjust styles, or pick your favorite.',
+    faqQ2: 'Where do you ship to?',
+    faqA2: 'We ship to 30+ countries worldwide via our global production network. This includes the United States, Canada, all EU countries, UK, Australia, Japan, and more. US/EU typically 3-7 business days, other regions 7-14 business days.',
+    faqQ3: 'How long does production and shipping take?',
+    faqA3: 'Production typically takes 2-5 business days. Shipping adds 2-7 business days depending on location. You\'ll receive a tracking number via email as soon as your order ships.',
+    faqQ4: 'What payment methods do you accept?',
+    faqA4: 'We accept all major credit cards (Visa, Mastercard, Amex), PayPal, Apple Pay, Google Pay. All transactions are processed securely.',
+    faqQ5: 'Can I upload my own photo?',
+    faqA5: 'Yes! You can upload JPG, PNG, or WebP files up to 20MB. Our AI will transform your photo into various artistic styles — cartoon, anime, oil painting, sketch — and then apply it to any product.',
+    faqQ6: "What's your return policy?",
+    faqA6: 'Since all products are custom-printed specifically for you, we cannot accept returns for changed minds. However, if your item arrives damaged or defective, we\'ll replace it at no cost. Contact us within 7 days of delivery with photos.',
+    footerTagline: 'AI-powered custom products. Turn your imagination into wearable art.',
+    footerPlatform: 'Platform', footerCompany: 'Company', footerLegal: 'Legal',
+    footerAbout: 'About', footerBlog: 'Blog', footerContact: 'Contact',
+    footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service', footerRefund: 'Refund Policy',
+    footerCopyright: '© 2026 ArtShift. All rights reserved.',
   },
   zh: {
-    howItWorks: '如何使用',
-    products: '产品',
-    pricing: '价格',
-    faq: '常见问题',
-    joinWaitlist: '加入候补',
-    logout: '退出登录',
-    signIn: '登录',
-    buyCredits: '购买积分',
-    credits: '积分',
-    launchingSoon: '即将上线 — 美国 · 欧洲 · 全球',
-    heroTitle1: '将你的',
-    heroTitle2: '照片变成',
-    heroTitle3: '可穿戴的',
-    heroTitle4: '艺术品',
-    getEarlyAccess: '获取早期访问',
-    seeHowItWorks: '看看它是如何工作的',
-    theProcess: '工作流程',
-    infiniteDesigns: '无限设计。',
-    step1Title: '描述你的愿景',
-    step2Title: 'AI 生成设计',
-    step3Title: '我们印刷并配送',
-    aiGenerationStudio: 'AI 生成工作室',
-    watchAICreate: '观看 AI 创作',
-    inRealTime: '实时',
-    textToImage: '文字生成图片',
-    uploadAndStyleTransfer: '上传并风格迁移',
-    yourPrompt: '你的提示词',
-    chooseStyle: '选择风格',
-    quality: '质量',
-    standard: '标准',
-    premium: '高级',
-    free: '免费',
-    pro: '专业',
-    generating: '生成中...',
-    generateImage: '生成图片',
-    applyStyleTransfer: '应用风格迁移',
-    comingSoon: '即将推出',
-    beTheFirst: '成为',
-    firstToCreate: '第一个',
-    toCreate: '创作者。',
-    realReviews: '真实评价',
-    lovedByEarlyTesters: '受到早期测试者喜爱',
-    questionsAnswered: '问题，已解答',
+    howItWorks: '如何使用', products: '产品', pricing: '价格', faq: '常见问题',
+    joinWaitlist: '加入候补名单', logout: '退出登录', signIn: '登录', buyCredits: '购买积分', credits: '积分',
+    heroBadge: '即将上线 — 美国 · 欧洲 · 全球',
+    heroTitle1a: '将你的', heroTitle1b: '照片变成', heroTitle2a: '穿戴艺术品', heroTitle2b: '只需几秒',
+    heroDesc1: '上传一张照片或描述你的想法。AI 将其转化为',
+    heroDescBold: '惊艳艺术作品', heroDesc2: ' —— 然后我们印在 T 恤、卫衣、马克杯和手机壳上。无需设计技巧。全球配送。',
+    btnGetEarlyAccess: '获取早期访问', btnSeeHowItWorks: '了解工作流程',
+    heroCheck1: '上传照片或描述想法', heroCheck2: '10+ 种 AI 艺术风格', heroCheck3: '配送至 30+ 国家',
+    howItWorksBadge: '流程', howItWorksTitle1: '三个步骤。', howItWorksTitle2: '无限可能。',
+    howItWorksDesc: '从灵感到送到家门口，只需数天。无需设计技能。无需复杂工具。',
+    step1Num: '01', step1Title: '描述你的想法', step1Desc: '输入任何内容："火星上的赛博朋克猫"或"水彩山水画"。越有创意越好。',
+    step2Num: '02', step2Title: 'AI 生成设计', step2Desc: '我们的 AI 即时创建独特的设计。选择你喜欢的，调整风格，或重新生成获取新灵感。',
+    step3Num: '03', step3Title: '打印并配送', step3Desc: '选择产品和尺寸。我们以优质品质打印并直接配送到你家门 —— 全球任意地点。',
+    styleGalleryTitle1: '任意风格', styleGalleryTitle2: '任你想象', styleGalleryDesc: '从经典油画到赛博朋克 —— 我们的 AI 将你的照片转换为你选择的风格。',
+    aiDemoBadge: 'AI 创作工作室', aiDemoTitle1: '实时观看 AI', aiDemoTitle2: '创作过程',
+    aiDemoDesc: '描述你想要的内容，上传照片进行风格迁移，观看 AI 为你生成设计。',
+    modeText: '文字生图', modeImage: '上传图片 & 风格迁移',
+    labelUploadImage: '上传图片', dropImageHere: '将图片拖到此处', dragDropUpload: '拖拽或点击上传',
+    imageFormatHint: 'JPG、PNG、WebP —— 最大 10MB', originalLabel: '原图',
+    labelPrompt: '输入提示词', labelAdditionalPrompt: '附加提示词（可选）',
+    placeholderPrompt: '例如："星空下的雄伟猫头鹰..."', placeholderAdditionalPrompt: '例如："让它更鲜艳" 或留空进行纯风格迁移',
+    labelChooseStyle: '选择风格', labelStyleStrength: '风格强度', labelQuality: '画质',
+    subtleLabel: '轻微', boldLabel: '强烈',
+    btnGenerate: '生成', btnGenerating: '生成中...', btnReset: '重置',
+    resultLabel: '结果', beforeAfterTip: '点击切换前后对比',
+    standardName: '标准', standardBadge: '免费', standardDesc: '快速，良好画质',
+    premiumName: '高级', premiumBadge: '专业', premiumDesc: '更多细节，更好一致性',
+    errorLoginRequired: '请先登录以使用高级画质。',
+    productsBadge: '产品线', productsTitle1: '你的艺术。', productsTitle2: '任意载体。',
+    productsDesc: '5 款优质产品。精心印制。从本地仓库全球配送。',
+    whyBadge: '为什么选择 ArtShift', whyTitle1: '不是', whyTitle2: '设计师？', whyTitle3: '没问题。',
+    whyDesc: '传统定制印刷需要设计技能或昂贵工具。ArtShift 让每个人都能掌握创作力 —— 凭借最先进的 AI 图像生成技术。',
+    btnStartCreatingFree: '免费开始创作',
+    featAiPowered: 'ChatGPT 图像生成驱动', featAiPoweredDesc: '世界最先进的 AI 模型，专为设计生成而微调',
+    featStyles: '10+ 种艺术风格', featStylesDesc: '写实、动漫、油画、赛博朋克、极简主义等',
+    featOneOrder: '一件起订。无最低限量。', featOneOrderDesc: '按需印刷。无库存，无浪费，无承诺',
+    featGlobalNetwork: '全球生产网络', featGlobalNetworkDesc: 'Printful 在美国、英国、欧盟和澳大利亚的本地仓库，最快配送',
+    featPrintQuality: '优质印刷品质', featPrintQualityDesc: 'DTG（直喷）印刷，色彩鲜艳，持久耐用',
+    featSecurePayments: '安全支付', featSecurePaymentsDesc: 'PayPal 驱动。支持主流信用卡、PayPal、Apple Pay 和 Google Pay',
+    testimonialsBadge: '用户好评', testimonialsTitle1: '创作者的挚爱', testimonialsTitle2: '遍布全球',
+    pricingBadge: '价格', pricingTitle: '即将推出', pricingDesc: '加入候补名单，上线时享受早鸟价优惠。',
+    btnGetEarlyBirdPricing: '获取早鸟价',
+    waitlistTitle1: '成为', waitlistTitleHighlight: '首批', waitlistTitle2: '创作者。',
+    waitlistDesc1: '加入候补名单，获得', waitlistDescHighlight: '早期访问权限', waitlistDesc2: '，上线时还可享受独家',
+    waitlistDiscount: '8 折', waitlistDesc3: '首单优惠。',
+    emailPlaceholder: '你的邮箱', errorValidEmail: '请输入有效的邮箱地址。',
+    btnJoining: '加入中...', btnJoinWaitlist: '加入候补名单 →',
+    waitlistSuccessTitle: '已加入！', waitlistSuccessDesc: '上线时会通知你。请查看邮箱确认邮件。',
+    waitlistNoSpam: '无垃圾邮件。随时退订。我们尊重你的收件箱。',
+    statWaitlist: '候补人数', statCountries: '覆盖国家', statProducts: '产品类型',
+    faqBadge: '常见问题', faqTitle1: '有疑问？', faqTitle2: '这里有答案',
+    faqQ1: 'AI 设计生成如何工作？',
+    faqA1: '用简单的语言描述你想要什么。我们的 AI 会根据你的描述生成独特的设计。你可以重新生成、调整风格或选择最喜欢的。',
+    faqQ2: '你们配送到哪里？',
+    faqA2: '我们通过全球生产网络配送至 30+ 个国家，包括美国、加拿大、所有欧盟国家、英国、澳大利亚等。美国/欧盟通常 3-7 个工作日，其他地区 7-14 个工作日。',
+    faqQ3: '生产和配送需要多长时间？',
+    faqA3: '生产通常需要 2-5 个工作日。根据地点不同，配送需要 2-7 个工作日。订单发货后你会收到邮件追踪号。',
+    faqQ4: '你们接受哪些支付方式？',
+    faqA4: '我们接受所有主流信用卡（Visa、Mastercard、Amex）、PayPal、Apple Pay、Google Pay。所有交易均安全处理。',
+    faqQ5: '我可以上传自己的照片吗？',
+    faqA5: '可以！你可以上传 JPG、PNG 或 WebP 文件（最大 20MB）。我们的 AI 会将你的照片转换为各种艺术风格 —— 卡通、动漫、油画、素描 —— 然后应用到任何产品上。',
+    faqQ6: '退货政策是什么？',
+    faqA6: '由于所有产品都是为您定制印刷的，我们不接受因改变主意而退货。但如果商品在运输中损坏或有缺陷，我们将免费更换。请在收货后 7 天内联系我们并提供照片。',
+    footerTagline: 'AI 驱动的定制产品。将你的想象力变成可穿戴的艺术品。',
+    footerPlatform: '平台', footerCompany: '公司', footerLegal: '法律',
+    footerAbout: '关于我们', footerBlog: '博客', footerContact: '联系我们',
+    footerPrivacy: '隐私政策', footerTerms: '服务条款', footerRefund: '退款政策',
+    footerCopyright: '© 2026 ArtShift. 保留所有权利。',
   },
 };
 
@@ -236,7 +286,7 @@ function FloatingIcon({ icon, x, y, delay, opacity = 0.12 }: {
 }
 
 // ─── Hero Section ──────────────────────────────────────────────────────────
-function HeroSection() {
+function HeroSection({ t }: { t: (key: string) => string }) {
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden bg-white/95">
       {/* Floating Lucide icons — crisp vector, not emoji */}
@@ -272,29 +322,28 @@ function HeroSection() {
           </div>
 
           <h1 className="text-[2rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3.5rem] leading-[1.1] font-extrabold tracking-tight mb-5">
-            <span className="text-gray-900">Shift Your </span>
-            <span className="gradient-text">Photos Into</span>
+            <span className="text-gray-900">{t("heroTitle1a")}</span>
+            <span className="gradient-text">{t("heroTitle1b")}</span>
             <br />
-            <span className="text-gray-900">Wearables </span>
-            <span className="text-gradient-warm">In Seconds</span>
+            <span className="text-gray-900">{t("heroTitle2a")}</span>
+            <span className="text-gradient-warm">{t("heroTitle2b")}</span>
           </h1>
 
           <p className="text-[15px] sm:text-[16px] text-gray-700 font-normal mb-8 max-w-lg leading-relaxed">
-            Upload a photo or describe your idea. AI transforms it into{' '}
-            <span className="font-semibold text-gray-900">stunning art</span>{' '}
-            — then we print it on T-shirts, hoodies, mugs &amp; phone cases.
-            Zero design skills. Shipped worldwide.
+            {t("heroDesc1")}{' '}
+            <span className="font-semibold text-gray-900">{t("heroDescBold")}</span>{' '}
+            {t("heroDesc2")}
           </p>
 
           <div className="flex flex-wrap gap-4 items-center mb-10">
             <a href="#waitlist"
               className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105 hover:shadow-xl"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              Get Early Access <ArrowRight size={16} />
+              {t("btnGetEarlyAccess")} <ArrowRight size={16} />
             </a>
             <a href="#how-it-works"
               className="inline-flex items-center gap-2 text-[14px] font-semibold text-gray-700 border border-gray-200 rounded-full px-8 py-4 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 bg-white">
-              See How It Works <ChevronDown size={15} />
+              {t("btnSeeHowItWorks")} <ChevronDown size={15} />
             </a>
           </div>
 
@@ -316,29 +365,11 @@ function HeroSection() {
 }
 
 // ─── How It Works ──────────────────────────────────────────────────────────
-function HowItWorks() {
+function HowItWorks({ t }: { t: (key: string) => string }) {
   const steps = [
-    {
-      num: '01',
-      title: 'Describe Your Vision',
-      desc: 'Type anything: "a cyberpunk cat on Mars" or "watercolor mountain landscape." The more creative, the better.',
-      image: '/images/step1-describe-vision.png',
-      color: '#3b82f6',
-    },
-    {
-      num: '02',
-      title: 'AI Generates Designs',
-      desc: 'Our AI instantly creates 4 unique designs. Pick your favorite, tweak the style, or regenerate for fresh ideas.',
-      image: '/images/step2-ai-generates.png',
-      color: '#8b5cf6',
-    },
-    {
-      num: '03',
-      title: 'We Print & Ship',
-      desc: 'Choose your product and size. We print with premium quality and ship directly to your door — anywhere worldwide.',
-      image: '/images/step3-print-ship.png',
-      color: '#f97316',
-    },
+    { num: t('step1Num'), title: t('step1Title'), desc: t('step1Desc'), image: '/images/step1-describe-vision.png', color: '#3b82f6' },
+    { num: t('step2Num'), title: t('step2Title'), desc: t('step2Desc'), image: '/images/step2-ai-generates.png', color: '#8b5cf6' },
+    { num: t('step3Num'), title: t('step3Title'), desc: t('step3Desc'), image: '/images/step3-print-ship.png', color: '#f97316' },
   ];
 
   return (
@@ -349,8 +380,8 @@ function HowItWorks() {
             The Process
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            Three steps.{' '}
-            <span className="gradient-text">Infinite designs.</span>
+            {t('howItWorksTitle1')}{' '}
+            <span className="gradient-text">{t("howItWorksTitle2")}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
             From idea to your doorstep in days. No design skills. No complicated tools.
@@ -391,7 +422,7 @@ interface AIDemoProps {
   userId: string | null;
 }
 
-function AIDemo({ userId }: AIDemoProps) {
+function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
   // ─── Mode: 'text' or 'image' ───────────────────────────
   const [mode, setMode] = useState<'text' | 'image'>('text');
   const [prompt, setPrompt] = useState('');
@@ -512,8 +543,8 @@ function AIDemo({ userId }: AIDemoProps) {
   };
 
   const QUALITY_TIERS = [
-    { id: 'standard' as const, name: 'Standard', badge: 'FREE', desc: 'Fast, good quality', color: '#10b981' },
-    { id: 'premium' as const, name: 'Premium', badge: 'PRO', desc: 'More detail, better coherence', color: '#8b5cf6' },
+    { id: 'standard' as const, name: t('standardName'), badge: t('standardBadge'), desc: t('standardDesc'), color: '#10b981' },
+    { id: 'premium' as const, name: t('premiumName'), badge: t('premiumBadge'), desc: t('premiumDesc'), color: '#8b5cf6' },
   ];
 
   return (
@@ -524,8 +555,8 @@ function AIDemo({ userId }: AIDemoProps) {
             AI Generation Studio
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            <span className="gradient-text">Watch AI Create</span>
-            <br />in Real Time
+            <span className="gradient-text">{t("aiDemoTitle1")}</span>
+            <br />{t("aiDemoTitle2")}
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
             Describe what you want, upload a photo for style transfer, and watch AI generate your design.
@@ -581,7 +612,7 @@ function AIDemo({ userId }: AIDemoProps) {
                   >
                     <Upload size={32} className={`mx-auto mb-3 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
                     <p className="text-sm font-semibold text-gray-700 mb-1">
-                      {isDragging ? 'Drop your image here' : 'Drag & drop or click to upload'}
+                      {isDragging ? t('dropImageHere') : t('dragDropUpload')}
                     </p>
                     <p className="text-xs text-gray-400">JPG, PNG, WebP — Max 10MB</p>
                     <input
@@ -622,7 +653,7 @@ function AIDemo({ userId }: AIDemoProps) {
             {/* ─── Prompt Input ─────────────────────────── */}
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                {mode === 'text' ? 'Your Prompt' : 'Additional Prompt (optional)'}
+                {mode === 'text' ? t('labelPrompt') : t('labelAdditionalPrompt')}
               </label>
               <textarea
                 value={prompt}
@@ -665,7 +696,7 @@ function AIDemo({ userId }: AIDemoProps) {
             {mode === 'image' && (
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                  Style Strength: {Math.round(strength * 100)}%
+                  {t('labelStyleStrength')}: {Math.round(strength * 100)}%
                 </label>
                 <input
                   type="range"
@@ -680,8 +711,8 @@ function AIDemo({ userId }: AIDemoProps) {
                   }}
                 />
                 <div className="flex justify-between text-[9px] text-gray-400 mt-1">
-                  <span>Subtle</span>
-                  <span>Bold</span>
+                  <span>{t('subtleLabel')}</span>
+                  <span>{t('boldLabel')}</span>
                 </div>
               </div>
             )}
@@ -860,7 +891,7 @@ function AIDemo({ userId }: AIDemoProps) {
 }
 
 // ─── Products ────────────────────────────────────────────────────────────────
-function Products() {
+function Products({ t }: { t: (key: string) => string }) {
   const products = [
     { emoji: '👕', name: 'T-Shirt', desc: 'Premium cotton, multiple colors', price: 'From $29.99', badge: 'Most Popular', badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
     { emoji: '🧥', name: 'Hoodie', desc: 'Soft fleece, Unisex fit', price: 'From $44.99', badge: 'Cozy', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
@@ -877,8 +908,8 @@ function Products() {
             Product Line
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            Your art.{' '}
-            <span className="gradient-text">Any surface.</span>
+            {t('productsTitle1')}{' '}
+            <span className="gradient-text">{t("productsTitle2")}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
             5 premium products. Printed with care. Shipped worldwide from local warehouses.
@@ -919,14 +950,14 @@ function Products() {
 }
 
 // ─── Why ArtShift ─────────────────────────────────────────────────────────────
-function WhyArtShift() {
+function WhyArtShift({ t }: { t: (key: string) => string }) {
   const features = [
-    { icon: <Sparkles size={20} />, title: 'ChatGPT Image Generation powered', desc: 'The world\'s most advanced AI models, fine-tuned for design generation', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: <Layers size={20} />, title: '10+ art styles', desc: 'Photorealistic, anime, oil painting, cyberpunk, minimalism, and more', color: '#8b5cf6', bg: '#f5f3ff' },
-    { icon: <Zap size={20} />, title: 'One order. No minimum.', desc: 'Print on demand. No inventory, no waste, no commitment', color: '#f97316', bg: '#fff7ed' },
-    { icon: <Globe size={20} />, title: 'Global production network', desc: 'Printful\'s local warehouses in US, UK, EU & Australia for fastest delivery', color: '#10b981', bg: '#ecfdf5' },
-    { icon: <ShieldCheck size={20} />, title: 'Premium print quality', desc: 'DTG (Direct-to-Garment) printing for vibrant, durable designs', color: '#3b82f6', bg: '#eff6ff' },
-    { icon: <CreditCard size={20} />, title: 'Secure payments', desc: 'Stripe-powered. All major cards, PayPal, Apple Pay & Google Pay accepted', color: '#8b5cf6', bg: '#f5f3ff' },
+    { icon: <Sparkles size={20} />, title: t('featAiPowered'), desc: t('featAiPoweredDesc'), color: '#3b82f6', bg: '#eff6ff' },
+    { icon: <Layers size={20} />, title: t('featStyles'), desc: t('featStylesDesc'), color: '#8b5cf6', bg: '#f5f3ff' },
+    { icon: <Zap size={20} />, title: t('featOneOrder'), desc: t('featOneOrderDesc'), color: '#f97316', bg: '#fff7ed' },
+    { icon: <Globe size={20} />, title: t('featGlobalNetwork'), desc: 'Printful\'s local warehouses in US, UK, EU & Australia for fastest delivery', color: '#10b981', bg: '#ecfdf5' },
+    { icon: <ShieldCheck size={20} />, title: t('featPrintQuality'), desc: t('featPrintQualityDesc'), color: '#3b82f6', bg: '#eff6ff' },
+    { icon: <CreditCard size={20} />, title: t('featSecurePayments'), desc: t('featSecurePaymentsDesc'), color: '#8b5cf6', bg: '#f5f3ff' },
   ];
 
   return (
@@ -938,17 +969,17 @@ function WhyArtShift() {
               Why ArtShift
             </span>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
-              Not a{' '}
-              <span className="gradient-text">designer?</span>
-              <br />No problem.
+              {t('whyTitle1')}{' '}
+              <span className="gradient-text">{t("whyTitle2")}</span>
+              <br />{t("whyTitle3")}.
             </h2>
             <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">
-              Traditional custom printing requires design skills or expensive tools. ArtShift puts creative power in everyone's hands — with the most advanced AI image generation.
+              {t("whyDesc")}
             </p>
             <a href="#waitlist"
               className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              Start Creating Free <ArrowRight size={16} />
+              {t("btnStartCreatingFree")} <ArrowRight size={16} />
             </a>
           </div>
 
@@ -972,20 +1003,18 @@ function WhyArtShift() {
 }
 
 // ─── Testimonials ──────────────────────────────────────────────────────────
-function Testimonials() {
+function Testimonials({ t }: { t: (key: string) => string }) {
   const reviews = [
-    { name: 'Alex M.', country: '🇺🇸 USA', text: 'I had zero design skills. Printed a custom hoodie with my cat in Van Gogh style. It looks incredible.', rating: 5 },
-    { name: 'Sophie L.', country: '🇩🇪 Germany', text: 'Ordered from Germany, arrived in 5 days. The print quality is better than any store-bought shirt.', rating: 5 },
-    { name: 'James K.', country: '🇬🇧 UK', text: 'Made personalized mugs for my entire team. They loved it. Will order again for sure.', rating: 5 },
+    { name: t('testimonial1Name'), country: '🇺🇸 USA', text: t('testimonial1Text'), rating: 5 },
+    { name: t('testimonial2Name'), country: '🇩🇪 Germany', text: t('testimonial2Text'), rating: 5 },
+    { name: t('testimonial3Name'), country: '🇬🇧 UK', text: t('testimonial3Text'), rating: 5 },
   ];
 
   return (
     <section className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600">
-            Real Reviews
-          </span>
+          <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600">{t('testimonialsBadge')}</span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
             Loved by{' '}
             <span className="gradient-text">early testers</span>
@@ -1020,7 +1049,7 @@ function Testimonials() {
 }
 
 // ─── Pricing ────────────────────────────────────────────────────────────────
-function Pricing() {
+function Pricing({ t }: { t: (key: string) => string }) {
   return (
     <section id="pricing" className="py-20 sm:py-28 px-6 sm:px-12 md:px-20 lg:px-28 bg-slate-50">
       <div className="max-w-6xl mx-auto">
@@ -1029,7 +1058,7 @@ function Pricing() {
             Pricing
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-            <span className="gradient-text">Coming Soon</span>
+            <span className='gradient-text'>{t('pricingTitle')}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mb-8">
             Join the waitlist to get early bird pricing when we launch.
@@ -1037,7 +1066,7 @@ function Pricing() {
           <a href="#waitlist"
             className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-            Get Early Bird Pricing <ArrowRight size={16} />
+            {t("btnGetEarlyBirdPricing")} <ArrowRight size={16} />
           </a>
         </div>
       </div>
@@ -1049,7 +1078,7 @@ function Pricing() {
 const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
 
 // ─── Waitlist ────────────────────────────────────────────────────────────────
-function Waitlist() {
+function Waitlist({ t }: { t: (key: string) => string }) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
@@ -1088,16 +1117,15 @@ function Waitlist() {
           <ArtShiftLogo className="w-10 h-10" />
         </div>
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-5">
-          Be the{' '}
+          {t("waitlistTitle1")}
           <span style={{ background: 'linear-gradient(135deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            first
+            {t("waitlistTitleHighlight")}
           </span>
-          {' '}to create.
+          {t("waitlistTitle2")}
         </h2>
         <p className="text-gray-300 text-base sm:text-lg mb-10 max-w-lg mx-auto leading-relaxed">
-          Join the waitlist and get{' '}
-          <span className="font-bold text-white">early access</span> when we launch — plus an exclusive{' '}
-          <span style={{ color: '#fbbf24' }} className="font-bold">20% off</span> on your first order.
+          {t("waitlistDesc1")}
+          <span className="font-bold text-white">{t("waitlistDescHighlight")}</span>{t("waitlistDesc2")}<span style={{ color: '#fbbf24' }} className="font-bold">{t("waitlistDiscount")}</span>{t("waitlistDesc3")}
         </p>
 
         {!submitted ? (
@@ -1114,14 +1142,14 @@ function Waitlist() {
             <button type="submit" disabled={loading}
               className="w-full rounded-2xl px-8 py-4 text-sm font-bold text-white transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-              {loading ? 'Joining...' : 'Join Waitlist →'}
+              {loading ? t('btnJoining') : t('btnJoinWaitlist')}
             </button>
           </form>
         ) : (
           <div className="rounded-2xl p-6 max-w-md mx-auto"
             style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
             <div className="text-4xl mb-3">🎉</div>
-            <p className="text-white font-semibold text-lg mb-1">You're in!</p>
+            <p className="text-white font-semibold text-lg mb-1">{t("waitlistSuccessTitle")}</p>
             <p className="text-gray-300 text-sm">We'll notify you when we launch. Check your inbox for a confirmation.</p>
           </div>
         )}
@@ -1146,15 +1174,15 @@ function Waitlist() {
 }
 
 // ─── FAQ ────────────────────────────────────────────────────────────────────
-function FAQ() {
+function FAQ({ t }: { t: (key: string) => string }) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const faqs = [
-    { q: 'How does the AI design generation work?', a: 'Simply describe what you want in plain English. Our AI — powered by ChatGPT Image Generation and Stable Diffusion XL — generates 4 unique designs based on your description. You can regenerate, adjust styles, or pick your favorite.' },
-    { q: 'Where do you ship to?', a: 'We ship to 30+ countries worldwide via Printful\'s global production network. This includes the United States, Canada, all EU countries, UK, Australia, Japan, and more. US/EU typically 3-7 business days, other regions 7-14 business days.' },
-    { q: 'How long does production and shipping take?', a: 'Production typically takes 2-5 business days. Shipping adds 2-7 business days depending on location. You\'ll receive a tracking number via email as soon as your order ships.' },
-    { q: 'What payment methods do you accept?', a: 'We accept all major credit cards (Visa, Mastercard, Amex), PayPal, Apple Pay, Google Pay, and Shop Pay. All transactions are processed securely via Stripe.' },
-    { q: 'Can I upload my own photo?', a: 'Yes! You can upload JPG, PNG, or WebP files up to 20MB. Our AI will transform your photo into various artistic styles — cartoon, anime, oil painting, sketch — and then apply it to any product.' },
-    { q: 'What\'s your return policy?', a: 'Since all products are custom-printed specifically for you, we cannot accept returns for changed minds. However, if your item arrives damaged or defective, we\'ll replace it at no cost. Contact us within 7 days of delivery with photos.' },
+    { q: t('faqQ1'), a: t('faqA1') },
+    { q: t('faqQ2'), a: t('faqA2') },
+    { q: t('faqQ3'), a: t('faqA3') },
+    { q: t('faqQ4'), a: t('faqA4') },
+    { q: t('faqQ5'), a: t('faqA5') },
+    { q: t('faqQ6'), a: t('faqA6') },
   ];
 
   return (
@@ -1165,8 +1193,8 @@ function FAQ() {
             FAQ
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
-            Questions,{' '}
-            <span className="gradient-text">answered</span>
+            {t('faqTitle1')}{' '}
+            <span className='gradient-text'>{t('faqTitle2')}</span>
           </h2>
         </div>
 
@@ -1197,7 +1225,7 @@ function FAQ() {
 }
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
-function Footer() {
+function Footer({ t }: { t: (key: string) => string }) {
   return (
     <footer className="py-16 px-6 sm:px-12 md:px-20 lg:px-28 bg-gray-950">
       <div className="max-w-6xl mx-auto">
@@ -1215,7 +1243,7 @@ function Footer() {
             <div>
               <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Platform</div>
               <div className="space-y-3">
-                {["How It Works", "Products", "Pricing"].map(l => (
+                {[t('howItWorks'), t('products'), t('pricing')].map(l => (
                   <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
@@ -1253,12 +1281,12 @@ function Footer() {
 }
 
 // ─── Style Gallery ─────────────────────────────────────────────────────────
-function StyleGallery() {
+function StyleGallery({ t }: { t: (key: string) => string }) {
   return (
     <section className="py-20 px-6 sm:px-12 md:px-20 bg-white">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
-          <span className="gradient-text">Any Style</span> You Can Imagine
+          <span className="gradient-text">{t("styleGalleryTitle1")}</span> {t("styleGalleryTitle2")}
         </h2>
         <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
           From classic oil paintings to cyberpunk — our AI transforms your photo into the style you choose.
@@ -1370,17 +1398,17 @@ export default function App() {
         onClose={() => setShowBuyCredits(false)}
         userId={user?.id}
       />
-      <HeroSection />
-      <HowItWorks />
-      <StyleGallery />
-      <AIDemo userId={user?.id || null} />
-      <Products />
-      <WhyArtShift />
-      <Testimonials />
-      <Pricing />
-      <Waitlist />
-      <FAQ />
-      <Footer />
+      <HeroSection t={t} />
+      <HowItWorks t={t} />
+      <StyleGallery t={t} />
+      <AIDemo userId={user?.id || null} t={t} />
+      <Products t={t} />
+      <WhyArtShift t={t} />
+      <Testimonials t={t} />
+      <Pricing t={t} />
+      <Waitlist t={t} />
+      <FAQ t={t} />
+      <Footer t={t} />
       {showBackToTop && (
         <button
           onClick={scrollToTop}
