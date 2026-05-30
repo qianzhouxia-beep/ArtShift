@@ -82,6 +82,9 @@ const translations: Record<string, Record<string, string>> = {
     footerAbout: 'About', footerBlog: 'Blog', footerContact: 'Contact',
     footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service', footerRefund: 'Refund Policy',
     footerCopyright: '© 2026 ArtShift. All rights reserved.',
+    testimonial1Name: 'Alex M.', testimonial1Text: 'I had zero design skills. Printed a custom hoodie with my cat in Van Gogh style. It looks incredible.',
+    testimonial2Name: 'Sophie L.', testimonial2Text: 'Ordered from Germany, arrived in 5 days. The print quality is better than any store-bought shirt.',
+    testimonial3Name: 'James K.', testimonial3Text: 'Made personalized mugs for my entire team. They loved it. Will order again for sure.',
   },
   zh: {
     howItWorks: '如何使用', products: '产品', pricing: '价格', faq: '常见问题',
@@ -152,6 +155,9 @@ const translations: Record<string, Record<string, string>> = {
     footerAbout: '关于我们', footerBlog: '博客', footerContact: '联系我们',
     footerPrivacy: '隐私政策', footerTerms: '服务条款', footerRefund: '退款政策',
     footerCopyright: '© 2026 ArtShift. 保留所有权利。',
+    testimonial1Name: 'Alex M.', testimonial1Text: '我完全没有设计技能。用我猫咪的照片印了一件梵高风格的卫衣。效果太惊艳了。',
+    testimonial2Name: 'Sophie L.', testimonial2Text: '从德国订货，5天就到了。印刷质量比任何店里买的T恤都好。',
+    testimonial3Name: 'James K.', testimonial3Text: '给整个团队做了定制马克杯。他们都很喜欢。肯定会再订购。',
   },
 };
 
