@@ -12,12 +12,12 @@ import BuyCreditsModal from './components/BuyCreditsModal';
 
 
 // ─── i18n Translations ─────────────────────────────────────────────
-const translations = {
+const translations: Record<string, Record<string, string>> = {
   en: {
-    howItWorks: t("howItWorks"),
-    products: t("products"),
-    pricing: t("pricing"),
-    faq: t("faq"),
+    howItWorks: 'How It Works',
+    products: 'Products',
+    pricing: 'Pricing',
+    faq: 'FAQ',
     joinWaitlist: 'Join Waitlist',
     logout: 'Logout',
     signIn: 'Sign In',
@@ -105,8 +105,9 @@ const translations = {
   },
 };
 
-function useT(lang) {
-  return (key) => translations[lang]?.[key] ?? key;
+function useT(lang: string): (key: string) => string {
+  const langObj: Record<string, string> = translations[lang] as unknown as Record<string, string>;
+  return (key: string): string => langObj[key] ?? key;
 }
 // ─────────────────────────────────────────────────────────────────────
 
@@ -205,6 +206,11 @@ function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, set
           ))}
         </div>
       )}
+      {/* Language Switcher */}
+      <div className="flex items-center gap-1 ml-4">
+        <button onClick={() => setLang('en')} className={`text-xs font-bold px-2 py-1 rounded ${lang === 'en' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}>EN</button>
+        <button onClick={() => setLang('zh')} className={`text-xs font-bold px-2 py-1 rounded ${lang === 'zh' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}>中文</button>
+      </div>
     </nav>
   );
 }
@@ -226,12 +232,6 @@ function FloatingIcon({ icon, x, y, delay, opacity = 0.12 }: {
       {icon}
     </div>
 
-      {/* Language Switcher */}
-      <div className="flex items-center gap-1 ml-4">
-        <button onClick={() => setLang('en')} className={`text-xs font-bold px-2 py-1 rounded ${lang === 'en' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}>EN</button>
-        <button onClick={() => setLang('zh')} className={`text-xs font-bold px-2 py-1 rounded ${lang === 'zh' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}>中文</button>
-      </div>
-    
   );
 }
 
@@ -1215,7 +1215,7 @@ function Footer() {
             <div>
               <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Platform</div>
               <div className="space-y-3">
-                {[t("howItWorks"), t("products"), t("pricing")].map(l => (
+                {["How It Works", "Products", "Pricing"].map(l => (
                   <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
