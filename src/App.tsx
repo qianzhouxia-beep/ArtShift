@@ -10,6 +10,107 @@ import {
 import ParticleBackground from './ParticleBackground';
 import BuyCreditsModal from './components/BuyCreditsModal';
 
+
+// ─── i18n Translations ─────────────────────────────────────────────
+const translations = {
+  en: {
+    howItWorks: t("howItWorks"),
+    products: t("products"),
+    pricing: t("pricing"),
+    faq: t("faq"),
+    joinWaitlist: 'Join Waitlist',
+    logout: 'Logout',
+    signIn: 'Sign In',
+    buyCredits: 'Buy Credits',
+    credits: 'credits',
+    launchingSoon: 'Launching Soon — US · Europe · Worldwide',
+    heroTitle1: 'Shift Your',
+    heroTitle2: 'Photos Into',
+    heroTitle3: 'Wearables',
+    heroTitle4: 'In Seconds',
+    getEarlyAccess: 'Get Early Access',
+    seeHowItWorks: 'See How It Works',
+    theProcess: 'The Process',
+    infiniteDesigns: 'Infinite designs.',
+    step1Title: 'Describe Your Vision',
+    step2Title: 'AI Generates Designs',
+    step3Title: 'We Print & Ship',
+    aiGenerationStudio: 'AI Generation Studio',
+    watchAICreate: 'Watch AI Create',
+    inRealTime: 'in Real Time',
+    textToImage: 'Text to Image',
+    uploadAndStyleTransfer: 'Upload & Style Transfer',
+    yourPrompt: 'Your Prompt',
+    chooseStyle: 'Choose Style',
+    quality: 'Quality',
+    standard: 'Standard',
+    premium: 'Premium',
+    free: 'FREE',
+    pro: 'PRO',
+    generating: 'Generating...',
+    generateImage: 'Generate Image',
+    applyStyleTransfer: 'Apply Style Transfer',
+    comingSoon: 'Coming Soon',
+    beTheFirst: 'Be the',
+    firstToCreate: 'first',
+    toCreate: 'to create.',
+    realReviews: 'Real Reviews',
+    lovedByEarlyTesters: 'Loved by early testers',
+    questionsAnswered: 'Questions, answered',
+  },
+  zh: {
+    howItWorks: '如何使用',
+    products: '产品',
+    pricing: '价格',
+    faq: '常见问题',
+    joinWaitlist: '加入候补',
+    logout: '退出登录',
+    signIn: '登录',
+    buyCredits: '购买积分',
+    credits: '积分',
+    launchingSoon: '即将上线 — 美国 · 欧洲 · 全球',
+    heroTitle1: '将你的',
+    heroTitle2: '照片变成',
+    heroTitle3: '可穿戴的',
+    heroTitle4: '艺术品',
+    getEarlyAccess: '获取早期访问',
+    seeHowItWorks: '看看它是如何工作的',
+    theProcess: '工作流程',
+    infiniteDesigns: '无限设计。',
+    step1Title: '描述你的愿景',
+    step2Title: 'AI 生成设计',
+    step3Title: '我们印刷并配送',
+    aiGenerationStudio: 'AI 生成工作室',
+    watchAICreate: '观看 AI 创作',
+    inRealTime: '实时',
+    textToImage: '文字生成图片',
+    uploadAndStyleTransfer: '上传并风格迁移',
+    yourPrompt: '你的提示词',
+    chooseStyle: '选择风格',
+    quality: '质量',
+    standard: '标准',
+    premium: '高级',
+    free: '免费',
+    pro: '专业',
+    generating: '生成中...',
+    generateImage: '生成图片',
+    applyStyleTransfer: '应用风格迁移',
+    comingSoon: '即将推出',
+    beTheFirst: '成为',
+    firstToCreate: '第一个',
+    toCreate: '创作者。',
+    realReviews: '真实评价',
+    lovedByEarlyTesters: '受到早期测试者喜爱',
+    questionsAnswered: '问题，已解答',
+  },
+};
+
+function useT(lang) {
+  return (key) => translations[lang]?.[key] ?? key;
+}
+// ─────────────────────────────────────────────────────────────────────
+
+
 // ─── Style Gallery Data ───────────────────────────────────────────────────────
 const styleGallery = [
   { src: '/images/styles/style-oil-painting.png', title: 'Oil Painting', desc: 'Van Gogh & Monet' },
@@ -34,11 +135,14 @@ interface NavbarProps {
   credits: number;
   onOpenAuth: () => void;
   onLogout: () => void;
+  t: (key: string) => string;
+  lang: string;
+  setLang: (l: string) => void;
 }
 
-function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout }: NavbarProps) {
+function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, setLang }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = ['How It Works', 'Products', 'Pricing', 'FAQ'];
+  const links = [t("howItWorks"), t("products"), t("pricing"), t("faq")];
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center bg-white/25 backdrop-blur-xl border-b border-white/20 shadow-lg" style={{ backdropFilter: 'blur(20px)' }}>
       <div className="flex items-center gap-3">
@@ -121,6 +225,13 @@ function FloatingIcon({ icon, x, y, delay, opacity = 0.12 }: {
     >
       {icon}
     </div>
+
+      {/* Language Switcher */}
+      <div className="flex items-center gap-1 ml-4">
+        <button onClick={() => setLang('en')} className={`text-xs font-bold px-2 py-1 rounded ${lang === 'en' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}>EN</button>
+        <button onClick={() => setLang('zh')} className={`text-xs font-bold px-2 py-1 rounded ${lang === 'zh' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:text-gray-900'}`}>中文</button>
+      </div>
+    
   );
 }
 
@@ -1104,7 +1215,7 @@ function Footer() {
             <div>
               <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Platform</div>
               <div className="space-y-3">
-                {['How It Works', 'Products', 'Pricing'].map(l => (
+                {[t("howItWorks"), t("products"), t("pricing")].map(l => (
                   <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
@@ -1177,6 +1288,9 @@ function StyleGallery() {
 
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [lang, setLang] = useState('en');
+  const t = useT(lang);
+
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [showBuyCredits, setShowBuyCredits] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -1242,6 +1356,9 @@ export default function App() {
         credits={credits}
         onOpenAuth={() => setShowAuth(true)}
         onLogout={handleLogout}
+        t={t}
+        lang={lang}
+        setLang={setLang}
       />
       <AuthModal
         isOpen={showAuth}

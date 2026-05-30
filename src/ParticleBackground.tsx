@@ -90,7 +90,9 @@ export default function ParticleBackground() {
       }
     }
 
-    const particles = Array.from({ length: 35 }, () => new Particle());
+    // Reduce particles on mobile for performance
+    const particleCount = window.innerWidth < 768 ? 18 : 35;
+    const particles = Array.from({ length: particleCount }, () => new Particle());
     let frameId: number;
 
     const onMouseMove = (e: MouseEvent) => {
