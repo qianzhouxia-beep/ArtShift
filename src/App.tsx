@@ -81,6 +81,38 @@ const translations: Record<string, Record<string, string>> = {
     footerPlatform: 'Platform', footerCompany: 'Company', footerLegal: 'Legal',
     footerAbout: 'About', footerBlog: 'Blog', footerContact: 'Contact',
     footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service', footerRefund: 'Refund Policy',
+    styleOilPainting: 'Oil Painting',
+    styleOilPaintingDesc: 'Van Gogh & Monet',
+    stylePixelArt: 'Pixel Art',
+    stylePixelArtDesc: '8-bit Retro',
+    styleAnime: 'Anime',
+    styleAnimeDesc: 'Studio Ghibli',
+    styleCyberpunk: 'Cyberpunk',
+    styleCyberpunkDesc: 'Neon Futurism',
+    stylePencilSketch: 'Pencil Sketch',
+    stylePencilSketchDesc: 'Graphite Drawing',
+    styleWatercolor: 'Watercolor',
+    styleWatercolorDesc: 'Soft & Ethereal',
+
+    productTshirt: 'T-Shirt', productTshirtDesc: 'Premium cotton, multiple colors',
+    priceTshirt: 'From $29.99', badgePopular: 'Most Popular',
+    productHoodie: 'Hoodie', productHoodieDesc: 'Soft fleece, Unisex fit',
+    priceHoodie: 'From $44.99', badgeCozy: 'Cozy',
+    productMug: 'Mug', productMugDesc: '11oz ceramic, dishwasher safe',
+    priceMug: 'From $22.99',
+    productPhoneCase: 'Phone Case', productPhoneCaseDesc: 'Snap & clear, all models',
+    pricePhoneCase: 'From $19.99',
+    productCap: 'Cap', productCapDesc: 'Adjustable, premium weave',
+    priceCap: 'From $24.99', badgeNew: 'New',
+    testimonialsEarlyTesters: 'early testers',
+    countryUSA: '🇺🇸 USA', countryGermany: '🇩🇪 Germany', countryUK: '🇬🇧 UK',
+    errorImageFormat: 'Please upload an image file (JPG, PNG, WebP).',
+    errorImageSize: 'Image must be under 10MB.',
+    errorPromptRequired: 'Please describe what you want to create.',
+    errorImageRequired: 'Please upload an image first.',
+    errorGeneric: 'Generation failed', errorNoImage: 'No image returned',
+    errorTransferFailed: 'Style transfer failed', errorRetry: 'Generation failed. Please try again.',
+    footerBrand: 'ArtShift',
     footerCopyright: '© 2026 ArtShift. All rights reserved.',
     testimonial1Name: 'Alex M.', testimonial1Text: 'I had zero design skills. Printed a custom hoodie with my cat in Van Gogh style. It looks incredible.',
     testimonial2Name: 'Sophie L.', testimonial2Text: 'Ordered from Germany, arrived in 5 days. The print quality is better than any store-bought shirt.',
@@ -154,7 +186,40 @@ const translations: Record<string, Record<string, string>> = {
     footerPlatform: '平台', footerCompany: '公司', footerLegal: '法律',
     footerAbout: '关于我们', footerBlog: '博客', footerContact: '联系我们',
     footerPrivacy: '隐私政策', footerTerms: '服务条款', footerRefund: '退款政策',
+    styleOilPainting: '油画',
+    styleOilPaintingDesc: '梵高与莫奈风格',
+    stylePixelArt: '像素艺术',
+    stylePixelArtDesc: '8位复古风',
+    styleAnime: '动漫',
+    styleAnimeDesc: '吉卜力工作室风格',
+    styleCyberpunk: '赛博朋克',
+    styleCyberpunkDesc: '霓虹未来主义',
+    stylePencilSketch: '铅笔素描',
+    stylePencilSketchDesc: '石墨手绘风格',
+    styleWatercolor: '水彩画',
+    styleWatercolorDesc: '柔和梦幻风格',
+    productTshirt: 'T恤', productTshirtDesc: '优质纯棉，多色可选',
+    priceTshirt: '$29.99 起', badgePopular: '最受欢迎',
+    productHoodie: '卫衣', productHoodieDesc: '柔软抓绒，男女通用',
+    priceHoodie: '$44.99 起', badgeCozy: '舒适',
+    productMug: '马克杯', productMugDesc: '11盎司陶瓷，可洗碗机清洗',
+    priceMug: '$22.99 起',
+    productPhoneCase: '手机壳', productPhoneCaseDesc: '透明硬壳，适配所有型号',
+    pricePhoneCase: '$19.99 起',
+    productCap: '帽子', productCapDesc: '可调节，优质编织',
+    priceCap: '$24.99 起', badgeNew: '新品',
+    testimonialsEarlyTesters: '早期测试用户',
+    countryUSA: '🇺🇸 美国', countryGermany: '🇩🇪 德国', countryUK: '🇬🇧 英国',
+    errorImageFormat: '请上传图片文件（JPG、PNG、WebP）。',
+    errorImageSize: '图片不能超过 10MB。',
+    errorPromptRequired: '请描述你想创作的内容。',
+    errorImageRequired: '请先上传一张图片。',
+    errorGeneric: '生成失败', errorNoImage: '未返回图片',
+    errorTransferFailed: '风格迁移失败', errorRetry: '生成失败，请重试。',
+    placeholderAdditionalPrompt: '例如："让它更鲜艳" 或留空进行纯风格迁移',
+    footerBrand: 'ArtShift',
     footerCopyright: '© 2026 ArtShift. 保留所有权利。',
+    originalLabel: '原图',
     testimonial1Name: 'Alex M.', testimonial1Text: '我完全没有设计技能。用我猫咪的照片印了一件梵高风格的卫衣。效果太惊艳了。',
     testimonial2Name: 'Sophie L.', testimonial2Text: '从德国订货，5天就到了。印刷质量比任何店里买的T恤都好。',
     testimonial3Name: 'James K.', testimonial3Text: '给整个团队做了定制马克杯。他们都很喜欢。肯定会再订购。',
@@ -170,12 +235,12 @@ function useT(lang: string): (key: string) => string {
 
 // ─── Style Gallery Data ───────────────────────────────────────────────────────
 const styleGallery = [
-  { src: '/images/styles/style-oil-painting.png', title: 'Oil Painting', desc: 'Van Gogh & Monet' },
-  { src: '/images/styles/style-pixel-art.png', title: 'Pixel Art', desc: '8-bit Retro' },
-  { src: '/images/styles/style-anime.png', title: 'Anime', desc: 'Studio Ghibli' },
-  { src: '/images/styles/style-cyberpunk.png', title: 'Cyberpunk', desc: 'Neon Futurism' },
-  { src: '/images/styles/style-pencil-sketch.png', title: 'Pencil Sketch', desc: 'Graphite Drawing' },
-  { src: '/images/styles/style-watercolor.png', title: 'Watercolor', desc: 'Soft & Ethereal' },
+  { src: '/images/styles/style-oil-painting.png', titleKey: 'styleOilPainting', descKey: 'styleOilPaintingDesc' },
+  { src: '/images/styles/style-pixel-art.png', titleKey: 'stylePixelArt', descKey: 'stylePixelArtDesc' },
+  { src: '/images/styles/style-anime.png', titleKey: 'styleAnime', descKey: 'styleAnimeDesc' },
+  { src: '/images/styles/style-cyberpunk.png', titleKey: 'styleCyberpunk', descKey: 'styleCyberpunkDesc' },
+  { src: '/images/styles/style-pencil-sketch.png', titleKey: 'stylePencilSketch', descKey: 'stylePencilSketchDesc' },
+  { src: '/images/styles/style-watercolor.png', titleKey: 'styleWatercolor', descKey: 'styleWatercolorDesc' },
 ];
 
 // ─── Logo Image (ChatGPT designed) ──────────────────────────────────────────────
@@ -222,7 +287,7 @@ function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, set
             <>
               <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 border border-violet-100">
                 <div className="text-[11px] font-bold text-violet-600">{credits}</div>
-                <div className="text-[10px] text-violet-400 font-medium">credits</div>
+                <div className="text-[10px] text-violet-400 font-medium">{t("credits")}</div>
               </div>
               <button
                 onClick={onLogout}
@@ -355,9 +420,9 @@ function HeroSection({ t }: { t: (key: string) => string }) {
 
           <div className="flex flex-wrap gap-6 text-[11px] text-gray-400 font-medium">
             {[
-              { icon: '✓', text: 'Upload photo or describe idea' },
-              { icon: '✓', text: 'AI art in 10+ styles' },
-              { icon: '✓', text: 'Ships to 30+ countries' },
+              { icon: '✓', text: t('heroCheck1') },
+              { icon: '✓', text: t('heroCheck2') },
+              { icon: '✓', text: t('heroCheck3') },
             ].map(item => (
               <span key={item.text} className="flex items-center gap-1.5">
                 <span style={{ color: '#3b82f6' }}>{item.icon}</span> {item.text}
@@ -533,7 +598,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Generation failed. Please try again.');
+      setError(err.message || t('errorRetry'));
     } finally {
       setGenerating(false);
     }
@@ -620,7 +685,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                     <p className="text-sm font-semibold text-gray-700 mb-1">
                       {isDragging ? t('dropImageHere') : t('dragDropUpload')}
                     </p>
-                    <p className="text-xs text-gray-400">JPG, PNG, WebP — Max 10MB</p>
+                    <p className="text-xs text-gray-400">{t("imageFormatHint")}</p>
                     <input
                       id="file-input"
                       type="file"
@@ -636,7 +701,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                   <div className="relative rounded-2xl overflow-hidden border border-gray-200">
                     <img
                       src={uploadedPreview}
-                      alt="Uploaded preview"
+                      alt={t("originalLabel")}
                       className="w-full max-h-64 object-contain bg-gray-50"
                     />
                     <button
@@ -778,12 +843,12 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  {mode === 'text' ? 'Generating...' : 'Transforming...'} (takes ~10s)
+                  {mode === 'text' ? 'Generating...' : t('btnGenerating')} (~10s)
                 </>
               ) : (
                 <>
                   {mode === 'text' ? <Wand2 size={18} /> : <ImagePlus size={18} />}
-                  {mode === 'text' ? 'Generate Image' : 'Apply Style Transfer'}
+                  {mode === 'text' ? t('btnGenerate') : t('modeImage')}
                   {quality === 'premium' && <span className="ml-1 text-[9px] bg-white/20 px-2 py-0.5 rounded-full">PRO</span>}
                 </>
               )}
@@ -806,7 +871,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
                       <div className="text-lg font-bold text-white">
-                        {mode === 'text' ? 'AI is creating...' : 'AI is transforming...'}
+                        {mode === 'text' ? t('aiDemoTitle1') + '...' : 'AI is transforming...'}
                       </div>
                       <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">
                         Please wait about 10 seconds
@@ -822,11 +887,11 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                           <div className="rounded-2xl overflow-hidden border border-gray-200">
                             <img src={uploadedPreview} alt="Original" className="w-full h-auto" />
                           </div>
-                          <div className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mt-2">Original</div>
+                          <div className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mt-2">{t("originalLabel")}</div>
                         </div>
                         <div>
                           <div className="rounded-2xl overflow-hidden shadow-lg">
-                            <img src={resultUrl} alt="Styled" className="w-full h-auto" />
+                            <img src={resultUrl} alt={t("resultLabel")} className="w-full h-auto" />
                           </div>
                           <div className="text-[9px] font-bold uppercase tracking-widest text-violet-500 mt-2">
                             {AI_STYLES.find(s => s.id === selectedStyle)?.name} Style
@@ -837,7 +902,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                     {/* Single result for text2img */}
                     {mode === 'text' && (
                       <div className="rounded-2xl overflow-hidden shadow-lg">
-                        <img src={resultUrl} alt="Generated AI Art" className="w-full h-auto" />
+                        <img src={resultUrl} alt={t("resultLabel")} className="w-full h-auto" />
                       </div>
                     )}
                     <div className="flex gap-4 justify-center">
@@ -873,9 +938,9 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
               </div>
               <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto">
                 {[
-                  { emoji: '👕', name: 'T-Shirt', color: '#eff6ff' },
-                  { emoji: '☕', name: 'Mug', color: '#fff7ed' },
-                  { emoji: '📱', name: 'Phone Case', color: '#f5f3ff' },
+                  { emoji: '👕', name: t('productTshirt'), color: '#eff6ff' },
+                  { emoji: '☕', name: t('productMug'), color: '#fff7ed' },
+                  { emoji: '📱', name: t('productPhoneCase'), color: '#f5f3ff' },
                 ].map((product, i) => (
                   <div key={i} className="text-center">
                     <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden"
@@ -899,11 +964,11 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
 // ─── Products ────────────────────────────────────────────────────────────────
 function Products({ t }: { t: (key: string) => string }) {
   const products = [
-    { emoji: '👕', name: 'T-Shirt', desc: 'Premium cotton, multiple colors', price: 'From $29.99', badge: 'Most Popular', badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
+    { emoji: '👕', name: t('productTshirt'), desc: t('productTshirtDesc'), price: t('priceTshirt'), badge: t('badgePopular'), badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
     { emoji: '🧥', name: 'Hoodie', desc: 'Soft fleece, Unisex fit', price: 'From $44.99', badge: 'Cozy', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
-    { emoji: '☕', name: 'Mug', desc: '11oz ceramic, dishwasher safe', price: 'From $22.99', badge: null, colors: ['bg-white', 'bg-gray-900'] },
-    { emoji: '📱', name: 'Phone Case', desc: 'Snap & clear, all models', price: 'From $19.99', badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
-    { emoji: '🧢', name: 'Cap', desc: 'Adjustable, premium weave', price: 'From $24.99', badge: 'New', badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
+    { emoji: '☕', name: t('productMug'), desc: t('productMugDesc'), price: t('priceMug'), badge: null, colors: ['bg-white', 'bg-gray-900'] },
+    { emoji: '📱', name: t('productPhoneCase'), desc: t('productPhoneCaseDesc'), price: t('pricePhoneCase'), badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
+    { emoji: '🧢', name: t('productCap'), desc: t('productCapDesc'), price: t('priceCap'), badge: t('badgeNew'), badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
   ];
 
   return (
@@ -961,7 +1026,7 @@ function WhyArtShift({ t }: { t: (key: string) => string }) {
     { icon: <Sparkles size={20} />, title: t('featAiPowered'), desc: t('featAiPoweredDesc'), color: '#3b82f6', bg: '#eff6ff' },
     { icon: <Layers size={20} />, title: t('featStyles'), desc: t('featStylesDesc'), color: '#8b5cf6', bg: '#f5f3ff' },
     { icon: <Zap size={20} />, title: t('featOneOrder'), desc: t('featOneOrderDesc'), color: '#f97316', bg: '#fff7ed' },
-    { icon: <Globe size={20} />, title: t('featGlobalNetwork'), desc: 'Printful\'s local warehouses in US, UK, EU & Australia for fastest delivery', color: '#10b981', bg: '#ecfdf5' },
+    { icon: <Globe size={20} />, title: t('featGlobalNetwork'), desc: t('featGlobalNetworkDesc'), color: '#10b981', bg: '#ecfdf5' },
     { icon: <ShieldCheck size={20} />, title: t('featPrintQuality'), desc: t('featPrintQualityDesc'), color: '#3b82f6', bg: '#eff6ff' },
     { icon: <CreditCard size={20} />, title: t('featSecurePayments'), desc: t('featSecurePaymentsDesc'), color: '#8b5cf6', bg: '#f5f3ff' },
   ];
@@ -1011,9 +1076,9 @@ function WhyArtShift({ t }: { t: (key: string) => string }) {
 // ─── Testimonials ──────────────────────────────────────────────────────────
 function Testimonials({ t }: { t: (key: string) => string }) {
   const reviews = [
-    { name: t('testimonial1Name'), country: '🇺🇸 USA', text: t('testimonial1Text'), rating: 5 },
-    { name: t('testimonial2Name'), country: '🇩🇪 Germany', text: t('testimonial2Text'), rating: 5 },
-    { name: t('testimonial3Name'), country: '🇬🇧 UK', text: t('testimonial3Text'), rating: 5 },
+    { name: t('testimonial1Name'), country: t('countryUSA'), text: t('testimonial1Text'), rating: 5 },
+    { name: t('testimonial2Name'), country: t('countryGermany'), text: t('testimonial2Text'), rating: 5 },
+    { name: t('testimonial3Name'), country: t('countryUK'), text: t('testimonial3Text'), rating: 5 },
   ];
 
   return (
@@ -1023,7 +1088,7 @@ function Testimonials({ t }: { t: (key: string) => string }) {
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600">{t('testimonialsBadge')}</span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
             Loved by{' '}
-            <span className="gradient-text">early testers</span>
+            <span className="gradient-text">{t("testimonialsEarlyTesters")}</span>
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1140,7 +1205,7 @@ function Waitlist({ t }: { t: (key: string) => string }) {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder={t("emailPlaceholder")}
               className="w-full rounded-2xl px-6 py-4 text-sm text-white placeholder-gray-400 outline-none transition-all duration-200"
               style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}
             />
@@ -1156,17 +1221,17 @@ function Waitlist({ t }: { t: (key: string) => string }) {
             style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>
             <div className="text-4xl mb-3">🎉</div>
             <p className="text-white font-semibold text-lg mb-1">{t("waitlistSuccessTitle")}</p>
-            <p className="text-gray-300 text-sm">We'll notify you when we launch. Check your inbox for a confirmation.</p>
+            <p className="text-gray-300 text-sm">{t("waitlistSuccessDesc")}</p>
           </div>
         )}
 
-        <p className="text-gray-500 text-[11px] mt-5">No spam. Unsubscribe anytime. We respect your inbox.</p>
+        <p className="text-gray-500 text-[11px] mt-5">{t("waitlistNoSpam")}</p>
 
         <div className="mt-12 pt-10 grid grid-cols-3 gap-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           {[
-            { num: '500+', label: 'On Waitlist' },
-            { num: '30+', label: 'Countries' },
-            { num: '5', label: 'Product Types' },
+            { num: '500+', label: t('statWaitlist') },
+            { num: '30+', label: t('statCountries') },
+            { num: '5', label: t('statProducts') },
           ].map((s, i) => (
             <div key={i}>
               <div className="text-3xl sm:text-4xl font-extrabold text-white mb-1">{s.num}</div>
@@ -1239,7 +1304,7 @@ function Footer({ t }: { t: (key: string) => string }) {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <ArtShiftLogo className="w-8 h-8" />
-              <span className="font-extrabold text-white tracking-tight text-lg">ArtShift</span>
+              <span className="font-extrabold text-white tracking-tight text-lg">{t("footerBrand")}</span>
             </div>
             <p className="text-gray-500 text-sm max-w-xs">
               AI-powered custom products. Turn your imagination into wearable art.
@@ -1247,7 +1312,7 @@ function Footer({ t }: { t: (key: string) => string }) {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Platform</div>
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t("footerPlatform")}</div>
               <div className="space-y-3">
                 {[t('howItWorks'), t('products'), t('pricing')].map(l => (
                   <a key={l} href={`#${l.toLowerCase().replace(' ', '-')}`}
@@ -1256,18 +1321,18 @@ function Footer({ t }: { t: (key: string) => string }) {
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Company</div>
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t("footerCompany")}</div>
               <div className="space-y-3">
-                {['About', 'Blog', 'Contact'].map(l => (
+                {[t('footerAbout'), t('footerBlog'), t('footerContact')].map(l => (
                   <a key={l} href="#"
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">Legal</div>
+              <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-4">{t("footerLegal")}</div>
               <div className="space-y-3">
-                {['Privacy Policy', 'Terms of Service', 'Refund Policy'].map(l => (
+                {[t('footerPrivacy'), t('footerTerms'), t('footerRefund')].map(l => (
                   <a key={l} href="#"
                     className="block text-gray-400 hover:text-white transition-colors text-sm">{l}</a>
                 ))}
@@ -1276,7 +1341,7 @@ function Footer({ t }: { t: (key: string) => string }) {
           </div>
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-white/10">
-          <p className="text-[11px] text-gray-600 uppercase tracking-widest">© 2026 ArtShift. All rights reserved.</p>
+          <p className="text-[11px] text-gray-600 uppercase tracking-widest">{t("footerCopyright")}</p>
           <div className="flex items-center gap-5">
             {/* Social links will be added when accounts are set up */}
           </div>
@@ -1300,18 +1365,18 @@ function StyleGallery({ t }: { t: (key: string) => string }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {styleGallery.map((style) => (
             <div
-              key={style.title}
+              key={style.titleKey}
               className="group cursor-pointer"
             >
               <div className="aspect-square rounded-2xl overflow-hidden shadow-md group-hover:shadow-xl transition-shadow duration-300 mb-3">
                 <img
                   src={style.src}
-                  alt={style.title}
+                  alt={t(style.titleKey)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm">{style.title}</h3>
-              <p className="text-gray-400 text-xs">{style.desc}</p>
+              <h3 className="font-semibold text-gray-900 text-sm">{t(style.titleKey)}</h3>
+              <p className="text-gray-400 text-xs">{t(style.descKey)}</p>
             </div>
           ))}
         </div>
@@ -1322,7 +1387,7 @@ function StyleGallery({ t }: { t: (key: string) => string }) {
 
 // ─── App ────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState('zh');
   const t = useT(lang);
 
   const [showBackToTop, setShowBackToTop] = useState(false);
