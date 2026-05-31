@@ -206,8 +206,6 @@ const translations: Record<string, Record<string, string>> = {
     priceMug: '$22.99 起',
     productPhoneCase: '手机壳', productPhoneCaseDesc: '透明硬壳，适配所有型号',
     pricePhoneCase: '$19.99 起',
-    productCap: '帽子', productCapDesc: '可调节，优质编织',
-    priceCap: '$24.99 起', badgeNew: '新品',
     testimonialsEarlyTesters: '早期测试用户',
     countryUSA: '🇺🇸 美国', countryGermany: '🇩🇪 德国', countryUK: '🇬🇧 英国',
     errorImageFormat: '请上传图片文件（JPG、PNG、WebP）。',
@@ -216,10 +214,8 @@ const translations: Record<string, Record<string, string>> = {
     errorImageRequired: '请先上传一张图片。',
     errorGeneric: '生成失败', errorNoImage: '未返回图片',
     errorTransferFailed: '风格迁移失败', errorRetry: '生成失败，请重试。',
-    placeholderAdditionalPrompt: '例如："让它更鲜艳" 或留空进行纯风格迁移',
     footerBrand: 'ArtShift',
     footerCopyright: '© 2026 ArtShift. 保留所有权利。',
-    originalLabel: '原图',
     testimonial1Name: 'Alex M.', testimonial1Text: '我完全没有设计技能。用我猫咪的照片印了一件梵高风格的卫衣。效果太惊艳了。',
     testimonial2Name: 'Sophie L.', testimonial2Text: '从德国订货，5天就到了。印刷质量比任何店里买的T恤都好。',
     testimonial3Name: 'James K.', testimonial3Text: '给整个团队做了定制马克杯。他们都很喜欢。肯定会再订购。',
@@ -281,7 +277,7 @@ function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, set
           <a href="#waitlist"
             className="text-[12px] sm:text-[13px] font-semibold text-white rounded-full px-5 py-1.5 transition-all duration-200"
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
-            Join Waitlist
+            {t('joinWaitlist')}
           </a>
           {user ? (
             <>
@@ -294,7 +290,7 @@ function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, set
                 className="text-[12px] sm:text-[13px] font-medium text-gray-400 hover:text-gray-600 rounded-full px-3 py-1.5 transition-all duration-200"
                 title="Sign out"
               >
-                Logout
+                {t('logout')}
               </button>
             </>
           ) : (
@@ -302,14 +298,14 @@ function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, set
               onClick={onOpenAuth}
               className="text-[12px] sm:text-[13px] font-semibold text-violet-600 rounded-full px-5 py-1.5 transition-all duration-200 hover:bg-violet-50 border border-violet-100"
             >
-              Sign In
+              {t('signIn')}
             </button>
           )}
           <button
             onClick={onOpenModal}
             className="text-[12px] sm:text-[13px] font-semibold text-gray-700 rounded-full px-5 py-1.5 transition-all duration-200 border border-gray-200 hover:bg-gray-50"
           >
-            Buy Credits
+            {t('buyCredits')}
           </button>
           <button className="sm:hidden text-gray-500" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -623,14 +619,14 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-violet-50 text-violet-600">
-            AI Generation Studio
+            {t('aiDemoBadge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
             <span className="gradient-text">{t("aiDemoTitle1")}</span>
             <br />{t("aiDemoTitle2")}
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            Describe what you want, upload a photo for style transfer, and watch AI generate your design.
+            {t('aiDemoDesc')}
           </p>
         </div>
 
@@ -648,7 +644,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                 }`}
               >
                 <Wand2 size={16} />
-                Text to Image
+                {t('modeText')}
               </button>
               <button
                 onClick={() => { setMode('image'); setError(''); }}
@@ -659,7 +655,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                 }`}
               >
                 <ImagePlus size={16} />
-                Upload & Style Transfer
+                {t('modeImage')}
               </button>
             </div>
 
@@ -667,7 +663,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
             {mode === 'image' && (
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                  Upload Your Image
+                  {t('labelUploadImage')}
                 </label>
                 {!uploadedPreview ? (
                   <div
@@ -714,7 +710,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                       <X size={14} />
                     </button>
                     <div className="absolute bottom-3 left-3 text-[9px] font-bold uppercase tracking-widest bg-white/90 px-2 py-1 rounded-full text-gray-600">
-                      Original
+                      {t("originalLabel")}
                     </div>
                   </div>
                 )}
@@ -742,7 +738,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
             {/* ─── Style Selection ──────────────────────── */}
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
-                Choose Style
+                {t('labelChooseStyle')}
               </label>
               <div className="grid grid-cols-3 gap-3">
                 {AI_STYLES.map((style) => (
@@ -791,7 +787,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
             {/* ─── Quality Tier ─────────────────────────── */}
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">
-                Quality
+                {t('labelQuality')}
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {QUALITY_TIERS.map((tier) => (
@@ -843,7 +839,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  {mode === 'text' ? 'Generating...' : t('btnGenerating')} (~10s)
+                  {t('btnGenerating')} (~10s)
                 </>
               ) : (
                 <>
@@ -871,10 +867,10 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
                       <div className="text-lg font-bold text-white">
-                        {mode === 'text' ? t('aiDemoTitle1') + '...' : 'AI is transforming...'}
+                        {mode === 'text' ? t('aiDemoTitle1') + '...' : t('aiTransforming')}
                       </div>
                       <div className="text-[10px] font-bold uppercase tracking-widest text-violet-300 mt-2">
-                        Please wait about 10 seconds
+                        {t('pleaseWait')}
                       </div>
                     </div>
                   </div>
@@ -913,13 +909,13 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg"
                         style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
                       >
-                        View Full Size
+                        {t('viewFullSize')}
                       </a>
                       <button
                         onClick={handleReset}
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-200 transition-all duration-200 hover:bg-gray-50"
                       >
-                        Generate Another
+                        {t('btnGenerateAnother')}
                       </button>
                     </div>
                   </div>
@@ -933,7 +929,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
             <div className="mt-12 pt-10 border-t border-gray-100">
               <div className="text-center mb-8">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                  Popular Products
+                  {t('productsBadge')}
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto">
@@ -965,7 +961,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
 function Products({ t }: { t: (key: string) => string }) {
   const products = [
     { emoji: '👕', name: t('productTshirt'), desc: t('productTshirtDesc'), price: t('priceTshirt'), badge: t('badgePopular'), badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
-    { emoji: '🧥', name: 'Hoodie', desc: 'Soft fleece, Unisex fit', price: 'From $44.99', badge: 'Cozy', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
+    { emoji: '🧥', name: t('productHoodie'), desc: t('productHoodieDesc'), price: t('priceHoodie'), badge: t('badgeCozy'), badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
     { emoji: '☕', name: t('productMug'), desc: t('productMugDesc'), price: t('priceMug'), badge: null, colors: ['bg-white', 'bg-gray-900'] },
     { emoji: '📱', name: t('productPhoneCase'), desc: t('productPhoneCaseDesc'), price: t('pricePhoneCase'), badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
     { emoji: '🧢', name: t('productCap'), desc: t('productCapDesc'), price: t('priceCap'), badge: t('badgeNew'), badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
@@ -976,7 +972,7 @@ function Products({ t }: { t: (key: string) => string }) {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-orange-50 text-orange-600">
-            Product Line
+            {t('productsBadge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
             {t('productsTitle1')}{' '}
@@ -1037,7 +1033,7 @@ function WhyArtShift({ t }: { t: (key: string) => string }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div>
             <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-              Why ArtShift
+              {t('whyBadge')}
             </span>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 leading-tight">
               {t('whyTitle1')}{' '}
@@ -1126,13 +1122,13 @@ function Pricing({ t }: { t: (key: string) => string }) {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            Pricing
+            {t('pricingBadge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
             <span className='gradient-text'>{t('pricingTitle')}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mb-8">
-            Join the waitlist to get early bird pricing when we launch.
+            {t('pricingDesc')}
           </p>
           <a href="#waitlist"
             className="inline-flex items-center gap-2 text-[14px] font-bold text-white rounded-full px-8 py-4 transition-all duration-200 hover:scale-105"
@@ -1261,7 +1257,7 @@ function FAQ({ t }: { t: (key: string) => string }) {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            FAQ
+            {t('faqBadge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900">
             {t('faqTitle1')}{' '}
@@ -1307,7 +1303,7 @@ function Footer({ t }: { t: (key: string) => string }) {
               <span className="font-extrabold text-white tracking-tight text-lg">{t("footerBrand")}</span>
             </div>
             <p className="text-gray-500 text-sm max-w-xs">
-              AI-powered custom products. Turn your imagination into wearable art.
+              {t('footerTagline')}
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
@@ -1360,7 +1356,7 @@ function StyleGallery({ t }: { t: (key: string) => string }) {
           <span className="gradient-text">{t("styleGalleryTitle1")}</span> {t("styleGalleryTitle2")}
         </h2>
         <p className="text-gray-500 text-lg mb-12 max-w-2xl mx-auto">
-          From classic oil paintings to cyberpunk — our AI transforms your photo into the style you choose.
+          {t('styleGalleryDesc')}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
           {styleGallery.map((style) => (
