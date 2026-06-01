@@ -22,11 +22,19 @@ from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+# Import Printful API Blueprint
+from printful_api import bp as printful_bp
+
+# Import Printful API Blueprint
+
 
 # ─── App Setup ──────────────────────────────────────────────────────────────
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 CORS(app)
+
+# Register Printful API Blueprint
+app.register_blueprint(printful_bp)
 
 # ─── Logging ────────────────────────────────────────────────────────────────
 logging.basicConfig(
