@@ -93,6 +93,7 @@ const translations: Record<string, Record<string, string>> = {
     stylePencilSketchDesc: 'Graphite Drawing',
     styleWatercolor: 'Watercolor',
     styleWatercolorDesc: 'Soft & Ethereal',
+    styleSuffix: 'Style',
 
     productTshirt: 'T-Shirt', productTshirtDesc: 'Premium cotton, multiple colors',
     priceTshirt: 'From $29.99', badgePopular: 'Most Popular',
@@ -198,6 +199,7 @@ const translations: Record<string, Record<string, string>> = {
     stylePencilSketchDesc: '石墨手绘风格',
     styleWatercolor: '水彩画',
     styleWatercolorDesc: '柔和梦幻风格',
+    styleSuffix: '风格',
     productTshirt: 'T恤', productTshirtDesc: '优质纯棉，多色可选',
     priceTshirt: '$29.99 起', badgePopular: '最受欢迎',
     productHoodie: '卫衣', productHoodieDesc: '柔软抓绒，男女通用',
@@ -385,7 +387,7 @@ function HeroSection({ t }: { t: (key: string) => string }) {
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-1.5 mb-5 text-[12px] font-semibold rounded-full px-4 py-1.5 bg-blue-50 text-blue-600">
             <Sparkles size={13} />
-            Launching Soon — US · Europe · Worldwide
+            {t('heroBadge')}
           </div>
 
           <h1 className="text-[2rem] sm:text-[2.5rem] md:text-[3rem] lg:text-[3.5rem] leading-[1.1] font-extrabold tracking-tight mb-5">
@@ -444,14 +446,14 @@ function HowItWorks({ t }: { t: (key: string) => string }) {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-blue-50 text-blue-600">
-            The Process
+            {t('howItWorksBadge')}
           </span>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
             {t('howItWorksTitle1')}{' '}
             <span className="gradient-text">{t("howItWorksTitle2")}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            From idea to your doorstep in days. No design skills. No complicated tools.
+            {t('howItWorksDesc')}
           </p>
         </div>
 
@@ -477,12 +479,12 @@ function HowItWorks({ t }: { t: (key: string) => string }) {
 
 // ─── AI Demo ────────────────────────────────────────────────────────────────
 const AI_STYLES = [
-  { id: 'oil-painting', name: 'Oil Painting', desc: 'Van Gogh & Monet' },
-  { id: 'pixel-art', name: 'Pixel Art', desc: '8-bit Retro' },
-  { id: 'anime', name: 'Anime', desc: 'Studio Ghibli' },
-  { id: 'cyberpunk', name: 'Cyberpunk', desc: 'Neon Futurism' },
-  { id: 'pencil-sketch', name: 'Pencil Sketch', desc: 'Graphite Drawing' },
-  { id: 'watercolor', name: 'Watercolor', desc: 'Soft & Ethereal' },
+  { id: 'oil-painting', nameKey: 'styleOilPainting', descKey: 'styleOilPaintingDesc' },
+  { id: 'pixel-art', nameKey: 'stylePixelArt', descKey: 'stylePixelArtDesc' },
+  { id: 'anime', nameKey: 'styleAnime', descKey: 'styleAnimeDesc' },
+  { id: 'cyberpunk', nameKey: 'styleCyberpunk', descKey: 'styleCyberpunkDesc' },
+  { id: 'pencil-sketch', nameKey: 'stylePencilSketch', descKey: 'stylePencilSketchDesc' },
+  { id: 'watercolor', nameKey: 'styleWatercolor', descKey: 'styleWatercolorDesc' },
 ];
 
 interface AIDemoProps {
@@ -727,8 +729,8 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={
                   mode === 'text'
-                    ? 'e.g. "A majestic owl in a starry night..."'
-                    : 'e.g. "Make it more colorful" or leave blank for pure style transfer'
+                    ? t('placeholderPrompt')
+                    : t('placeholderAdditionalPrompt')
                 }
                 rows={mode === 'text' ? 3 : 2}
                 className="w-full rounded-2xl px-5 py-4 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-200 resize-none"
@@ -752,8 +754,8 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                     }`}
                     style={selectedStyle === style.id ? { background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' } : {}}
                   >
-                    <div>{style.name}</div>
-                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-gray-400'}`}>{style.desc}</div>
+                    <div>{t(style.nameKey)}</div>
+                    <div className={`text-[10px] mt-0.5 ${selectedStyle === style.id ? 'text-white/70' : 'text-gray-400'}`}>{t(style.descKey)}</div>
                   </button>
                 ))}
               </div>
@@ -890,7 +892,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                             <img src={resultUrl} alt={t("resultLabel")} className="w-full h-auto" />
                           </div>
                           <div className="text-[9px] font-bold uppercase tracking-widest text-violet-500 mt-2">
-                            {AI_STYLES.find(s => s.id === selectedStyle)?.name} Style
+                            {t(AI_STYLES.find(s => s.id === selectedStyle)?.nameKey || '')} {t('styleSuffix')}
                           </div>
                         </div>
                       </div>
@@ -979,7 +981,7 @@ function Products({ t }: { t: (key: string) => string }) {
             <span className="gradient-text">{t("productsTitle2")}</span>
           </h2>
           <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto">
-            5 premium products. Printed with care. Shipped worldwide from local warehouses.
+            {t('productsDesc')}
           </p>
         </div>
 
@@ -1154,7 +1156,7 @@ function Waitlist({ t }: { t: (key: string) => string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
-      setError('Please enter a valid email address.');
+      setError(t('errorValidEmail'));
       return;
     }
     setError('');
