@@ -9,6 +9,10 @@ Endpoints:
   POST /api/generate        → AI image generation (future)
   GET  /api/products        → Product catalog
   GET  /api/health          → Health check
+  POST /api/orders          → Create order (public)
+  GET  /api/orders          → List orders (admin)
+  GET  /api/orders/<id>     → Get order (admin)
+  PATCH /api/orders/<id>    → Update order status (admin)
 """
 
 import os
@@ -16,6 +20,8 @@ import json
 import logging
 import time
 import hashlib
+import random
+import string
 from datetime import datetime
 
 from flask import Flask, request, jsonify, send_from_directory, send_file
@@ -68,6 +74,9 @@ OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
 # Printful Config
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
 
+# Admin Auth
+ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
+
 # Database path (SQLite for MVP)
 DB_PATH = os.environ.get("DB_PATH", "artshift.db")
 
@@ -98,6 +107,32 @@ def get_db():
             created_at TEXT DEFAULT (datetime('now', 'utc'))
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_number TEXT UNIQUE NOT NULL,
+            customer_email TEXT NOT NULL,
+            product_id TEXT NOT NULL,
+            product_name TEXT,
+            variant_id TEXT,
+            price REAL NOT NULL,
+            currency TEXT DEFAULT 'USD',
+            quantity INTEGER DEFAULT 1,
+            design_url TEXT,
+            design_prompt TEXT,
+            shipping_address TEXT,
+            status TEXT DEFAULT 'pending',
+            payment_status TEXT DEFAULT 'pending',
+            paypal_order_id TEXT,
+            tracking_number TEXT,
+            notes TEXT,
+            created_at TEXT DEFAULT (datetime('now', 'utc')),
+            updated_at TEXT DEFAULT (datetime('now', 'utc'))
+        )
+    """)
+    conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)""")
+    conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email)""")
+    conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number)""")
     conn.commit()
     return conn
 
@@ -105,6 +140,35 @@ def get_db():
 # Initialize DB on startup
 get_db().close()
 logger.info(f"Database initialized at {DB_PATH}")
+
+# ─── Helper Functions ───────────────────────────────────────────────────────
+
+def generate_order_number():
+    """Generate unique order number like AS-20260602-XXXXX"""
+    date_str = datetime.now().strftime("%Y%m%d")
+    suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    return f"AS-{date_str}-{suffix}"
+
+
+def require_admin(f):
+    """Decorator: check X-Admin-Token header for admin endpoints."""
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get("X-Admin-Token", "")
+        if not ADMIN_TOKEN:
+            logger.error("ADMIN_TOKEN not configured on server")
+            return jsonify({"ok": False, "error": "Server misconfigured"}), 500
+        if token != ADMIN_TOKEN:
+            return jsonify({"ok": False, "error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+
+def row_to_dict(row):
+    """Convert sqlite3.Row to dict."""
+    return dict(row) if row else None
+
 
 # ─── Static File Serving ────────────────────────────────────────────────────
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -142,7 +206,7 @@ def health_check():
     return jsonify({
         "status": "ok",
         "service": "ArtShift API",
-        "version": "1.0.0",
+        "version": "1.1.0",
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "env": ENV,
     })
@@ -455,6 +519,253 @@ def public_stats():
         "product_types": 5,
         "styles_available": 10,
     })
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ORDER MANAGEMENT ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.route("/api/orders", methods=["POST"])
+@limiter.limit("10 per hour")
+def create_order():
+    """
+    Create a new order (public endpoint).
+    
+    Request body:
+      {
+        "customer_email": "user@example.com",
+        "product_id": "tshirt",
+        "variant_id": "M/White",
+        "price": 29.99,
+        "quantity": 1,
+        "design_url": "https://...",
+        "design_prompt": "A cyberpunk cat",
+        "shipping_address": { ... },
+        "paypal_order_id": "PAY-..."
+      }
+    
+    Response:
+      { "ok": true, "order": { ... }, "order_number": "AS-20260602-XXXXX" }
+    """
+    data = request.get_json(silent=True) or {}
+    
+    # Required fields validation
+    customer_email = (data.get("customer_email") or "").strip().lower()
+    product_id = data.get("product_id", "")
+    price = data.get("price")
+    
+    if not customer_email or "@" not in customer_email:
+        return jsonify({"ok": False, "error": "Valid customer_email is required"}), 400
+    if not product_id:
+        return jsonify({"ok": False, "error": "product_id is required"}), 400
+    if price is None or float(price) <= 0:
+        return jsonify({"ok": False, "error": "Valid price is required"}), 400
+    
+    try:
+        db = get_db()
+        
+        # Generate order number
+        order_number = generate_order_number()
+        
+        # Ensure uniqueness (collision guard)
+        while db.execute("SELECT 1 FROM orders WHERE order_number=?", (order_number,)).fetchone():
+            order_number = generate_order_number()
+        
+        # Look up product name
+        products = {
+            "tshirt": "T-Shirt",
+            "hoodie": "Hoodie",
+            "mug": "Ceramic Mug",
+            "phone-case": "Phone Case",
+            "cap": "Baseball Cap",
+        }
+        product_name = products.get(product_id, product_id)
+        
+        # Serialize shipping address if dict
+        shipping_raw = data.get("shipping_address")
+        shipping_str = json.dumps(shipping_raw) if isinstance(shipping_raw, dict) else (shipping_raw or "")
+        
+        cursor = db.execute("""
+            INSERT INTO orders (
+                order_number, customer_email, product_id, product_name,
+                variant_id, price, currency, quantity,
+                design_url, design_prompt, shipping_address,
+                paypal_order_id
+            ) VALUES (?, ?, ?, ?, ?, ?, 'USD', ?, ?, ?, ?, ?)
+        """, (
+            order_number,
+            customer_email,
+            product_id,
+            product_name,
+            data.get("variant_id"),
+            float(price),
+            int(data.get("quantity", 1)),
+            data.get("design_url", ""),
+            data.get("design_prompt", ""),
+            shipping_str,
+            data.get("paypal_order_id", ""),
+        ))
+        db.commit()
+        order_id = cursor.lastrowid
+        
+        # Fetch the created order
+        order = row_to_dict(db.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone())
+        db.close()
+        
+        logger.info(f"Order created: {order_number} by {customer_email} - {product_name} ${price}")
+        
+        return jsonify({
+            "ok": True,
+            "order": order,
+            "order_number": order_number,
+            "message": f"Order {order_number} created successfully",
+        }), 201
+        
+    except Exception as e:
+        logger.error(f"Create order error: {e}", exc_info=True)
+        return jsonify({"ok": False, "error": "Failed to create order. Please try again."}), 500
+
+
+@app.route("/api/orders", methods=["GET"])
+@require_admin
+def list_orders():
+    """
+    List all orders (admin only).
+    
+    Query params:
+      ?status=pending  — filter by status
+      ?limit=50        — max results (default 50)
+      ?offset=0        — pagination offset
+    
+    Headers:
+      X-Admin-Token: <your-admin-token>
+    """
+    status_filter = request.args.get("status", "").strip()
+    limit = min(int(request.args.get("limit", 50)), 200)
+    offset = int(request.args.get("offset", 0))
+    
+    try:
+        db = get_db()
+        
+        if status_filter:
+            rows = db.execute(
+                "SELECT * FROM orders WHERE status=? ORDER BY id DESC LIMIT ? OFFSET ?",
+                (status_filter, limit, offset),
+            ).fetchall()
+            total = db.execute("SELECT COUNT(*) as cnt FROM orders WHERE status=?", (status_filter,)).fetchone()["cnt"]
+        else:
+            rows = db.execute(
+                "SELECT * FROM orders ORDER BY id DESC LIMIT ? OFFSET ?",
+                (limit, offset),
+            ).fetchall()
+            total = db.execute("SELECT COUNT(*) as cnt FROM orders").fetchone()["cnt"]
+        
+        db.close()
+        
+        return jsonify({
+            "ok": True,
+            "orders": [row_to_dict(r) for r in rows],
+            "total": total,
+            "limit": limit,
+            "offset": offset,
+        })
+        
+    except Exception as e:
+        logger.error(f"List orders error: {e}", exc_info=True)
+        return jsonify({"ok": False, "error": "Failed to fetch orders"}), 500
+
+
+@app.route("/api/orders/<int:order_id>", methods=["GET"])
+@require_admin
+def get_order(order_id):
+    """
+    Get a single order by ID (admin only).
+    
+    Headers:
+      X-Admin-Token: <your-admin-token>
+    """
+    try:
+        db = get_db()
+        order = db.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone()
+        db.close()
+        
+        if not order:
+            return jsonify({"ok": False, "error": "Order not found"}), 404
+        
+        return jsonify({
+            "ok": True,
+            "order": row_to_dict(order),
+        })
+        
+    except Exception as e:
+        logger.error(f"Get order error: {e}", exc_info=True)
+        return jsonify({"ok": False, "error": "Failed to fetch order"}), 500
+
+
+@app.route("/api/orders/<int:order_id>", methods=["PATCH"])
+@require_admin
+def update_order(order_id):
+    """
+    Update order status/tracking (admin only).
+    
+    Request body:
+      { "status": "processing", "tracking_number": "1Z999..." }
+    
+    Allowed fields: status, tracking_number, notes, payment_status
+    
+    Headers:
+      X-Admin-Token: <your-admin-token>
+    """
+    data = request.get_json(silent=True) or {}
+    
+    # Only allow specific fields to be updated
+    allowed_fields = {"status", "tracking_number", "notes", "payment_status"}
+    updates = {}
+    for field in allowed_fields:
+        if field in data:
+            updates[field] = data[field]
+    
+    if not updates:
+        return jsonify({"ok": False, "error": "No valid fields to update"}), 400
+    
+    # Validate status value if provided
+    valid_statuses = {"pending", "processing", "production", "shipped", "delivered", "cancelled", "refunded"}
+    if "status" in updates and updates["status"] not in valid_statuses:
+        return jsonify({
+            "ok": False,
+            "error": f"Invalid status. Must be one of: {', '.join(sorted(valid_statuses))}"
+        }), 400
+    
+    try:
+        db = get_db()
+        
+        # Check order exists
+        existing = db.execute("SELECT id FROM orders WHERE id=?", (order_id,)).fetchone()
+        if not existing:
+            db.close()
+            return jsonify({"ok": False, "error": "Order not found"}), 404
+        
+        # Build UPDATE query dynamically
+        set_clause = ", ".join(f"{k}=?" for k in updates.keys())
+        values = list(updates.values()) + [order_id]
+        db.execute(f"UPDATE orders SET {set_clause}, updated_at=datetime('now','utc') WHERE id=?", values)
+        db.commit()
+        
+        # Fetch updated order
+        order = row_to_dict(db.execute("SELECT * FROM orders WHERE id=?", (order_id,)).fetchone())
+        db.close()
+        
+        logger.info(f"Order {order_id} updated: {updates}")
+        
+        return jsonify({
+            "ok": True,
+            "order": order,
+            "message": "Order updated successfully",
+        })
+        
+    except Exception as e:
+        logger.error(f"Update order error: {e}", exc_info=True)
+        return jsonify({"ok": False, "error": "Failed to update order"}), 500
 
 
 # ─── Error Handlers ─────────────────────────────────────────────────────────
