@@ -1,8 +1,9 @@
-"""
+﻿"""
 Printful API Integration for ArtShift
 ======================================
 
-Scheme H: Use Sync API (https://sync.printful.com/) to bypass Cloudflare JS Challenge.
+Uses official Printful Sync API (https://api.printful.com).
+If 403 Cloudflare challenge occurs, set PRINTFUL_BASE_URL env to a Workers proxy.
 
 Endpoints implemented:
   GET  /api/printful/products
@@ -22,17 +23,17 @@ import logging
 import requests
 from flask import Blueprint, request, jsonify
 
-# ── Config ───────────────────────────────────────────────────────────────────
+# 鈹€鈹€ Config 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
-PRINTFUL_BASE_URL = "https://sync.printful.com/"  # Scheme H: Sync API
+PRINTFUL_BASE_URL = os.environ.get("PRINTFUL_BASE_URL", "https://api.printful.com")  # Use official API; set env var to use Workers proxy if needed
 BLUEPRINT_NAME = "printful"
 
 logger = logging.getLogger("artshift.printful")
 
-# ── Blueprint ────────────────────────────────────────────────────────────────
+# 鈹€鈹€ Blueprint 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 bp = Blueprint(BLUEPRINT_NAME, __name__)
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# 鈹€鈹€ Helpers 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
 def call_printful_api(endpoint: str, method: str = "GET", data: dict = None) -> dict:
     """
@@ -62,7 +63,7 @@ def call_printful_api(endpoint: str, method: str = "GET", data: dict = None) -> 
             return {"ok": False, "error": f"Unsupported method: {method}"}
 
         elapsed = time.time() - start
-        logger.info(f"[Printful] {method} {url} → {resp.status_code} ({elapsed:.2f}s)")
+        logger.info(f"[Printful] {method} {url} 鈫?{resp.status_code} ({elapsed:.2f}s)")
 
         if resp.status_code in [200, 201, 204]:
             return {"ok": True, "data": resp.json().get("result", {})}
@@ -75,7 +76,7 @@ def call_printful_api(endpoint: str, method: str = "GET", data: dict = None) -> 
         return {"ok": False, "error": str(e)}
 
 
-# ── Routes ──────────────────────────────────────────────────────────────────
+# 鈹€鈹€ Routes 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
 @bp.route("/api/printful/products", methods=["GET"])
 def printful_products():
@@ -190,3 +191,4 @@ def printful_webhook():
     logger.info(f"[Printful Webhook] Received event: {event_type}")
     # Process event (update order status in DB, etc.)
     return jsonify({"ok": True}), 200
+
