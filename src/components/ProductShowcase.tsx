@@ -176,7 +176,6 @@ export default function ProductShowcase({ onSelectProduct, onBack, t }: Props) {
                 product={product}
                 isSelected={selectedId === product.id}
                 onBuy={() => handleBuy(product)}
-                t={t}
               />
             ))}
           </div>
@@ -191,12 +190,10 @@ function ProductCard({
   product,
   isSelected,
   onBuy,
-  t,
 }: {
   product: Product;
   isSelected: boolean;
   onBuy: () => void;
-  t: (key: string) => string;
 }) {
   const hasMockup = product.mockups.length > 0;
   const mockupUrl = hasMockup ? product.mockups[0] : null;

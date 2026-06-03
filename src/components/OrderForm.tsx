@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ArrowLeft, ShoppingBag, Loader2, CheckCircle,
-  CreditCard, Truck, Mail, MapPin, User, Package
+  CreditCard, Truck, User, Package
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -51,7 +51,7 @@ const fmt = (price: number | null, currency = 'USD') => {
 };
 
 // ─── Component ─────────────────────────────────────────────────
-export default function OrderForm({ product, onBack, t }: Props) {
+export default function OrderForm({ product, onBack }: Props) {
   const [step, setStep] = useState<'form' | 'submitting' | 'success' | 'error'>('form');
   const [variantId, setVariantId] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState('');
