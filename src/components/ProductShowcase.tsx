@@ -196,7 +196,7 @@ function ProductCard({
   onBuy: () => void;
 }) {
   const hasMockup = product.mockups.length > 0;
-  const mockupUrl = hasMockup ? product.mockups[0] : null;
+  const mockupUrl = hasMockup ? product.mockups[0] : (product.thumbnail || null);
   const variantCount = product.variants.length;
   const availableVariants = product.variants.filter((v) => v.available);
 

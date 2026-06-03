@@ -1040,13 +1040,21 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
 }
 
 // ─── Products ────────────────────────────────────────────────────────────────
+const PRODUCT_THUMBNAILS: Record<string, string> = {
+  tshirt: 'https://files.cdn.printful.com/files/10d/10d2bf18292acbe89efa75f61b1a14d5_preview.png',
+  hoodie: 'https://files.cdn.printful.com/files/541/541ff37ae43c2c2f6fc7391febe22b0f_preview.png',
+  mug: 'https://files.cdn.printful.com/files/804/804b0908cc09b46c5701c77580283a24_preview.png',
+  case: 'https://files.cdn.printful.com/files/d40/d401d1f32465ffbf79d17f3569083df7_preview.png',
+  cap: 'https://files.cdn.printful.com/files/148/148145e2f5785f9b969e461ce984363f_preview.png',
+};
+
 function Products({ t }: { t: (key: string) => string }) {
   const products = [
-    { emoji: '👕', name: t('productTshirt'), desc: t('productTshirtDesc'), price: t('priceTshirt'), badge: t('badgePopular'), badgeColor: '#3b82f6', badgeBg: '#eff6ff', colors: ['bg-white', 'bg-gray-900', 'bg-blue-600'] },
-    { emoji: '🧥', name: t('productHoodie'), desc: t('productHoodieDesc'), price: t('priceHoodie'), badge: t('badgeCozy'), badgeColor: '#8b5cf6', badgeBg: '#f5f3ff', colors: ['bg-gray-700', 'bg-gray-900', 'bg-emerald-800'] },
-    { emoji: '☕', name: t('productMug'), desc: t('productMugDesc'), price: t('priceMug'), badge: null, colors: ['bg-white', 'bg-gray-900'] },
-    { emoji: '📱', name: t('productPhoneCase'), desc: t('productPhoneCaseDesc'), price: t('pricePhoneCase'), badge: null, colors: ['bg-gray-200', 'bg-gray-400'] },
-    { emoji: '🧢', name: t('productCap'), desc: t('productCapDesc'), price: t('priceCap'), badge: t('badgeNew'), badgeColor: '#f97316', badgeBg: '#fff7ed', colors: ['bg-gray-900', 'bg-gray-700'] },
+    { key: 'tshirt', thumb: PRODUCT_THUMBNAILS.tshirt, name: 'Unisex Vintage T-Shirt', desc: 'Stanley/Stella · 6 colors · S-3XL', price: 'From $29.99', badge: 'Popular', badgeColor: '#3b82f6', badgeBg: '#eff6ff' },
+    { key: 'hoodie', thumb: PRODUCT_THUMBNAILS.hoodie, name: 'Unisex Hoodie', desc: 'Cotton Heritage · 6 sizes · S-3XL', price: 'From $46.00', badge: 'Cozy', badgeColor: '#8b5cf6', badgeBg: '#f5f3ff' },
+    { key: 'mug', thumb: PRODUCT_THUMBNAILS.mug, name: 'Mug with Color Inside', desc: '11oz ceramic · dishwasher safe', price: 'From $17.95', badge: null, badgeColor: '', badgeBg: '' },
+    { key: 'case', thumb: PRODUCT_THUMBNAILS.case, name: 'MagSafe tough case', desc: 'iPhone 14/15/16/17 · Matte', price: 'From $27.25', badge: null, badgeColor: '', badgeBg: '' },
+    { key: 'cap', thumb: PRODUCT_THUMBNAILS.cap, name: 'Dad hat', desc: 'Cotton Patch · 7 colors · One size', price: 'From $23.75', badge: 'New', badgeColor: '#f97316', badgeBg: '#fff7ed' },
   ];
 
   return (
@@ -1075,19 +1083,19 @@ function Products({ t }: { t: (key: string) => string }) {
                   {p.badge}
                 </div>
               )}
-              <div className="aspect-square flex items-center justify-center bg-slate-50">
-                <span className="text-6xl sm:text-7xl">{p.emoji}</span>
+              <div className="aspect-square flex items-center justify-center bg-slate-50 overflow-hidden">
+                <img
+                  src={p.thumb}
+                  alt={p.name}
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                />
               </div>
               <div className="p-4 sm:p-5">
                 <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">{p.name}</h4>
                 <p className="text-[10px] sm:text-[11px] text-gray-500 mb-3">{p.desc}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold text-blue-600">{p.price}</span>
-                  <div className="flex gap-1">
-                    {p.colors.map((c, j) => (
-                      <div key={j} className={`w-3 h-3 rounded-full ${c} border border-gray-200`} />
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
