@@ -192,12 +192,14 @@ def row_to_dict(row):
 
 
 # ─── Static File Serving ────────────────────────────────────────────────────
+# 前端由 Zeabur 独立部署（artshift.api-tokenmaster.com），不属于本后端服务
+# 如果 dist/ 不存在说明当前是纯后端环境，静默跳过即可
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dist")
-
-# Ensure dist exists or fall back
-if not os.path.isdir(STATIC_DIR):
+HAS_STATIC = os.path.isdir(STATIC_DIR)
+if not HAS_STATIC:
+    logger.info("dist/ not found — skipping frontend static serving (backend-only mode)")
     STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-    logger.warning(f"dist/ not found, falling back to {STATIC_DIR}")
+    HAS_STATIC = os.path.isdir(STATIC_DIR)
 
 
 @app.route("/")
@@ -208,12 +210,16 @@ if not os.path.isdir(STATIC_DIR):
 @app.route("/waitlist")
 def serve_frontend():
     """Serve the SPA - all routes fall back to index.html"""
+    if not HAS_STATIC:
+        return jsonify({"service": "ArtShift API", "status": "ok"}), 200
     return send_from_directory(STATIC_DIR, "index.html")
 
 
 @app.route("/assets/<path:filename>")
 def serve_assets(filename):
     """Serve JS/CSS assets with caching headers"""
+    if not HAS_STATIC:
+        return jsonify({"error": "Not found"}), 404
     response = send_from_directory(os.path.join(STATIC_DIR, "assets"), filename)
     response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
@@ -221,12 +227,16 @@ def serve_assets(filename):
 
 @app.route("/favicon.svg")
 def favicon():
+    if not HAS_STATIC:
+        return jsonify({"error": "Not found"}), 404
     return send_from_directory(STATIC_DIR, "favicon.svg")
 
 
 @app.route("/data/<path:filename>")
 def serve_data(filename):
     """Serve static data files (e.g. products.json)"""
+    if not HAS_STATIC:
+        return jsonify({"error": "Not found"}), 404
     return send_from_directory(os.path.join(STATIC_DIR, "data"), filename)
 
 
