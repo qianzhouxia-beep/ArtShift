@@ -1016,19 +1016,48 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
               </div>
               <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-2xl mx-auto">
                 {[
-                  { emoji: '👕', name: t('productTshirt'), color: '#eff6ff' },
-                  { emoji: '☕', name: t('productMug'), color: '#fff7ed' },
-                  { emoji: '📱', name: t('productPhoneCase'), color: '#f5f3ff' },
+                  { 
+                    image: 'https://files.cdn.printful.com/files/10d/10d2bf18292acbe89efa75f61b1a14d5_preview.png',
+                    name: 'Vintage T-Shirt',
+                    bg: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
+                    price: '$29.99'
+                  },
+                  { 
+                    image: 'https://files.cdn.printful.com/files/804/804b0908cc09b46c5701c77580283a24_preview.png',
+                    name: 'Mug',
+                    bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                    price: '$17.95'
+                  },
+                  { 
+                    image: 'https://files.cdn.printful.com/files/d40/d401d1f32465ffbf79d17f3569083df7_preview.png',
+                    name: 'iPhone Case',
+                    bg: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)',
+                    price: '$27.25'
+                  },
                 ].map((product, i) => (
-                  <div key={i} className="text-center">
-                    <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden"
-                      style={{ backgroundColor: product.color }}>
-                      <span className="text-5xl sm:text-6xl opacity-70">{product.emoji}</span>
-                      <div className="absolute bottom-2 text-[8px] sm:text-[9px] text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">
-                        {product.name}
+                  <a key={i}
+                    href="#products"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-center group"
+                  >
+                    <div className="aspect-[3/4] rounded-2xl flex items-center justify-center mb-3 relative overflow-hidden shadow-sm transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl"
+                      style={{ background: product.bg }}>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover p-4 sm:p-6 transition-all duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/5" />
+                      <div className="absolute bottom-2 flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+                        <span className="text-[10px] font-bold text-violet-600">{product.price}</span>
+                        <span className="text-[9px] text-gray-500">{product.name}</span>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
