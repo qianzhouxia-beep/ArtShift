@@ -1,0 +1,129 @@
+[
+  {
+    "id": 436131993,
+    "name": "Unisex Hoodie",
+    "thumbnail": "https://files.cdn.printful.com/files/541/541ff37ae43c2c2f6fc7391febe22b0f_preview.png",
+    "retail_price": 46.00,
+    "currency": "USD",
+    "mockups": ["https://files.cdn.printful.com/products/380/10774_1759916354.jpg"],
+    "variants": [
+      {"id": 10774, "name": "Unisex Hoodie / S", "size": "S", "color": "White", "price": 46.00, "available": true},
+      {"id": 10775, "name": "Unisex Hoodie / M", "size": "M", "color": "White", "price": 46.00, "available": true},
+      {"id": 10776, "name": "Unisex Hoodie / L", "size": "L", "color": "White", "price": 46.00, "available": true},
+      {"id": 10777, "name": "Unisex Hoodie / XL", "size": "XL", "color": "White", "price": 46.00, "available": true},
+      {"id": 10778, "name": "Unisex Hoodie / 2XL", "size": "2XL", "color": "White", "price": 46.00, "available": true},
+      {"id": 10779, "name": "Unisex Hoodie / 3XL", "size": "3XL", "color": "White", "price": 48.50, "available": true}
+    ]
+  },
+  {
+    "id": 436131461,
+    "name": "Mug with Color Inside",
+    "thumbnail": "https://files.cdn.printful.com/files/804/804b0908cc09b46c5701c77580283a24_preview.png",
+    "retail_price": 17.95,
+    "currency": "USD",
+    "mockups": ["https://files.cdn.printful.com/products/450/6780_1715615703.jpg"],
+    "variants": [
+      {"id": 6780, "name": "Mug with Color Inside / 11 oz", "size": "11 oz", "color": "Yellow", "price": 17.95, "available": true}
+    ]
+  },
+  {
+    "id": 436130984,
+    "name": "MagSafe tough case for iPhone",
+    "thumbnail": "https://files.cdn.printful.com/files/d40/d401d1f32465ffbf79d17f3569083df7_preview.png",
+    "retail_price": 27.25,
+    "currency": "USD",
+    "mockups": [],
+    "variants": [
+      {"id": 24527, "name": "MagSafe case / iPhone 16 Pro", "size": "iPhone 16 Pro", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24528, "name": "MagSafe case / iPhone 16 Pro Max", "size": "iPhone 16 Pro Max", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24529, "name": "MagSafe case / iPhone 16 Plus", "size": "iPhone 16 Plus", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24530, "name": "MagSafe case / iPhone 16", "size": "iPhone 16", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24532, "name": "MagSafe case / iPhone 15 Pro Max", "size": "iPhone 15 Pro Max", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24533, "name": "MagSafe case / iPhone 15 Pro", "size": "iPhone 15 Pro", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24534, "name": "MagSafe case / iPhone 15 Plus", "size": "iPhone 15 Plus", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24535, "name": "MagSafe case / iPhone 15", "size": "iPhone 15", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24536, "name": "MagSafe case / iPhone 14 Pro Max", "size": "iPhone 14 Pro Max", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24537, "name": "MagSafe case / iPhone 14 Pro", "size": "iPhone 14 Pro", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24538, "name": "MagSafe case / iPhone 14 Plus", "size": "iPhone 14 Plus", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 24539, "name": "MagSafe case / iPhone 14", "size": "iPhone 14", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 27907, "name": "MagSafe case / iPhone 17", "size": "iPhone 17", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 27912, "name": "MagSafe case / iPhone 17 Pro Max", "size": "iPhone 17 Pro Max", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 27913, "name": "MagSafe case / iPhone 17 Pro", "size": "iPhone 17 Pro", "color": "Matte", "price": 27.25, "available": true},
+      {"id": 27914, "name": "MagSafe case / iPhone 17 Air", "size": "iPhone 17 Air", "color": "Matte", "price": 27.25, "available": true}
+    ]
+  },
+  {
+    "id": 436130651,
+    "name": "Dad hat",
+    "thumbnail": "https://files.cdn.printful.com/files/148/148145e2f5785f9b969e461ce984363f_preview.png",
+    "retail_price": 23.75,
+    "currency": "USD",
+    "mockups": [
+      "https://files.cdn.printful.com/products/138/33214_1756541947.jpg",
+      "https://files.cdn.printful.com/products/138/33228_1756541947.jpg",
+      "https://files.cdn.printful.com/products/138/33241_1756541947.jpg",
+      "https://files.cdn.printful.com/products/138/33215_1756541947.jpg",
+      "https://files.cdn.printful.com/products/138/33239_1756541947.jpg"
+    ],
+    "variants": [
+      {"id": 33214, "name": "Dad hat / White / One size", "size": "One size", "color": "White", "price": 23.75, "available": true},
+      {"id": 33228, "name": "Dad hat / Stone / One size", "size": "One size", "color": "Stone", "price": 23.75, "available": true},
+      {"id": 33241, "name": "Dad hat / Pink / One size", "size": "One size", "color": "Pink", "price": 23.75, "available": true},
+      {"id": 33215, "name": "Dad hat / Black / One size", "size": "One size", "color": "Black", "price": 23.75, "available": true},
+      {"id": 33239, "name": "Dad hat / Light Blue / One size", "size": "One size", "color": "Light Blue", "price": 23.75, "available": true},
+      {"id": 33242, "name": "Dad hat / Natural / One size", "size": "One size", "color": "Natural", "price": 23.75, "available": true},
+      {"id": 33218, "name": "Dad hat / Navy / One size", "size": "One size", "color": "Navy", "price": 23.75, "available": true}
+    ]
+  },
+  {
+    "id": 436126374,
+    "name": "Unisex Garment Dyed Creator 2.0 Vintage T-Shirt",
+    "thumbnail": "https://files.cdn.printful.com/files/10d/10d2bf18292acbe89efa75f61b1a14d5_preview.png",
+    "retail_price": 29.99,
+    "currency": "USD",
+    "mockups": [
+      "https://files.cdn.printful.com/products/276/42811_1692867801.jpg",
+      "https://files.cdn.printful.com/products/276/42817_1692867801.jpg",
+      "https://files.cdn.printful.com/products/276/42823_1692867801.jpg",
+      "https://files.cdn.printful.com/products/276/42835_1692867801.jpg"
+    ],
+    "variants": [
+      {"id": 42811, "name": "Vintage T-Shirt / Misty Grey / S", "size": "S", "color": "Misty Grey", "price": 29.99, "available": true},
+      {"id": 42812, "name": "Vintage T-Shirt / Misty Grey / M", "size": "M", "color": "Misty Grey", "price": 29.99, "available": true},
+      {"id": 42813, "name": "Vintage T-Shirt / Misty Grey / L", "size": "L", "color": "Misty Grey", "price": 29.99, "available": true},
+      {"id": 42814, "name": "Vintage T-Shirt / Misty Grey / XL", "size": "XL", "color": "Misty Grey", "price": 29.99, "available": true},
+      {"id": 42815, "name": "Vintage T-Shirt / Misty Grey / 2XL", "size": "2XL", "color": "Misty Grey", "price": 29.99, "available": true},
+      {"id": 42816, "name": "Vintage T-Shirt / Misty Grey / 3XL", "size": "3XL", "color": "Misty Grey", "price": 31.99, "available": true},
+      {"id": 42817, "name": "Vintage T-Shirt / Black Rock / S", "size": "S", "color": "Black Rock", "price": 29.99, "available": true},
+      {"id": 42818, "name": "Vintage T-Shirt / Black Rock / M", "size": "M", "color": "Black Rock", "price": 29.99, "available": true},
+      {"id": 42819, "name": "Vintage T-Shirt / Black Rock / L", "size": "L", "color": "Black Rock", "price": 29.99, "available": true},
+      {"id": 42820, "name": "Vintage T-Shirt / Black Rock / XL", "size": "XL", "color": "Black Rock", "price": 29.99, "available": true},
+      {"id": 42821, "name": "Vintage T-Shirt / Black Rock / 2XL", "size": "2XL", "color": "Black Rock", "price": 29.99, "available": true},
+      {"id": 42822, "name": "Vintage T-Shirt / Black Rock / 3XL", "size": "3XL", "color": "Black Rock", "price": 31.99, "available": true},
+      {"id": 42823, "name": "Vintage T-Shirt / Stone / S", "size": "S", "color": "Stone", "price": 29.99, "available": true},
+      {"id": 42830, "name": "Vintage T-Shirt / Stone / M", "size": "M", "color": "Stone", "price": 29.99, "available": true},
+      {"id": 42831, "name": "Vintage T-Shirt / Stone / L", "size": "L", "color": "Stone", "price": 29.99, "available": true},
+      {"id": 42832, "name": "Vintage T-Shirt / Stone / XL", "size": "XL", "color": "Stone", "price": 29.99, "available": true},
+      {"id": 42833, "name": "Vintage T-Shirt / Stone / 2XL", "size": "2XL", "color": "Stone", "price": 29.99, "available": true},
+      {"id": 42834, "name": "Vintage T-Shirt / Stone / 3XL", "size": "3XL", "color": "Stone", "price": 31.99, "available": true},
+      {"id": 42824, "name": "Vintage T-Shirt / Green Bay / S", "size": "S", "color": "Green Bay", "price": 29.99, "available": true},
+      {"id": 42825, "name": "Vintage T-Shirt / Green Bay / M", "size": "M", "color": "Green Bay", "price": 29.99, "available": true},
+      {"id": 42826, "name": "Vintage T-Shirt / Green Bay / L", "size": "L", "color": "Green Bay", "price": 29.99, "available": true},
+      {"id": 42827, "name": "Vintage T-Shirt / Green Bay / XL", "size": "XL", "color": "Green Bay", "price": 29.99, "available": true},
+      {"id": 42828, "name": "Vintage T-Shirt / Green Bay / 2XL", "size": "2XL", "color": "Green Bay", "price": 29.99, "available": true},
+      {"id": 42829, "name": "Vintage T-Shirt / Green Bay / 3XL", "size": "3XL", "color": "Green Bay", "price": 31.99, "available": true},
+      {"id": 42835, "name": "Vintage T-Shirt / Deep Teal / S", "size": "S", "color": "Deep Teal", "price": 29.99, "available": true},
+      {"id": 42836, "name": "Vintage T-Shirt / Deep Teal / M", "size": "M", "color": "Deep Teal", "price": 29.99, "available": true},
+      {"id": 42837, "name": "Vintage T-Shirt / Deep Teal / L", "size": "L", "color": "Deep Teal", "price": 29.99, "available": true},
+      {"id": 42838, "name": "Vintage T-Shirt / Deep Teal / XL", "size": "XL", "color": "Deep Teal", "price": 29.99, "available": true},
+      {"id": 42839, "name": "Vintage T-Shirt / Deep Teal / 2XL", "size": "2XL", "color": "Deep Teal", "price": 29.99, "available": true},
+      {"id": 42840, "name": "Vintage T-Shirt / Deep Teal / 3XL", "size": "3XL", "color": "Deep Teal", "price": 31.99, "available": true},
+      {"id": 42841, "name": "Vintage T-Shirt / Taupe / S", "size": "S", "color": "Taupe", "price": 29.99, "available": true},
+      {"id": 42842, "name": "Vintage T-Shirt / Taupe / M", "size": "M", "color": "Taupe", "price": 29.99, "available": true},
+      {"id": 42843, "name": "Vintage T-Shirt / Taupe / L", "size": "L", "color": "Taupe", "price": 29.99, "available": true},
+      {"id": 42844, "name": "Vintage T-Shirt / Taupe / XL", "size": "XL", "color": "Taupe", "price": 29.99, "available": true},
+      {"id": 42845, "name": "Vintage T-Shirt / Taupe / 2XL", "size": "2XL", "color": "Taupe", "price": 29.99, "available": true},
+      {"id": 42846, "name": "Vintage T-Shirt / Taupe / 3XL", "size": "3XL", "color": "Taupe", "price": 31.99, "available": true}
+    ]
+  }
+]

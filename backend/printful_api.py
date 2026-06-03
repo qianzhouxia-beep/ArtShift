@@ -2,8 +2,9 @@
 Printful API Integration for ArtShift
 ======================================
 
-Uses official Printful Sync API (https://api.printful.com).
-If 403 Cloudflare challenge occurs, set PRINTFUL_BASE_URL env to a Workers proxy.
+Uses curl_cffi (Chrome TLS fingerprint emulation) to bypass Cloudflare Bot Fight Mode
+on api.printful.com. Regular 'requests' library gets blocked with CF challenge;
+curl_cffi impersonates a real browser and passes through.
 
 Endpoints implemented:
   GET  /api/printful/products
@@ -20,12 +21,11 @@ Endpoints implemented:
 import os
 import time
 import logging
-import requests
+from curl_cffi import requests
 from flask import Blueprint, request, jsonify
 
 # 鈹€鈹€ Config 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
-PRINTFUL_BASE_URL = os.environ.get("PRINTFUL_BASE_URL", "https://api.printful.com")  # Use official API; set env var to use Workers proxy if needed
 BLUEPRINT_NAME = "printful"
 
 logger = logging.getLogger("artshift.printful")
@@ -37,14 +37,16 @@ bp = Blueprint(BLUEPRINT_NAME, __name__)
 
 def call_printful_api(endpoint: str, method: str = "GET", data: dict = None) -> dict:
     """
-    Call Printful REST API (Sync API endpoint).
+    Call Printful REST API using curl_cffi (Chrome impersonation).
     Returns parsed JSON or raises exception.
     """
-    url = f"{PRINTFUL_BASE_URL.rstrip('/')}/{endpoint.lstrip('/')}"
+    url = f"https://api.printful.com/{endpoint.lstrip('/')}"
     headers = {
         "Authorization": f"Bearer {PRINTFUL_API_KEY}",
         "Content-Type": "application/json",
-        "User-Agent": "ArtShift/1.0 (PrintfulIntegration)",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+        "Accept-Language": "en-US,en;q=0.9",
     }
 
     logger.info(f"[Printful] Calling {method} {url}")
@@ -52,13 +54,13 @@ def call_printful_api(endpoint: str, method: str = "GET", data: dict = None) -> 
 
     try:
         if method.upper() == "GET":
-            resp = requests.get(url, headers=headers, timeout=15)
+            resp = requests.get(url, headers=headers, timeout=15, impersonate="chrome")
         elif method.upper() == "POST":
-            resp = requests.post(url, json=data, headers=headers, timeout=15)
+            resp = requests.post(url, json=data, headers=headers, timeout=15, impersonate="chrome")
         elif method.upper() == "PUT":
-            resp = requests.put(url, json=data, headers=headers, timeout=15)
+            resp = requests.put(url, json=data, headers=headers, timeout=15, impersonate="chrome")
         elif method.upper() == "DELETE":
-            resp = requests.delete(url, headers=headers, timeout=15)
+            resp = requests.delete(url, headers=headers, timeout=15, impersonate="chrome")
         else:
             return {"ok": False, "error": f"Unsupported method: {method}"}
 

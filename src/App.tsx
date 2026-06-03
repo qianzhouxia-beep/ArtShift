@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import AuthModal from './components/AuthModal';
+import ProductShowcase from './components/ProductShowcase';
+import OrderForm from './components/OrderForm';
 import {
   Sparkles, Zap, Globe, ShieldCheck, Star, ArrowRight,
   ChevronDown,
   Palette, Truck, CreditCard, Menu, X,
   Package, Smartphone, Image, Layers, Wand2,
-  ArrowUp, Upload, ImagePlus,
+  ArrowUp, Upload, ImagePlus, ShoppingBag,
 } from 'lucide-react';
 import ParticleBackground from './ParticleBackground';
 import BuyCreditsModal from './components/BuyCreditsModal';
@@ -118,6 +120,41 @@ const translations: Record<string, Record<string, string>> = {
     testimonial1Name: 'Alex M.', testimonial1Text: 'I had zero design skills. Printed a custom hoodie with my cat in Van Gogh style. It looks incredible.',
     testimonial2Name: 'Sophie L.', testimonial2Text: 'Ordered from Germany, arrived in 5 days. The print quality is better than any store-bought shirt.',
     testimonial3Name: 'James K.', testimonial3Text: 'Made personalized mugs for my entire team. They loved it. Will order again for sure.',
+    backToHome: 'Back to Home',
+    shopNow: 'Shop Now',
+    chooseProduct: 'Choose Your Product',
+    chooseProductDesc: 'Select a product to customize with your AI design. Printed on demand, shipped worldwide.',
+    customizeBuy: 'Customize & Buy',
+    outOfStock: 'Out of Stock',
+    createYourOrder: 'Create Your Order',
+    customizeOrder: 'Customize your {product} and place your order.',
+    selectVariant: 'Select Variant',
+    yourDesign: 'Your Design',
+    designUrlPlaceholder: 'https://example.com/my-design.png',
+    designPromptLabel: 'Design Prompt (optional)',
+    designPromptPlaceholder: 'Describe your design idea...',
+    quantity: 'Quantity',
+    customer: 'Customer',
+    emailRequired: 'Email is required',
+    shippingAddress: 'Shipping Address',
+    fullName: 'Full Name',
+    addressLine1: 'Address Line 1',
+    addressLine2: 'Address Line 2',
+    city: 'City',
+    state: 'State',
+    zipCode: 'ZIP / Postal Code',
+    country: 'Country',
+    phone: 'Phone',
+    orderSummary: 'Order Summary',
+    placeOrder: 'Place Order',
+    creatingOrder: 'Creating Order...',
+    orderSuccess: 'Order Created!',
+    orderPlaced: 'Your order {number} has been placed.',
+    backToProducts: 'Back to Products',
+    loadingProducts: 'Loading products...',
+    loadFailed: 'Unable to load products.',
+    retry: 'Retry',
+    usingCached: 'Using cached data',
   },
   zh: {
     howItWorks: '如何使用', products: '产品', pricing: '价格', faq: '常见问题',
@@ -221,6 +258,41 @@ const translations: Record<string, Record<string, string>> = {
     testimonial1Name: 'Alex M.', testimonial1Text: '我完全没有设计技能。用我猫咪的照片印了一件梵高风格的卫衣。效果太惊艳了。',
     testimonial2Name: 'Sophie L.', testimonial2Text: '从德国订货，5天就到了。印刷质量比任何店里买的T恤都好。',
     testimonial3Name: 'James K.', testimonial3Text: '给整个团队做了定制马克杯。他们都很喜欢。肯定会再订购。',
+    backToHome: '返回首页',
+    shopNow: '立即选购',
+    chooseProduct: '选择你的产品',
+    chooseProductDesc: '选择一款产品，用你的AI设计进行定制。按需印刷，全球配送。',
+    customizeBuy: '定制购买',
+    outOfStock: '缺货',
+    createYourOrder: '创建订单',
+    customizeOrder: '为 {product} 定制并下单。',
+    selectVariant: '选择规格',
+    yourDesign: '你的设计',
+    designUrlPlaceholder: 'https://example.com/my-design.png',
+    designPromptLabel: '设计描述（可选）',
+    designPromptPlaceholder: '描述你的设计想法...',
+    quantity: '数量',
+    customer: '客户信息',
+    emailRequired: '请输入邮箱',
+    shippingAddress: '收货地址',
+    fullName: '姓名',
+    addressLine1: '地址第一行',
+    addressLine2: '地址第二行',
+    city: '城市',
+    state: '省/州',
+    zipCode: '邮政编码',
+    country: '国家',
+    phone: '电话',
+    orderSummary: '订单摘要',
+    placeOrder: '提交订单',
+    creatingOrder: '创建订单中...',
+    orderSuccess: '订单已创建！',
+    orderPlaced: '你的订单 {number} 已提交。',
+    backToProducts: '返回产品列表',
+    loadingProducts: '加载产品中...',
+    loadFailed: '无法加载产品。',
+    retry: '重试',
+    usingCached: '使用缓存数据',
   },
 };
 
@@ -258,9 +330,10 @@ interface NavbarProps {
   t: (key: string) => string;
   lang: string;
   setLang: (l: string) => void;
+  onShopNow: () => void;
 }
 
-function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, setLang }: NavbarProps) {
+function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, setLang, onShopNow }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const links = [t("howItWorks"), t("products"), t("pricing"), t("faq")];
   return (
@@ -281,6 +354,13 @@ function Navbar({ onOpenModal, user, credits, onOpenAuth, onLogout, t, lang, set
             style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
             {t('joinWaitlist')}
           </a>
+          <button
+            onClick={onShopNow}
+            className="text-[12px] sm:text-[13px] font-semibold text-violet-600 rounded-full px-5 py-1.5 transition-all duration-200 border border-violet-200 hover:bg-violet-50 flex items-center gap-1.5"
+          >
+            <ShoppingBag size={14} />
+            Shop
+          </button>
           {user ? (
             <>
               <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 border border-violet-100">
@@ -1394,6 +1474,10 @@ export default function App() {
   const [user, setUser] = useState<{ id: string; email: string } | null>(null);
   const [credits, setCredits] = useState(0);
 
+  // Page navigation
+  const [currentPage, setCurrentPage] = useState<'home' | 'products' | 'order'>('home');
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
   // Load user from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('artshift_user');
@@ -1446,46 +1530,70 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white">
-      <ParticleBackground />
-      <Navbar
-        onOpenModal={() => setShowBuyCredits(true)}
-        user={user}
-        credits={credits}
-        onOpenAuth={() => setShowAuth(true)}
-        onLogout={handleLogout}
-        t={t}
-        lang={lang}
-        setLang={setLang}
-      />
-      <AuthModal
-        isOpen={showAuth}
-        onClose={() => setShowAuth(false)}
-        onSuccess={handleAuthSuccess}
-      />
-      <BuyCreditsModal
-        isOpen={showBuyCredits}
-        onClose={() => setShowBuyCredits(false)}
-        userId={user?.id}
-      />
-      <HeroSection t={t} />
-      <HowItWorks t={t} />
-      <StyleGallery t={t} />
-      <AIDemo userId={user?.id || null} t={t} />
-      <Products t={t} />
-      <WhyArtShift t={t} />
-      <Testimonials t={t} />
-      <Pricing t={t} />
-      <Waitlist t={t} />
-      <FAQ t={t} />
-      <Footer t={t} />
-      {showBackToTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 p-4 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-          style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
-        >
-          <ArrowUp size={20} />
-        </button>
+      {currentPage === 'home' ? (
+        <>
+          <ParticleBackground />
+          <Navbar
+            onOpenModal={() => setShowBuyCredits(true)}
+            user={user}
+            credits={credits}
+            onOpenAuth={() => setShowAuth(true)}
+            onLogout={handleLogout}
+            t={t}
+            lang={lang}
+            setLang={setLang}
+            onShopNow={() => setCurrentPage('products')}
+          />
+          <AuthModal
+            isOpen={showAuth}
+            onClose={() => setShowAuth(false)}
+            onSuccess={handleAuthSuccess}
+          />
+          <BuyCreditsModal
+            isOpen={showBuyCredits}
+            onClose={() => setShowBuyCredits(false)}
+            userId={user?.id}
+          />
+          <HeroSection t={t} />
+          <HowItWorks t={t} />
+          <StyleGallery t={t} />
+          <AIDemo userId={user?.id || null} t={t} />
+          <Products t={t} />
+          <WhyArtShift t={t} />
+          <Testimonials t={t} />
+          <Pricing t={t} />
+          <Waitlist t={t} />
+          <FAQ t={t} />
+          <Footer t={t} />
+          {showBackToTop && (
+            <button
+              onClick={scrollToTop}
+              className="fixed bottom-8 right-8 z-50 p-4 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+              style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+            >
+              <ArrowUp size={20} />
+            </button>
+          )}
+        </>
+      ) : currentPage === 'products' ? (
+        <ProductShowcase
+          onSelectProduct={(product) => {
+            setSelectedProduct(product);
+            setCurrentPage('order');
+          }}
+          onBack={() => setCurrentPage('home')}
+          t={t}
+        />
+      ) : currentPage === 'order' && selectedProduct ? (
+        <OrderForm
+          product={selectedProduct}
+          onBack={() => setCurrentPage('products')}
+          t={t}
+        />
+      ) : (
+        <div className="min-h-screen flex items-center justify-center">
+          <p>Page not found</p>
+        </div>
       )}
     </div>
   );
