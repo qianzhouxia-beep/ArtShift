@@ -192,7 +192,12 @@ def row_to_dict(row):
 
 
 # ─── Static File Serving ────────────────────────────────────────────────────
-STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dist")
+
+# Ensure dist exists or fall back
+if not os.path.isdir(STATIC_DIR):
+    STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+    logger.warning(f"dist/ not found, falling back to {STATIC_DIR}")
 
 
 @app.route("/")
@@ -217,6 +222,12 @@ def serve_assets(filename):
 @app.route("/favicon.svg")
 def favicon():
     return send_from_directory(STATIC_DIR, "favicon.svg")
+
+
+@app.route("/data/<path:filename>")
+def serve_data(filename):
+    """Serve static data files (e.g. products.json)"""
+    return send_from_directory(os.path.join(STATIC_DIR, "data"), filename)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
