@@ -86,6 +86,8 @@ DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
 STABILITY_API_KEY = os.environ.get("STABILITY_API_KEY", "")
 STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-xl-1024-v1-0")
+# Public base URL for serving generated images (must be set in Zeabur)
+BASE_URL = os.environ.get("BASE_URL", "https://artshift-backend.zeabur.app")
 
 # Printful Config
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
@@ -513,7 +515,7 @@ def _call_stability(prompt: str, style: str) -> dict:
                 fpath = _os.path.join(gen_dir, fname)
                 with open(fpath, "wb") as f:
                     f.write(img_bytes)
-                saved_urls.append(f"/static/generated/{fname}")
+                saved_urls.append(f"{BASE_URL}/static/generated/{fname}")
         logger.info(f"Stability generated {len(saved_urls)} images in {elapsed:.1f}s")
         return {
             "ok": True, "images": saved_urls,
