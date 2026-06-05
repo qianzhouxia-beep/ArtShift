@@ -569,9 +569,11 @@ const AI_STYLES = [
 
 interface AIDemoProps {
   userId: string | null;
+  onImageGenerated?: (url: string) => void;
+  onPrintNow?: () => void;
 }
 
-function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
+function AIDemo({ userId, t, onImageGenerated, onPrintNow }: AIDemoProps & { t: (key: string) => string }) {
   // ─── Mode: 'text' or 'image' ───────────────────────────
   const [mode, setMode] = useState<'text' | 'image'>('text');
   const [prompt, setPrompt] = useState('');
@@ -650,6 +652,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
         if (!res.ok) throw new Error(data.error || 'Generation failed');
         if (data.success && data.imageUrl) {
           setResultUrl(data.imageUrl);
+          onImageGenerated?.(data.imageUrl);
         } else {
           throw new Error('No image returned');
         }
@@ -671,6 +674,7 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
         if (!res.ok) throw new Error(data.error || 'Style transfer failed');
         if (data.success && data.imageUrl) {
           setResultUrl(data.imageUrl);
+          onImageGenerated?.(data.imageUrl);
         } else {
           throw new Error('No image returned');
         }
@@ -993,6 +997,15 @@ function AIDemo({ userId, t }: AIDemoProps & { t: (key: string) => string }) {
                       >
                         {t('viewFullSize')}
                       </a>
+                      {onPrintNow && (
+                        <button
+                          onClick={onPrintNow}
+                          className="inline-flex items-center gap-2 rounded-xl px-8 py-3 text-sm font-bold text-white transition-all duration-200 hover:shadow-lg"
+                          style={{ background: 'linear-gradient(135deg, #f97316, #ef4444)' }}
+                        >
+                          🖨️ 印到产品上
+                        </button>
+                      )}
                       <button
                         onClick={handleReset}
                         className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-gray-700 border border-gray-200 transition-all duration-200 hover:bg-gray-50"
@@ -1514,6 +1527,7 @@ export default function App() {
   // Page navigation
   const [currentPage, setCurrentPage] = useState<'home' | 'products' | 'order'>('home');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [designUrl, setDesignUrl] = useState<string | null>(null);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -1594,7 +1608,10 @@ export default function App() {
           <HeroSection t={t} />
           <HowItWorks t={t} />
           <StyleGallery t={t} />
-          <AIDemo userId={user?.id || null} t={t} />
+          <AIDemo userId={user?.id || null} t={t}
+            onImageGenerated={(url) => setDesignUrl(url)}
+            onPrintNow={() => setCurrentPage('products')}
+          />
           <Products t={t} />
           <WhyArtShift t={t} />
           <Testimonials t={t} />
@@ -1614,6 +1631,7 @@ export default function App() {
         </>
       ) : currentPage === 'products' ? (
         <ProductShowcase
+          designUrl={designUrl}
           onSelectProduct={(product) => {
             setSelectedProduct(product);
             setCurrentPage('order');
@@ -1624,6 +1642,7 @@ export default function App() {
       ) : currentPage === 'order' && selectedProduct ? (
         <OrderForm
           product={selectedProduct}
+          designUrl={designUrl}
           onBack={() => setCurrentPage('products')}
           t={t}
         />
