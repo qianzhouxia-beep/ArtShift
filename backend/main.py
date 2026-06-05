@@ -247,6 +247,13 @@ def serve_data(filename):
     return send_from_directory(os.path.join(STATIC_DIR, "data"), filename)
 
 
+@app.route("/static/<path:filename>")
+def serve_static(filename):
+    """Serve files from the static/ directory (generated images, etc.)"""
+    static_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+    return send_from_directory(static_root, filename)
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # API ENDPOINTS
 # ══════════════════════════════════════════════════════════════════════════════
