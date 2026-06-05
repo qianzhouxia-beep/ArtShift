@@ -22,6 +22,7 @@ interface Product {
 }
 
 interface Props {
+  designUrl?: string | null;
   onSelectProduct: (product: Product) => void;
   onBack: () => void;
   t: (key: string) => string;
@@ -38,7 +39,7 @@ const fmt = (price: number | null, currency = 'USD') => {
 };
 
 // ─── Component ─────────────────────────────────────────────────
-export default function ProductShowcase({ onSelectProduct, onBack, t }: Props) {
+export default function ProductShowcase({ designUrl, onSelectProduct, onBack, t }: Props) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -150,6 +151,22 @@ export default function ProductShowcase({ onSelectProduct, onBack, t }: Props) {
           )}
         </div>
 
+        {/* Design preview banner */}
+        {designUrl && (
+          <div className="mb-12 rounded-3xl overflow-hidden border border-violet-100 bg-gradient-to-r from-violet-50 to-fuchsia-50 p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shadow-md flex-shrink-0 border-2 border-white">
+                <img src={designUrl} alt="Your design" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-violet-600 mb-1">Your design</div>
+                <h3 className="font-bold text-gray-900 text-lg mb-1">Print it on a product</h3>
+                <p className="text-gray-500 text-sm">Select a product below to see your design printed on it.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="text-center mb-16">
           <span className="inline-block text-[11px] font-bold uppercase tracking-widest mb-4 px-4 py-1.5 rounded-full bg-violet-50 text-violet-600">
             Printful Products
@@ -174,6 +191,7 @@ export default function ProductShowcase({ onSelectProduct, onBack, t }: Props) {
               <ProductCard
                 key={product.id}
                 product={product}
+                designUrl={designUrl}
                 isSelected={selectedId === product.id}
                 onBuy={() => handleBuy(product)}
               />
@@ -188,10 +206,12 @@ export default function ProductShowcase({ onSelectProduct, onBack, t }: Props) {
 // ─── Product Card ──────────────────────────────────────────────
 function ProductCard({
   product,
+  designUrl,
   isSelected,
   onBuy,
 }: {
   product: Product;
+  designUrl?: string | null;
   isSelected: boolean;
   onBuy: () => void;
 }) {
@@ -215,6 +235,21 @@ function ProductCard({
             className="w-full h-full object-cover"
             loading="lazy"
           />
+        ) : designUrl ? (
+          <div className="w-full h-full relative bg-gray-100">
+            <img
+              src={product.thumbnail || product.mockups[0] || ''}
+              alt=""
+              className="w-full h-full object-cover opacity-70"
+            />
+            <div className="absolute inset-0 flex items-center justify-center p-6">
+              <img
+                src={designUrl}
+                alt="Design preview"
+                className="max-w-[70%] max-h-[70%] object-contain rounded-lg shadow-lg border-2 border-white"
+              />
+            </div>
+          </div>
         ) : (
           <div className="text-center p-6">
             <div className="text-6xl mb-3 opacity-30">

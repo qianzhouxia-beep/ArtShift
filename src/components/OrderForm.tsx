@@ -37,6 +37,7 @@ interface ShippingAddress {
 
 interface Props {
   product: Product;
+  designUrl?: string | null;
   onBack: () => void;
   t: (key: string) => string;
 }
@@ -51,11 +52,11 @@ const fmt = (price: number | null, currency = 'USD') => {
 };
 
 // ─── Component ─────────────────────────────────────────────────
-export default function OrderForm({ product, onBack }: Props) {
+export default function OrderForm({ product, designUrl: initialDesignUrl, onBack }: Props) {
   const [step, setStep] = useState<'form' | 'submitting' | 'success' | 'error'>('form');
   const [variantId, setVariantId] = useState<string>('');
   const [customerEmail, setCustomerEmail] = useState('');
-  const [designUrl, setDesignUrl] = useState('');
+  const [designUrl, setDesignUrl] = useState(initialDesignUrl || '');
   const [designPrompt, setDesignPrompt] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [shipping, setShipping] = useState<ShippingAddress>({
