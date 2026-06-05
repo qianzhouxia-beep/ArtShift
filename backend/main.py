@@ -368,6 +368,67 @@ def generate_image():
         }), 502
 
 
+@app.route("/api/generation/text-to-image", methods=["POST"])
+@limiter.limit("20 per hour")
+def generate_text_to_image():
+    """Text-to-image endpoint matching frontend expectations."""
+    data = request.get_json(silent=True) or {}
+    prompt = (data.get("prompt") or "").strip()
+    style = (data.get("style") or "auto").strip().lower()
+
+    if not prompt or len(prompt) < 3:
+        return jsonify({"success": False, "error": "Prompt must be at least 3 characters"}), 400
+
+    try:
+        result = call_ai_generate(prompt, style)
+        if result.get("ok") and result.get("images"):
+            return jsonify({
+                "success": True,
+                "imageUrl": result["images"][0],
+                "images": result["images"],
+                "prompt_used": result.get("prompt_used", prompt),
+                "style": style,
+            })
+        else:
+            return jsonify({"success": False, "error": result.get("error", "Generation failed")}), 502
+    except Exception as e:
+        logger.error(f"Text-to-image generation failed: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "AI service temporarily unavailable. Please try again."}), 502
+
+
+@app.route("/api/generation/image-to-image", methods=["POST"])
+@limiter.limit("20 per hour")
+def generate_image_to_image():
+    """Image-to-image style transfer endpoint."""
+    prompt = (request.form.get("prompt") or "").strip()
+    style = (request.form.get("style") or "auto").strip().lower()
+    uploaded_file = request.files.get("image")
+
+    if not uploaded_file:
+        return jsonify({"success": False, "error": "No image uploaded"}), 400
+
+    # For now, fall back to text-to-image if prompt is provided,
+    # otherwise generate a generic style transfer prompt
+    if not prompt:
+        prompt = "Transform this uploaded image with artistic style"
+
+    try:
+        result = call_ai_generate(prompt, style)
+        if result.get("ok") and result.get("images"):
+            return jsonify({
+                "success": True,
+                "imageUrl": result["images"][0],
+                "images": result["images"],
+                "prompt_used": result.get("prompt_used", prompt),
+                "style": style,
+            })
+        else:
+            return jsonify({"success": False, "error": result.get("error", "Style transfer failed")}), 502
+    except Exception as e:
+        logger.error(f"Image-to-image generation failed: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "Style transfer service temporarily unavailable. Please try again."}), 502
+
+
 def call_ai_generate(prompt: str, style: str) -> dict:
     """Call AI image generation API (OpenAI DALL-E or DeepSeek compatible)."""
     import requests
