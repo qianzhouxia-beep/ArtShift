@@ -84,6 +84,8 @@ AI_PROVIDER = os.environ.get("AI_PROVIDER", "openai")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
+STABILITY_API_KEY = os.environ.get("STABILITY_API_KEY", "")
+STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-xl-1024-v1-0")
 
 # Printful Config
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
@@ -430,26 +432,112 @@ def generate_image_to_image():
 
 
 def call_ai_generate(prompt: str, style: str) -> dict:
-    """Call AI image generation API (OpenAI DALL-E or DeepSeek compatible)."""
+    """
+    Call AI image generation API.
+    Priority: Stability AI (if STABILITY_API_KEY is set) > OpenAI DALL-E.
+    """
     import requests
 
-    if AI_PROVIDER == "deepseek":
-        api_key = DEEPSEEK_API_KEY
-        base_url = os.environ.get("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+    # ── Stability AI (优先，如果配置了 STABILITY_API_KEY) ─────────────────────
+    if STABILITY_API_KEY and AI_PROVIDER in ("stability", "stability-ai", "sd", "auto"):
+        return _call_stability(prompt, style)
+
+    # ── OpenAI DALL-E ────────────────────────────────────────────────────────
+    if OPENAI_API_KEY:
+        return _call_openai(prompt, style)
+
+    logger.error("No AI provider API key configured")
+    return {"ok": False, "error": "AI service not configured"}
+
+
+def _call_stability(prompt: str, style: str) -> dict:
+    """Call Stability AI Stable Diffusion API (SDXL 1.0)."""
+    import requests
+    import base64
+    import os as _os
+
+    api_key = STABILITY_API_KEY
+    engine_id = STABILITY_ENGINE
+    url = f"https://api.stability.ai/v1/generation/{engine_id}/text-to-image"
+
+    STYLE_CFG = {
+        "auto":           (30, "K_DPMPP_2M"),
+        "anime":          (25, "K_EULER"),
+        "oil-painting":   (35, "K_DPMPP_2S_ANCESTRAL"),
+        "watercolor":     (28, "K_EULER_ANCESTRAL"),
+        "photorealistic": (20, "K_DPMPP_2M"),
+        "cyberpunk":      (30, "K_DPMPP_2M"),
+        "pixel-art":      (25, "DDIM"),
+        "minimalist":     (20, "K_EULER"),
+        "pop-art":        (28, "K_DPMPP_2M"),
+        "sketch":         (35, "K_DPMPP_2S_ANCESTRAL"),
+        "van-gogh":       (35, "K_DPMPP_2S_ANCESTRAL"),
+        "ukiyo-e":        (30, "K_EULER"),
+    }
+    cfg_scale, sampler = STYLE_CFG.get(style, STYLE_CFG["auto"])
+
+    payload = {
+        "text_prompts": [
+            {"text": prompt, "weight": 1.0},
+            {"text": "blurry, low quality, watermark, text, bad anatomy, worst quality", "weight": -1.0}
+        ],
+        "cfg_scale": cfg_scale,
+        "height": 1024,
+        "width": 1024,
+        "samples": 1,
+        "steps": 40,
+        "sampler": sampler,
+    }
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    logger.info(f"Stability AI: engine={engine_id}, style={style}")
+    start = time.time()
+    resp = requests.post(url, json=payload, headers=headers, timeout=120)
+    elapsed = time.time() - start
+
+    if resp.status_code == 200:
+        data = resp.json()
+        saved_urls = []
+        gen_dir = _os.path.join(_os.path.dirname(__file__), "static", "generated")
+        _os.makedirs(gen_dir, exist_ok=True)
+        for i, art in enumerate(data.get("artifacts", [])):
+            b64 = art.get("base64", "")
+            if b64:
+                img_bytes = base64.b64decode(b64)
+                fname = f"gen_{int(time.time())}_{i}.png"
+                fpath = _os.path.join(gen_dir, fname)
+                with open(fpath, "wb") as f:
+                    f.write(img_bytes)
+                saved_urls.append(f"/static/generated/{fname}")
+        logger.info(f"Stability generated {len(saved_urls)} images in {elapsed:.1f}s")
+        return {
+            "ok": True, "images": saved_urls,
+            "prompt_used": prompt, "style": style,
+            "model": engine_id, "generation_time_ms": round(elapsed * 1000),
+            "provider": "stability",
+        }
     else:
-        api_key = OPENAI_API_KEY
-        base_url = OPENAI_API_BASE
+        logger.error(f"Stability error {resp.status_code}: {resp.text[:500]}")
+        return {"ok": False, "error": f"Stability AI error ({resp.status_code})"}
 
-    if not api_key:
-        logger.error("No API key configured for AI provider")
-        return {"ok": False, "error": "AI service not configured"}
 
+def _call_openai(prompt: str, style: str) -> dict:
+    """Call OpenAI DALL-E API."""
+    import requests
+
+    api_key = OPENAI_API_KEY
+    base_url = OPENAI_API_BASE
     url = f"{base_url.rstrip('/')}/images/generations"
     payload = {
         "model": os.environ.get("AI_MODEL", "dall-e-3"),
         "prompt": prompt,
-        "n": min(int(os.environ.get("IMAGE_COUNT", "4")), 4),
-        "size": os.environ.get("IMAGE_SIZE", "1024x1024"),
+        "n": 1,
+        "size": "1024x1024",
         "quality": "standard",
         "response_format": "url",
     }
@@ -458,27 +546,24 @@ def call_ai_generate(prompt: str, style: str) -> dict:
         "Content-Type": "application/json",
     }
 
-    logger.info(f"Calling AI generate: model={payload['model']}, style={style}")
+    logger.info(f"OpenAI DALL-E: model={payload['model']}")
     start = time.time()
-
     resp = requests.post(url, json=payload, headers=headers, timeout=60)
     elapsed = time.time() - start
 
     if resp.status_code == 200:
         data = resp.json()
         images = [item.get("url", "") for item in data.get("data", [])]
-        logger.info(f"AI generated {len(images)} images in {elapsed:.1f}s")
+        logger.info(f"OpenAI generated {len(images)} images in {elapsed:.1f}s")
         return {
-            "ok": True,
-            "images": images,
-            "prompt_used": prompt,
-            "style": style,
-            "model": payload["model"],
-            "generation_time_ms": round(elapsed * 1000),
+            "ok": True, "images": images,
+            "prompt_used": prompt, "style": style,
+            "model": payload["model"], "generation_time_ms": round(elapsed * 1000),
         }
     else:
-        logger.error(f"AI API error {resp.status_code}: {resp.text[:500]}")
-        return {"ok": False, "error": f"AI service returned error ({resp.status_code})"}
+        logger.error(f"OpenAI error {resp.status_code}: {resp.text[:500]}")
+        return {"ok": False, "error": f"OpenAI error ({resp.status_code})"}
+
 
 
 @app.route("/api/products", methods=["GET"])
