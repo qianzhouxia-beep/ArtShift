@@ -89,7 +89,10 @@ STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-xl-1024-
 # Public base URL for serving generated images (must be set in Zeabur)
 BASE_URL = os.environ.get("BASE_URL", "https://artshift-backend.zeabur.app")
 
-# Printful Config
+# Supabase Config
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET", "generated-images")
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
 
 # Admin Auth
@@ -452,11 +455,21 @@ def call_ai_generate(prompt: str, style: str) -> dict:
     return {"ok": False, "error": "AI service not configured"}
 
 
+def _save_local(img_bytes: bytes, fname: str, saved_urls: list):
+    """Fallback: save image to local static directory."""
+    import os as _os
+    gen_dir = _os.path.join(_os.path.dirname(__file__), "static", "generated")
+    _os.makedirs(gen_dir, exist_ok=True)
+    fpath = _os.path.join(gen_dir, fname)
+    with open(fpath, "wb") as f:
+        f.write(img_bytes)
+    saved_urls.append(f"{BASE_URL}/static/generated/{fname}")
+
+
 def _call_stability(prompt: str, style: str) -> dict:
     """Call Stability AI Stable Diffusion API (SDXL 1.0)."""
     import requests
     import base64
-    import os as _os
 
     api_key = STABILITY_API_KEY
     engine_id = STABILITY_ENGINE
@@ -505,17 +518,39 @@ def _call_stability(prompt: str, style: str) -> dict:
     if resp.status_code == 200:
         data = resp.json()
         saved_urls = []
-        gen_dir = _os.path.join(_os.path.dirname(__file__), "static", "generated")
-        _os.makedirs(gen_dir, exist_ok=True)
+        ts = int(time.time())
         for i, art in enumerate(data.get("artifacts", [])):
             b64 = art.get("base64", "")
             if b64:
                 img_bytes = base64.b64decode(b64)
-                fname = f"gen_{int(time.time())}_{i}.png"
-                fpath = _os.path.join(gen_dir, fname)
-                with open(fpath, "wb") as f:
-                    f.write(img_bytes)
-                saved_urls.append(f"{BASE_URL}/static/generated/{fname}")
+                fname = f"gen_{ts}_{i}.png"
+
+                # ── Upload to Supabase Storage ─────────────────────────────
+                if SUPABASE_URL and SUPABASE_SERVICE_KEY:
+                    supa_path = f"{SUPABASE_BUCKET}/{fname}"
+                    upload_url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{supa_path}"
+                    up_headers = {
+                        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                        "Content-Type": "image/png",
+                        "x-upsert": "true",
+                    }
+                    try:
+                        up_resp = requests.post(upload_url, data=img_bytes, headers=up_headers, timeout=30)
+                        if up_resp.status_code in (200, 201):
+                            public_url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{supa_path}"
+                            saved_urls.append(public_url)
+                            logger.info(f"Supabase upload OK: {public_url}")
+                        else:
+                            logger.error(f"Supabase upload failed {up_resp.status_code}: {up_resp.text[:200]}")
+                            # fallback: save locally
+                            _save_local(img_bytes, fname, saved_urls)
+                    except Exception as e:
+                        logger.error(f"Supabase upload exception: {e}")
+                        _save_local(img_bytes, fname, saved_urls)
+                else:
+                    # No Supabase configured, fallback local
+                    _save_local(img_bytes, fname, saved_urls)
+
         logger.info(f"Stability generated {len(saved_urls)} images in {elapsed:.1f}s")
         return {
             "ok": True, "images": saved_urls,
