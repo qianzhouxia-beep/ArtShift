@@ -85,8 +85,8 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
 STABILITY_API_KEY = os.environ.get("STABILITY_API_KEY", "")
-STABILITY_API_VERSION = os.environ.get("STABILITY_API_VERSION", "v1beta")
-STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-v1-5")
+STABILITY_API_VERSION = os.environ.get("STABILITY_API_VERSION", "v1")  # 修复：从 v1beta 改为 v1
+STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-xl-1024-v1-0")  # 修复：使用 SDXL
 # Public base URL for serving generated images (must be set in Zeabur)
 BASE_URL = os.environ.get("BASE_URL", "https://artshift-backend.zeabur.app")
 
