@@ -397,13 +397,16 @@ def generate_text_to_image():
     try:
         result = call_ai_generate(prompt, style)
         if result.get("ok") and result.get("images"):
-            return jsonify({
+            resp_data = {
                 "success": True,
-                "imageUrl": result["images"][0],
+                "imageUrl": result["images"][0] if result["images"] else (result.get("base64_images", [None])[0] or ""),
                 "images": result["images"],
                 "prompt_used": result.get("prompt_used", prompt),
                 "style": style,
-            })
+            }
+            if result.get("base64_images"):
+                resp_data["base64Images"] = result["base64_images"]
+            return jsonify(resp_data)
         else:
             return jsonify({"success": False, "error": result.get("error", "Generation failed")}), 502
     except Exception as e:
@@ -527,14 +530,18 @@ def _call_stability(prompt: str, style: str) -> dict:
     if resp.status_code == 200:
         data = resp.json()
         saved_urls = []
+        base64_images = []  # 直接返回 base64 数据给前端显示
         ts = int(time.time())
         for i, art in enumerate(data.get("artifacts", [])):
             b64 = art.get("base64", "")
             if b64:
                 img_bytes = base64.b64decode(b64)
                 fname = f"gen_{ts}_{i}.png"
+                b64_url = f"data:image/png;base64,{b64}"
+                base64_images.append(b64_url)
 
                 # ── Upload to Supabase Storage ─────────────────────────────
+                uploaded = False
                 if SUPABASE_URL and SUPABASE_SERVICE_KEY:
                     supa_path = f"{SUPABASE_BUCKET}/{fname}"
                     upload_url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{supa_path}"
@@ -549,20 +556,20 @@ def _call_stability(prompt: str, style: str) -> dict:
                             public_url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{supa_path}"
                             saved_urls.append(public_url)
                             logger.info(f"Supabase upload OK: {public_url}")
+                            uploaded = True
                         else:
                             logger.error(f"Supabase upload failed {up_resp.status_code}: {up_resp.text[:200]}")
-                            # fallback: save locally
-                            _save_local(img_bytes, fname, saved_urls)
                     except Exception as e:
                         logger.error(f"Supabase upload exception: {e}")
-                        _save_local(img_bytes, fname, saved_urls)
-                else:
-                    # No Supabase configured, fallback local
+
+                # ── Fallback: save locally AND return base64 ─────────────
+                if not uploaded:
                     _save_local(img_bytes, fname, saved_urls)
 
         logger.info(f"Stability generated {len(saved_urls)} images in {elapsed:.1f}s")
         return {
             "ok": True, "images": saved_urls,
+            "base64_images": base64_images,  # 前端直接用这个显示
             "prompt_used": prompt, "style": style,
             "model": engine_id, "generation_time_ms": round(elapsed * 1000),
             "provider": "stability",
