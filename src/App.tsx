@@ -650,9 +650,10 @@ function AIDemo({ userId, t, onImageGenerated, onPrintNow }: AIDemoProps & { t: 
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Generation failed');
-        if (data.success && data.imageUrl) {
-          setResultUrl(data.imageUrl);
-          onImageGenerated?.(data.imageUrl);
+        if (data.success && (data.imageUrl || data.base64Images?.[0])) {
+          const imgUrl = data.base64Images?.[0] || data.imageUrl;
+          setResultUrl(imgUrl);
+          onImageGenerated?.(imgUrl);
         } else {
           throw new Error('No image returned');
         }
@@ -672,9 +673,10 @@ function AIDemo({ userId, t, onImageGenerated, onPrintNow }: AIDemoProps & { t: 
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Style transfer failed');
-        if (data.success && data.imageUrl) {
-          setResultUrl(data.imageUrl);
-          onImageGenerated?.(data.imageUrl);
+        if (data.success && (data.imageUrl || data.base64Images?.[0])) {
+          const imgUrl = data.base64Images?.[0] || data.imageUrl;
+          setResultUrl(imgUrl);
+          onImageGenerated?.(imgUrl);
         } else {
           throw new Error('No image returned');
         }
