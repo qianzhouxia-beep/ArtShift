@@ -85,7 +85,8 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
 STABILITY_API_KEY = os.environ.get("STABILITY_API_KEY", "")
-STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-xl-1024-v1-0")
+STABILITY_API_VERSION = os.environ.get("STABILITY_API_VERSION", "v1beta")
+STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-v1-5")
 # Public base URL for serving generated images (must be set in Zeabur)
 BASE_URL = os.environ.get("BASE_URL", "https://artshift-backend.zeabur.app")
 
@@ -479,8 +480,9 @@ def _call_stability(prompt: str, style: str) -> dict:
     import base64
 
     api_key = STABILITY_API_KEY
+    api_version = STABILITY_API_VERSION
     engine_id = STABILITY_ENGINE
-    url = f"https://api.stability.ai/v1/generation/{engine_id}/text-to-image"
+    url = f"https://api.stability.ai/{api_version}/generation/{engine_id}/text-to-image"
 
     STYLE_CFG = {
         "auto":           (30, "K_DPMPP_2M"),
