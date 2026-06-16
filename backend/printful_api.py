@@ -16,6 +16,7 @@ Endpoints implemented:
   GET  /api/printful/orders/<id>
   POST /api/printful/mockup
   POST /api/printful/webhook
+  POST /api/printful/edm-nonce   (EDM -- Embedded Design Maker nonce)
 """
 
 import os
@@ -26,6 +27,7 @@ from flask import Blueprint, request, jsonify
 
 # 鈹€鈹€ Config 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 PRINTFUL_API_KEY = os.environ.get("PRINTFUL_API_KEY", "")
+PRINTFUL_EDM_TOKEN = os.environ.get("PRINTFUL_EDM_TOKEN", "")  # EDM专用Token（需审批通过后获取）
 BLUEPRINT_NAME = "printful"
 
 logger = logging.getLogger("artshift.printful")
@@ -193,4 +195,88 @@ def printful_webhook():
     logger.info(f"[Printful Webhook] Received event: {event_type}")
     # Process event (update order status in DB, etc.)
     return jsonify({"ok": True}), 200
+
+
+# ─── EDM (Embedded Design Maker) ─────────────────────────────────────────────
+
+@bp.route("/api/printful/edm-nonce", methods=["POST"])
+def printful_edm_nonce():
+    """
+    Generate an EDM nonce for the Printful Embedded Design Maker.
+
+    The PRINTFUL_EDM_TOKEN is a dedicated token (separate from PRINTFUL_API_KEY)
+    that Printful issues after EDM access is approved.
+
+    Request body:
+      { "external_product_id": "my-tshirt-001",
+        "external_customer_id": null }
+
+    Returns:
+      { "ok": true, "nonce": "...", "data": {...} }
+    """
+    # ── Guard: EDM not configured ──────────────────────────────────────────
+    if not PRINTFUL_EDM_TOKEN:
+        logger.error("[Printful EDM] PRINTFUL_EDM_TOKEN not configured")
+        return jsonify({
+            "ok": False,
+            "error": "EDM is not enabled. Configure PRINTFUL_EDM_TOKEN to activate the designer.",
+        }), 503
+
+    # ── Parse request ──────────────────────────────────────────────────────
+    data = request.get_json(silent=True) or {}
+    external_product_id = (data.get("external_product_id") or "").strip()
+    external_customer_id = data.get("external_customer_id")  # optional, can be None/null
+
+    if not external_product_id:
+        return jsonify({
+            "ok": False,
+            "error": "external_product_id is required",
+        }), 400
+
+    # ── Call Printful EDM API ──────────────────────────────────────────────
+    url = "https://api.printful.com/embedded-designer/nonces"
+    headers = {
+        "Authorization": f"Bearer {PRINTFUL_EDM_TOKEN}",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+    }
+    payload = {
+        "external_product_id": external_product_id,
+        "external_customer_id": external_customer_id,
+    }
+
+    logger.info(f"[Printful EDM] Requesting nonce for product: {external_product_id}")
+    start = time.time()
+
+    try:
+        resp = requests.post(
+            url, json=payload, headers=headers,
+            timeout=15, impersonate="chrome",
+        )
+        elapsed = time.time() - start
+        logger.info(f"[Printful EDM] Nonce response: {resp.status_code} ({elapsed:.2f}s)")
+
+        if resp.status_code in (200, 201):
+            result = resp.json()
+            nonce_data = result.get("result", result)
+            return jsonify({
+                "ok": True,
+                "nonce": nonce_data.get("nonce", ""),
+                "data": nonce_data,
+            }), 200
+        else:
+            logger.error(f"[Printful EDM] Error {resp.status_code}: {resp.text[:500]}")
+            return jsonify({
+                "ok": False,
+                "error": f"Printful EDM error ({resp.status_code})",
+                "details": resp.text[:300],
+            }), 502
+
+    except Exception as e:
+        logger.error(f"[Printful EDM] Request failed: {e}", exc_info=True)
+        return jsonify({
+            "ok": False,
+            "error": f"EDM service unavailable: {str(e)}",
+        }), 502
 

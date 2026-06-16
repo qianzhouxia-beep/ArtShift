@@ -1,64 +1,93 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+/* ===== Luminous Craft Light — Base Styles ===== */
 
-  body {
-    background-color: #f0f0ee;
-    color: #1a1a1a;
-    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #faf8ff;
+  color: #131b2e;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  ::selection {
-    background: #3b82f6;
-    color: white;
+/* Glass panel — core design element */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(123, 116, 134, 0.15);
+}
+
+/* Product card hover glow */
+.glow-effect {
+  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+}
+
+/* Luminous shadow for cards */
+.shadow-luminous {
+  box-shadow: 0 10px 40px -10px rgba(107, 56, 212, 0.1);
+}
+
+/* AI glow effect — soft purple ambient shadow */
+.ai-glow {
+  box-shadow: 0 0 40px -10px rgba(107, 56, 212, 0.15);
+}
+
+/* Canvas glow — deeper shadow for studio preview */
+.canvas-glow {
+  box-shadow: 0 0 60px -15px rgba(139, 92, 246, 0.15);
+}
+
+/* Custom scrollbar for studio sidebar */
+@media (min-width: 768px) {
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: #cbc3d7;
+    border-radius: 10px;
   }
 }
 
-@layer utilities {
-  .gradient-text {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #f97316 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% 200%;
-    animation: gradientShift 5s ease infinite;
-  }
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(to right, #8B5CF6, #3B82F6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .gradient-text-blue {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+/* Mobile menu transition */
+#mobile-menu {
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(100%);
+}
+#mobile-menu.active {
+  transform: translateX(0);
+}
 
-  @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f2f3ff;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbc3d7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7b7486;
+}
 
-  .text-gradient-warm {
-    background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-  }
-
-  .glass-card-strong {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 1);
-  }
+/* Material Symbols base */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }

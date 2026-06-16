@@ -29,6 +29,8 @@ Printful Blueprint routes:
 import os
 import json
 import logging
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 import time
 import hashlib
 import random
@@ -43,6 +45,8 @@ import sqlite3
 
 # Import Printful API Blueprint
 from printful_api import bp as printful_bp
+# Import Gooten API Blueprint (Printful alternative)
+from gooten_api import bp as gooten_bp
 
 
 # ─── App Setup ──────────────────────────────────────────────────────────────
@@ -52,6 +56,7 @@ CORS(app)
 
 # Register Printful API Blueprint
 app.register_blueprint(printful_bp)
+app.register_blueprint(gooten_bp)
 
 
 # ─── Logging ────────────────────────────────────────────────────────────────
@@ -85,8 +90,8 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 OPENAI_API_BASE = os.environ.get("OPENAI_API_BASE", "https://api.openai.com/v1")
 STABILITY_API_KEY = os.environ.get("STABILITY_API_KEY", "")
-STABILITY_API_VERSION = os.environ.get("STABILITY_API_VERSION", "v1beta")
-STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-v1-5")
+STABILITY_API_VERSION = os.environ.get("STABILITY_API_VERSION", "v1")  # 修复：从 v1beta 改为 v1
+STABILITY_ENGINE = os.environ.get("STABILITY_ENGINE", "stable-diffusion-xl-1024-v1-0")  # 修复：使用 SDXL
 # Public base URL for serving generated images (must be set in Zeabur)
 BASE_URL = os.environ.get("BASE_URL", "https://artshift-backend.zeabur.app")
 
@@ -417,29 +422,55 @@ def generate_text_to_image():
 @app.route("/api/generation/image-to-image", methods=["POST"])
 @limiter.limit("20 per hour")
 def generate_image_to_image():
-    """Image-to-image style transfer endpoint."""
-    prompt = (request.form.get("prompt") or "").strip()
-    style = (request.form.get("style") or "auto").strip().lower()
-    uploaded_file = request.files.get("image")
+    """Image-to-image style transfer endpoint.
+    
+    Accepts:
+      - multipart/form-data: image (file) + prompt (form field) + style (form field)
+      - application/json: { image: "base64...", prompt: "...", style: "..." }
+    """
+    import base64
 
-    if not uploaded_file:
-        return jsonify({"success": False, "error": "No image uploaded"}), 400
+    prompt = ""
+    style = "auto"
+    init_image_b64 = ""
 
-    # For now, fall back to text-to-image if prompt is provided,
-    # otherwise generate a generic style transfer prompt
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+        prompt = (data.get("prompt") or "").strip()
+        style = (data.get("style") or "auto").strip().lower()
+        init_image_b64 = (data.get("image") or "").strip()
+    else:
+        prompt = (request.form.get("prompt") or "").strip()
+        style = (request.form.get("style") or "auto").strip().lower()
+        uploaded_file = request.files.get("image")
+        if uploaded_file:
+            init_image_b64 = base64.b64encode(uploaded_file.read()).decode("utf-8")
+            init_image_b64 = f"data:{uploaded_file.content_type or 'image/png'};base64,{init_image_b64}"
+
+    if not init_image_b64:
+        return jsonify({"success": False, "error": "No image provided"}), 400
     if not prompt:
-        prompt = "Transform this uploaded image with artistic style"
+        prompt = "Transform this image with artistic style, maintain the original composition and shapes but apply a new artistic aesthetic"
 
     try:
-        result = call_ai_generate(prompt, style)
+        if STABILITY_API_KEY and AI_PROVIDER in ("stability", "stability-ai", "sd", "auto"):
+            result = _call_stability_image_to_image(prompt, style, init_image_b64)
+        else:
+            # Fallback to text-to-image (less ideal, but works without Stability API)
+            logger.warning("No Stability API key for img2img, falling back to text-to-image")
+            result = call_ai_generate(prompt, style)
+
         if result.get("ok") and result.get("images"):
-            return jsonify({
+            resp_data = {
                 "success": True,
                 "imageUrl": result["images"][0],
                 "images": result["images"],
                 "prompt_used": result.get("prompt_used", prompt),
                 "style": style,
-            })
+            }
+            if result.get("base64_images"):
+                resp_data["base64Images"] = result["base64_images"]
+            return jsonify(resp_data)
         else:
             return jsonify({"success": False, "error": result.get("error", "Style transfer failed")}), 502
     except Exception as e:
@@ -577,6 +608,110 @@ def _call_stability(prompt: str, style: str) -> dict:
     else:
         logger.error(f"Stability error {resp.status_code}: {resp.text[:500]}")
         return {"ok": False, "error": f"Stability AI error ({resp.status_code})"}
+
+
+def _call_stability_image_to_image(prompt: str, style: str, init_image_b64: str) -> dict:
+    """Call Stability AI Image-to-Image API (SDXL 1.0)."""
+    import requests
+    import base64
+
+    api_key = STABILITY_API_KEY
+    api_version = STABILITY_API_VERSION
+    engine_id = STABILITY_ENGINE
+    url = f"https://api.stability.ai/{api_version}/generation/{engine_id}/image-to-image"
+
+    STYLE_CFG = {
+        "auto":           (30, "K_DPMPP_2M"),
+        "anime":          (25, "K_EULER"),
+        "oil-painting":   (35, "K_DPMPP_2S_ANCESTRAL"),
+        "watercolor":     (28, "K_EULER_ANCESTRAL"),
+        "photorealistic": (20, "K_DPMPP_2M"),
+        "cyberpunk":      (30, "K_DPMPP_2M"),
+        "pixel-art":      (25, "DDIM"),
+        "minimalist":     (20, "K_EULER"),
+        "pop-art":        (28, "K_DPMPP_2M"),
+        "sketch":         (35, "K_DPMPP_2S_ANCESTRAL"),
+        "van-gogh":       (35, "K_DPMPP_2S_ANCESTRAL"),
+        "ukiyo-e":        (30, "K_EULER"),
+    }
+    cfg_scale, sampler = STYLE_CFG.get(style, STYLE_CFG["auto"])
+
+    # Strip data:image/...;base64, prefix if present
+    if "," in init_image_b64:
+        init_image_b64 = init_image_b64.split(",", 1)[1]
+
+    payload = {
+        "init_image": init_image_b64,
+        "text_prompts": json.dumps([
+            {"text": prompt, "weight": 1.0},
+            {"text": "blurry, low quality, watermark, text, bad anatomy, worst quality", "weight": -1.0}
+        ]),
+        "cfg_scale": str(cfg_scale),
+        "samples": "1",
+        "steps": "40",
+        "sampler": sampler,
+        "image_strength": "0.35",
+        "init_noise_scale": "0.35",
+    }
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",
+    }
+
+    logger.info(f"Stability AI image-to-image: engine={engine_id}, style={style}")
+    start = time.time()
+    resp = requests.post(url, data=payload, headers=headers, timeout=120)
+    elapsed = time.time() - start
+
+    if resp.status_code == 200:
+        data = resp.json()
+        saved_urls = []
+        base64_images = []
+        ts = int(time.time())
+        for i, art in enumerate(data.get("artifacts", [])):
+            b64 = art.get("base64", "")
+            if b64:
+                img_bytes = base64.b64decode(b64)
+                fname = f"gen_{ts}_{i}.png"
+                b64_url = f"data:image/png;base64,{b64}"
+                base64_images.append(b64_url)
+
+                uploaded = False
+                if SUPABASE_URL and SUPABASE_SERVICE_KEY:
+                    supa_path = f"{SUPABASE_BUCKET}/{fname}"
+                    upload_url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/{supa_path}"
+                    up_headers = {
+                        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                        "Content-Type": "image/png",
+                        "x-upsert": "true",
+                    }
+                    try:
+                        up_resp = requests.post(upload_url, data=img_bytes, headers=up_headers, timeout=30)
+                        if up_resp.status_code in (200, 201):
+                            public_url = f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{supa_path}"
+                            saved_urls.append(public_url)
+                            logger.info(f"Supabase upload OK: {public_url}")
+                            uploaded = True
+                        else:
+                            logger.error(f"Supabase upload failed {up_resp.status_code}: {up_resp.text[:200]}")
+                    except Exception as e:
+                        logger.error(f"Supabase upload exception: {e}")
+
+                if not uploaded:
+                    _save_local(img_bytes, fname, saved_urls)
+
+        logger.info(f"Stability img2img generated {len(saved_urls)} images in {elapsed:.1f}s")
+        return {
+            "ok": True, "images": saved_urls,
+            "base64_images": base64_images,
+            "prompt_used": prompt, "style": style,
+            "model": engine_id, "generation_time_ms": round(elapsed * 1000),
+            "provider": "stability",
+        }
+    else:
+        logger.error(f"Stability img2img error {resp.status_code}: {resp.text[:500]}")
+        return {"ok": False, "error": f"Stability AI image-to-image error ({resp.status_code})"}
 
 
 def _call_openai(prompt: str, style: str) -> dict:
