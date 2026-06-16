@@ -34,7 +34,6 @@ export default function Checkout() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState(false);
   const paypalBtnRef = useRef<HTMLDivElement>(null);
 
   // Address state
