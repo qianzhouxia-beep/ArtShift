@@ -28,21 +28,21 @@ const PRODUCT_DATA: Product[] = [
     name: 'Heavyweight Hoodie',
     subtitle: 'Essential Collection · 400GSM',
     price: 84.99,
-    image: '/images/products/hoodie.svg',
+    image: '/images/products/hoodie.png',
   },
   {
     id: 'sweatshirt',
     name: 'Classic Sweatshirt',
     subtitle: 'Drop Shoulder · Midweight',
     price: 49.99,
-    image: '/images/products/sweatshirt.svg',
+    image: '/images/products/sweatshirt.png',
   },
   {
     id: 'tshirt',
     name: 'Signature T-Shirt',
     subtitle: 'Boxy Fit · Organic Cotton',
     price: 32.00,
-    image: '/images/products/tshirt.svg',
+    image: '/images/products/tshirt.png',
   },
   {
     id: 'hat',
@@ -56,14 +56,14 @@ const PRODUCT_DATA: Product[] = [
     name: 'Impact Phone Case',
     subtitle: 'Ultra Protective · Matte Finish',
     price: 45.00,
-    image: '/images/products/phonecase.svg',
+    image: '/images/products/phonecase.png',
   },
   {
     id: 'mug',
     name: 'Ceramic Studio Mug',
     subtitle: '11oz · Matte Black Ceramic',
     price: 24.99,
-    image: '/images/products/mug.svg',
+    image: '/images/products/mug.png',
   },
 ];
 
