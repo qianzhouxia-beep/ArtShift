@@ -23,22 +23,22 @@ const STYLES: StyleOption[] = [
   {
     id: 'cyberpunk',
     name: 'Cyberpunk',
-    image: '/images/styles/style-cyberpunk.png',
+    image: '/images/styles/style-cyberpunk.svg',
   },
   {
     id: 'anime',
     name: 'Anime',
-    image: '/images/styles/style-anime.png',
+    image: '/images/styles/style-anime.svg',
   },
   {
     id: 'oil-painting',
     name: 'Oil Painting',
-    image: '/images/styles/style-oil-painting.png',
+    image: '/images/styles/style-oil-painting.svg',
   },
   {
     id: 'watercolor',
     name: 'Watercolor',
-    image: '/images/styles/style-watercolor.png',
+    image: '/images/styles/style-watercolor.svg',
   },
   {
     id: 'pixel-art',
@@ -48,7 +48,7 @@ const STYLES: StyleOption[] = [
   {
     id: 'pencil-sketch',
     name: 'Pencil Sketch',
-    image: '/images/styles/style-pencil-sketch.png',
+    image: '/images/styles/style-pencil-sketch.svg',
   },
 ];
 
@@ -62,14 +62,12 @@ const COLORS = [
 const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
 
 const MOCKUP_IMAGES: Record<string, string> = {
-  hoodie:
-    'https://lh3.googleusercontent.com/aida/AP1WRLvHj5YaVX-B8X8oJejKMOQxee6T-j8TkRAYNIS6V8GJKgqnQuPloapqp1-Wn8L4998ExdrJThP3tHMF8oUB5WePa1GDYzRESLB6R2r1ZcEesQZx8rKMEZyYlgNDhnGUqVKzZrOY0WsPmZfqk7qgqt816EAVozVaNoFTSI1y4FVKjO7LT7zkOoIL3HhHbLs2jbQoMv7LNnD_A9zXixtMog34h3XJA6xRqgSUW9RpDBiDL6MgZAsp7Up1dSw',
-  tshirt:
-    'https://lh3.googleusercontent.com/aida/AP1WRLtDXBeToAUlrxRlD8yGmIJRxVQjmQyKKyuQ67J13Pc5KRIJrun1_fkbtbLe1OfursIbCtfKLCbkjng6Agc9c5YeTQm0f6gP89vwUPgcRkizO8D3Go5P1B8yXfcl-JMNVxthu_Dsmqkl1KsQeH0k1i1pGr1MxzX3xPedpGIVGxhZ81XKDdcXVEcWERQTlGGEZVwu0b_eGvyoFK-A6DCtUe3cyuWo6_EBBMuLyjh-Yh-q9Ikztq4m7RMsxefa',
-  sweatshirt:
-    'https://lh3.googleusercontent.com/aida/AP1WRLvHj5YaVX-B8X8oJejKMOQxee6T-j8TkRAYNIS6V8GJKgqnQuPloapqp1-Wn8L4998ExdrJThP3tHMF8oUB5WePa1GDYzRESLB6R2r1ZcEesQZx8rKMEZyYlgNDhnGUqVKzZrOY0WsPmZfqk7qgqt816EAVozVaNoFTSI1y4FVKjO7LT7zkOoIL3HhHbLs2jbQoMv7LNnD_A9zXixtMog34h3XJA6xRqgSUW9RpDBiDL6MgZAsp7Up1dSw',
-  mug:
-    'https://lh3.googleusercontent.com/aida/AP1WRLsr1mVP6f4cIKlaDkxVzUZqYNj-7KZ5pdpBB-boBUus2Iqs-GqvoOEhidkTzmInhSqgm_BovvFqDq00Mccv_8hZT4ncllBq5IQX-tebPsl2LwjNSY0b9Z5afzPc6pM-WWfAkRcVGdGS9UGW0LMWjC1wf8C1z16s95QpERmYtBYLs1wzhzzYQd195EghWcPGv0IGOGZZKv0IxXeAc0HKuMq4Jnnluk-gmin1KJh0TIsImeRVogp3B6K4RMa3',
+  hoodie: '/images/products/hoodie.svg',
+  tshirt: '/images/products/tshirt.svg',
+  sweatshirt: '/images/products/sweatshirt.svg',
+  hat: '/images/products/hat.svg',
+  mug: '/images/products/mug.svg',
+  phonecase: '/images/products/phonecase.svg',
 };
 
 export default function AIStudio() {

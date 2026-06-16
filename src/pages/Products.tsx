@@ -28,48 +28,42 @@ const PRODUCT_DATA: Product[] = [
     name: 'Heavyweight Hoodie',
     subtitle: 'Essential Collection · 400GSM',
     price: 84.99,
-    image:
-      'https://lh3.googleusercontent.com/aida/AP1WRLvHj5YaVX-B8X8oJejKMOQxee6T-j8TkRAYNIS6V8GJKgqnQuPloapqp1-Wn8L4998ExdrJThP3tHMF8oUB5WePa1GDYzRESLB6R2r1ZcEesQZx8rKMEZyYlgNDhnGUqVKzZrOY0WsPmZfqk7qgqt816EAVozVaNoFTSI1y4FVKjO7LT7zkOoIL3HhHbLs2jbQoMv7LNnD_A9zXixtMog34h3XJA6xRqgSUW9RpDBiDL6MgZAsp7Up1dSw',
+    image: '/images/products/hoodie.svg',
   },
   {
     id: 'sweatshirt',
     name: 'Classic Sweatshirt',
     subtitle: 'Drop Shoulder · Midweight',
     price: 49.99,
-    image:
-      'https://lh3.googleusercontent.com/aida/AP1WRLvHj5YaVX-B8X8oJejKMOQxee6T-j8TkRAYNIS6V8GJKgqnQuPloapqp1-Wn8L4998ExdrJThP3tHMF8oUB5WePa1GDYzRESLB6R2r1ZcEesQZx8rKMEZyYlgNDhnGUqVKzZrOY0WsPmZfqk7qgqt816EAVozVaNoFTSI1y4FVKjO7LT7zkOoIL3HhHbLs2jbQoMv7LNnD_A9zXixtMog34h3XJA6xRqgSUW9RpDBiDL6MgZAsp7Up1dSw',
+    image: '/images/products/sweatshirt.svg',
   },
   {
     id: 'tshirt',
     name: 'Signature T-Shirt',
     subtitle: 'Boxy Fit · Organic Cotton',
     price: 32.00,
-    image:
-      'https://lh3.googleusercontent.com/aida/AP1WRLtDXBeToAUlrxRlD8yGmIJRxVQjmQyKKyuQ67J13Pc5KRIJrun1_fkbtbLe1OfursIbCtfKLCbkjng6Agc9c5YeTQm0f6gP89vwUPgcRkizO8D3Go5P1B8yXfcl-JMNVxthu_Dsmqkl1KsQeH0k1i1pGr1MxzXx3PedpGIVGxhZ81XKDdcXVEcWERQTlGGEZVwu0b_eGvyoFK-A6DCtUe3cyuWo6_EBBMuLyjh-Yh-q9Ikztq4m7RMsxefa',
+    image: '/images/products/tshirt.svg',
   },
   {
     id: 'hat',
     name: 'Structured 5-Panel',
     subtitle: 'Adjustable · Twill Finish',
     price: 39.99,
-    image:
-      'https://lh3.googleusercontent.com/aida/AP1WRLs9dcbcRum3fM9dsGfzG5kvDBbHDoSZ2dGfZJ0bwOsTdzV7pv0kAqnJ6BNJzc50kjjHegfDjk8-CzUS6NuY47BOJr1PvdKxWTnsXY_HNnNRjT2s8USZVtzjyl8-nmPa7dXNY6LlhcB81gU02bQfTuHd-TW-SG5L27hB2V1IFijQvvnR3V1Qz1BNc3OcIIzjYFSHCY1oyXTnUkbvh3rDcETkClD0bxUaGs3_9m8C-DUbLCwKk3MRuPxOUs',
+    image: '/images/products/hat.svg',
   },
   {
     id: 'phonecase',
     name: 'Impact Phone Case',
     subtitle: 'Ultra Protective · Matte Finish',
     price: 45.00,
-    image:
-      'https://lh3.googleusercontent.com/aida/AP1WRLt4Im0vNOgqfcmko7oMK5ShEPqwJKitkI2FZMho_ECOGBrwDrc9wbHEUUGlD-zAI5xVJdovY9mA9FuY31vHWDPAyNrxip_Fgyiyi9UG-txKG-DLZ_FxuNcQijPHF2U358turPHmOyELrNToNrNkUxEDZo7eS-xoUPAuvgiQRGWa3ubKo1J1Wdg1Y84OjSGu_Hgl1K88TutmNlg4YzYk8xR580uuW7VlhIZxDpsqhquBTpITiorHlDKQVEE',
+    image: '/images/products/phonecase.svg',
   },
   {
     id: 'mug',
     name: 'Ceramic Studio Mug',
     subtitle: '11oz · Matte Black Ceramic',
     price: 24.99,
-    image:
-      'https://lh3.googleusercontent.com/aida/AP1WRLsr1mVP6f4cIKlaDkxVzUZqYNj-7KZ5pdpBB-boBUus2Iqs-GqvoOEhidkTzmInhSqgm_BovvFqDq00Mccv_8hZT4ncllBq5IQX-tebPsl2LwjNSY0b9Z5afzPc6pM-WWfAkRcVGdGS9UGW0LMWjC1wf8C1z16s95QpERmYtBYLs1wzhzzYQd195EghWcPGv0IGOGZZKv0IxXeAc0HKuMq4Jnnluk-gmin1KJh0TIsImeRVogp3B6K4RMa3',
+    image: '/images/products/mug.svg',
   },
 ];
 

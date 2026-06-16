@@ -16,7 +16,7 @@ export default function SignUp() {
           <div className="hidden md:flex flex-col justify-between p-12 relative bg-primary text-on-primary">
             <div className="z-10">
               <a href="/" className="block mb-12">
-                <img alt="ArtShift Logo" className="h-12 w-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLtVLN-09XYDplSHWwe7xXZ7ouhvnhzmhWr-0vyQWWXjxaMeICSEqHkbC0K04rEjDBLAZWNiBYxWHcFzDw95QYMIt0eDolTcihMaIczsLdZGGuXPbEbp9V2mMiJoZO3c17IxbuDX7OipjP4_nRdth39G_CHQZ1g7NTiTbUf_D9C473qitLl3l0IDFPvFDn9z3IqGQI-SlivzP8hMx7uO8iX6xL_-evZpJ4GlJY7dHkGxnITx75rmeICclw32" />
+                <img alt="ArtShift Logo" className="h-12 w-auto" src="/logo.png" />
               </a>
               <h2 className="text-5xl font-extrabold mb-6 leading-tight">Elevate Your Apparel with AI.</h2>
               <p className="text-lg leading-relaxed opacity-90">Join a community of digital creators turning artistic vision into wearable reality.</p>
@@ -39,7 +39,7 @@ export default function SignUp() {
             <div className="mb-12">
               <div className="md:hidden flex justify-center mb-6">
                 <a href="/">
-                  <img alt="ArtShift Logo" className="h-10 w-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLtVLN-09XYDplSHWwe7xXZ7ouhvnhzmhWr-0vyQWWXjxaMeICSEqHkbC0K04rEjDBLAZWNiBYxWHcFzDw95QYMIt0eDolTcihMaIczsLdZGGuXPbEbp9V2mMiJoZO3c17IxbuDX7OipjP4_nRdth39G_CHQZ1g7NTiTbUf_D9C473qitLl3l0IDFPvFDn9z3IqGQI-SlivzP8hMx7uO8iX6xL_-evZpJ4GlJY7dHkGxnITx75rmeICclw32" />
+                  <img alt="ArtShift Logo" className="h-10 w-auto" src="/logo.png" />
                 </a>
               </div>
               <h1 className="text-[32px] font-bold text-on-surface mb-1">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h1>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#fffff0"/>
+  <!-- Sketchy lines -->
+  <g stroke="#555" stroke-width="1" fill="none" opacity="0.4">
+    <path d="M100 80 L200 90 M102 85 L198 95 M105 78 L202 86"/>
+    <path d="M300 100 L420 110 M305 105 L418 115 M298 98 M422 108"/>
+    <path d="M80 200 L180 190 M78 205 L182 195 M83 198 L177 188"/>
+    <path d="M350 200 L450 180 M348 205 L452 183 M353 198 L448 178"/>
+    <path d="M120 350 L220 340 M118 355 L222 343 M123 348 L218 338"/>
+    <path d="M280 370 L420 350 M278 375 L422 353 M283 368 L418 348"/>
+  </g>
+  <!-- Portrait sketch -->
+  <ellipse cx="256" cy="200" rx="60" ry="75" fill="none" stroke="#333" stroke-width="1.5" opacity="0.6"/>
+  <path d="M220 200 L230 180 L240 200" fill="none" stroke="#333" stroke-width="1.2" opacity="0.4"/>
+  <path d="M272 200 L282 180 L292 200" fill="none" stroke="#333" stroke-width="1.2" opacity="0.4"/>
+  <path d="M240 240 C250 260 262 260 272 240" fill="none" stroke="#333" stroke-width="1.2" opacity="0.4"/>
+  <!-- Cross-hatching -->
+  <g stroke="#999" stroke-width="0.5" opacity="0.3">
+    <line x1="200" y1="160" x2="220" y2="140"/><line x1="205" y1="160" x2="225" y2="140"/>
+    <line x1="280" y1="160" x2="300" y2="140"/><line x1="285" y1="160" x2="305" y2="140"/>
+    <line x1="200" y1="280" x2="220" y2="300"/><line x1="205" y1="280" x2="225" y2="300"/>
+    <line x1="280" y1="280" x2="300" y2="300"/><line x1="285" y1="280" x2="305" y2="300"/>
+  </g>
+  <text x="256" y="400" text-anchor="middle" fill="#666" font-family="serif" font-size="20">Pencil Sketch</text>
+</svg>

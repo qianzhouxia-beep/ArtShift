@@ -19,7 +19,7 @@ export default function Footer() {
             <img
               alt="ArtShift Logo"
               className="h-8 w-auto object-contain"
-              src="https://lh3.googleusercontent.com/aida/AP1WRLtVLN-09XYDplSHWwe7xXZ7ouhvnhzmhWr-0vyQWWXjxaMeICSEqHkbC0K04rEjDBLAZWNiBYxWHcFzDw95QYMIt0eDolTcihMaIczsLdZGGuXPbEbp9V2mMiJoZO3c17IxbuDX7OipjP4_nRdth39G_CHQZ1g7NTiTbUf_D9C473qitLl3l0IDFPvFDn9z3IqGQI-SlivzP8hMx7uO8iX6xL_-evZpJ4GlJY7dHkGxnITx75rmeICclw32"
+              src="/logo.png"
             />
             <span className="text-lg font-bold text-on-surface hidden sm:block">ArtShift</span>
           </Link>

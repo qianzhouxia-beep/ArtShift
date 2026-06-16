@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" fill="none">
+  <rect width="400" height="500" rx="24" fill="#F8F9FA"/>
+  <ellipse cx="200" cy="470" rx="80" ry="10" fill="#000" opacity="0.08"/>
+  <!-- Phone case body -->
+  <rect x="120" y="110" width="160" height="320" rx="28" stroke="#2C3E50" stroke-width="3" fill="#fff"/>
+  <!-- Inner screen area -->
+  <rect x="134" y="130" width="132" height="260" rx="18" fill="#1A1A2E"/>
+  <!-- Camera cutout -->
+  <circle cx="200" cy="148" r="8" fill="#2C2C3E" stroke="#444" stroke-width="1"/>
+  <circle cx="200" cy="148" r="4" fill="#000"/>
+  <!-- Speaker grille -->
+  <rect x="185" y="165" width="30" height="3" rx="1.5" fill="#333"/>
+  <!-- Print area on case -->
+  <rect x="148" y="220" width="104" height="90" rx="8" fill="none" stroke="#D0D5DD" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="200" y="273" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#98A2B3">Your Design Here</text>
+  <!-- Bottom ports -->
+  <rect x="185" y="410" width="30" height="4" rx="2" fill="#333"/>
+  <circle cx="178" cy="412" r="2" fill="#333"/>
+  <circle cx="222" cy="412" r="2" fill="#333"/>
+  <!-- Side buttons -->
+  <rect x="280" y="200" width="6" height="30" rx="3" fill="#D0D5DD" stroke="#2C3E50" stroke-width="1.5"/>
+  <rect x="280" y="245" width="6" height="40" rx="3" fill="#D0D5DD" stroke="#2C3E50" stroke-width="1.5"/>
+  <rect x="114" y="250" width="6" height="25" rx="3" fill="#D0D5DD" stroke="#2C3E50" stroke-width="1.5"/>
+  <text x="200" y="480" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#475467" font-weight="600">Premium Case</text>
+</svg>

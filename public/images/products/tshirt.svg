@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" fill="none">
+  <rect width="400" height="500" rx="24" fill="#F8F9FA"/>
+  <ellipse cx="200" cy="470" rx="100" ry="12" fill="#000" opacity="0.08"/>
+  <!-- T-Shirt body -->
+  <path d="M155 95 L120 120 L105 200 L115 200 L115 430 L285 430 L285 200 L295 200 L280 120 L245 95" stroke="#2C3E50" stroke-width="3" fill="#fff"/>
+  <!-- Collar -->
+  <path d="M165 95 C165 70 200 60 200 60 C200 60 235 70 235 95" stroke="#2C3E50" stroke-width="3" fill="#F5F5F5"/>
+  <!-- Sleeves -->
+  <path d="M155 95 L120 120 L133 130 L158 108" stroke="#2C3E50" stroke-width="2" fill="#F0F2F5"/>
+  <path d="M245 95 L280 120 L267 130 L242 108" stroke="#2C3E50" stroke-width="2" fill="#F0F2F5"/>
+  <!-- Print area -->
+  <rect x="158" y="170" width="84" height="88" rx="8" fill="#E8ECF0" stroke="#D0D5DD" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="200" y="223" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#98A2B3">Your Design Here</text>
+  <!-- Bottom -->
+  <path d="M115 430 L285 430" stroke="#2C3E50" stroke-width="2" fill="none"/>
+  <text x="200" y="480" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#475467" font-weight="600">NL 3900</text>
+</svg>
