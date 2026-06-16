@@ -49,7 +49,7 @@ const PRODUCT_DATA: Product[] = [
     name: 'Structured 5-Panel',
     subtitle: 'Adjustable · Twill Finish',
     price: 39.99,
-    image: '/images/products/hat.svg',
+    image: '/images/products/hat.png',
   },
   {
     id: 'phonecase',

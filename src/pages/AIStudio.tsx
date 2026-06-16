@@ -65,7 +65,7 @@ const MOCKUP_IMAGES: Record<string, string> = {
   hoodie: '/images/products/hoodie.png',
   tshirt: '/images/products/tshirt.png',
   sweatshirt: '/images/products/sweatshirt.png',
-  hat: '/images/products/hat.svg',
+  hat: '/images/products/hat.png',
   mug: '/images/products/mug.png',
   phonecase: '/images/products/phonecase.png',
 };
