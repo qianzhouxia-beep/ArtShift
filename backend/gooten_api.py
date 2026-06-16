@@ -21,13 +21,23 @@ Endpoints implemented:
 
 import os
 import time
+import json
 import logging
+import sqlite3
 import requests
 from flask import Blueprint, request, jsonify
 
 # ── Config ─────────────────────────────────────────────────────────────────
 GOOTEN_RECIPE_ID = os.environ.get("GOOTEN_RECIPE_ID", "2c9ed314-da42-4c32-9c0e-c1705aa501c3")
 GOOTEN_PARTNER_BILLING_KEY = os.environ.get("GOOTEN_PARTNER_BILLING_KEY", "")
+
+# ── Database ───────────────────────────────────────────────────────────────
+DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "artshift.db"))
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 GOOTEN_BASE = "https://api.print.io"
 BLUEPRINT_NAME = "gooten"
 
@@ -345,14 +355,45 @@ def gooten_submit_order():
     }
 
     result = _call_api("POST", "/api/v/5/source/api/orders/", data=payload)
+    gooten_order_id = ""
     if result.get("ok"):
         order_data = result.get("data", {})
+        gooten_order_id = order_data.get("Id", "")
         result["data"] = {
-            "order_id": order_data.get("Id", ""),
+            "order_id": gooten_order_id,
             "status": order_data.get("Status", "Submitted"),
             "total": order_data.get("Total", {}),
             "is_test": is_test,
         }
+
+    # Save to local database regardless
+    try:
+        db = get_db()
+        item_sku = items[0].get("sku", "") if items else ""
+        item_price = items[0].get("price", 0) if items else 0
+        item_img = items[0].get("image_url", "") if items else ""
+        db.execute("""
+            INSERT INTO orders (order_number, customer_email, product_id, product_name, price, quantity,
+                                design_url, shipping_address, status, payment_status, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            gooten_order_id or f"PENDING-{int(time.time())}",
+            shipping.get("email", ""),
+            item_sku,
+            shipping.get("first_name", "") + " " + shipping.get("last_name", ""),
+            item_price,
+            1,
+            item_img,
+            json.dumps(shipping),
+            "submitted" if result.get("ok") else "failed",
+            "paid" if body.get("paypal_order_id") else "pending",
+            f"Gooten test={is_test} ref={body.get('reference', '')}",
+        ))
+        db.commit()
+        db.close()
+    except Exception as e:
+        logger.error(f"[Gooten] Failed to save order to DB: {e}")
+
     return jsonify(result)
 
 
@@ -387,16 +428,62 @@ def gooten_list_orders():
 def gooten_webhook():
     """
     Receive shipment / order status updates from Gooten.
-    Stores event in log for debugging.
+    Updates local order status and tracking info.
     """
     body = request.get_json(silent=True) or {}
-    logger.info(f"[Gooten Webhook] Received: {body}")
     event_type = body.get("EventType", body.get("event_type", "unknown"))
     order_id = body.get("OrderId", body.get("order_id", ""))
-    logger.info(f"[Gooten Webhook] Order {order_id} -> {event_type}")
+    tracking = body.get("TrackingNumber", body.get("tracking_number", ""))
+    status = body.get("Status", "").lower()
+    logger.info(f"[Gooten Webhook] Order {order_id} -> {event_type} (status={status})")
 
-    # TODO: update local order status in database
+    try:
+        db = get_db()
+        if status:
+            db.execute("UPDATE orders SET status=?, updated_at=datetime('now','utc') WHERE order_number=?", (status, order_id))
+        if tracking:
+            db.execute("UPDATE orders SET tracking_number=?, updated_at=datetime('now','utc') WHERE order_number=?", (tracking, order_id))
+        db.commit()
+        db.close()
+        logger.info(f"[Gooten Webhook] Updated order {order_id}: status={status} tracking={tracking}")
+    except Exception as e:
+        logger.error(f"[Gooten Webhook] DB update failed: {e}")
+
     return jsonify({"ok": True, "received": event_type}), 200
+
+
+# ── My Orders (user-facing) ───────────────────────────────────────────────
+
+@bp.route("/api/gooten/my-orders", methods=["GET"])
+def gooten_my_orders():
+    """Return orders for a given email. Query: ?email=xxx"""
+    email = request.args.get("email", "")
+    if not email:
+        return jsonify({"ok": False, "error": "email is required"}), 400
+    try:
+        db = get_db()
+        rows = db.execute(
+            "SELECT * FROM orders WHERE customer_email=? ORDER BY created_at DESC LIMIT 20",
+            (email,)
+        ).fetchall()
+        db.close()
+        orders = []
+        for r in rows:
+            orders.append({
+                "id": r["id"],
+                "order_number": r["order_number"],
+                "product_id": r["product_id"],
+                "product_name": r["product_name"],
+                "price": r["price"],
+                "status": r["status"],
+                "payment_status": r["payment_status"],
+                "tracking_number": r["tracking_number"],
+                "created_at": r["created_at"],
+                "design_url": r["design_url"],
+            })
+        return jsonify({"ok": True, "orders": orders})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
 
 
 # ── Health ────────────────────────────────────────────────────────────────

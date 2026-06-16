@@ -111,8 +111,9 @@ export default function Checkout() {
           },
         ],
         currency: 'USD',
-        is_test: true, // test mode until production ready
+        is_test: true,
         reference: `artshift-${Date.now()}`,
+        paypal_order_id: paypalTransactionId || '',
       };
 
       const resp = await fetch(`${API_BASE}/api/gooten/orders`, {
