@@ -3,6 +3,73 @@ import { useState } from 'react';
 export default function SignUp() {
   const [mode, setMode] = useState<'signup' | 'login'>('signup');
   const [showPassword, setShowPassword] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (mode === 'signup') {
+      if (!fullName.trim()) { setError('Please enter your full name'); return; }
+      if (!email.trim()) { setError('Please enter your email'); return; }
+      if (!password || password.length < 6) { setError('Password must be at least 6 characters'); return; }
+      if (!agreeTerms) { setError('Please agree to the Terms of Service'); return; }
+
+      // Save user to localStorage
+      const users = JSON.parse(localStorage.getItem('artshift_users') || '[]');
+      if (users.find((u: any) => u.email === email)) {
+        setError('An account with this email already exists');
+        return;
+      }
+      users.push({ fullName, email, password, createdAt: new Date().toISOString() });
+      localStorage.setItem('artshift_users', JSON.stringify(users));
+      localStorage.setItem('artshift_user', JSON.stringify({ fullName, email }));
+      setRegistered(true);
+    } else {
+      // Login mode
+      if (!email.trim()) { setError('Please enter your email'); return; }
+      if (!password) { setError('Please enter your password'); return; }
+
+      const users = JSON.parse(localStorage.getItem('artshift_users') || '[]');
+      const user = users.find((u: any) => u.email === email && u.password === password);
+      if (!user) {
+        setError('Invalid email or password');
+        return;
+      }
+      localStorage.setItem('artshift_user', JSON.stringify({ fullName: user.fullName, email: user.email }));
+      setRegistered(true);
+    }
+  };
+
+  // Register success screen
+  if (registered) {
+    return (
+      <div className="min-h-screen bg-surface text-on-surface flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+            <span className="material-symbols-outlined text-4xl text-green-600">check</span>
+          </div>
+          <h1 className="text-headline-lg font-extrabold mb-4">
+            {mode === 'signup' ? 'Account Created!' : 'Welcome Back!'}
+          </h1>
+          <p className="text-on-surface-variant text-body-lg mb-8">
+            {mode === 'signup'
+              ? 'Your account has been successfully created. Start creating your AI-powered designs!'
+              : 'You\'ve been logged in successfully. Continue your creative journey.'}
+          </p>
+          <a href="/studio" className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary-container transition-colors shadow-md">
+            <span className="material-symbols-outlined">brush</span>
+            Start Designing
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen text-on-surface">
@@ -74,30 +141,33 @@ export default function SignUp() {
               </div>
             </div>
 
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-6" onSubmit={handleSubmit}>
               {mode === 'signup' && (
               <div>
                 <label className="block text-sm font-semibold text-on-surface mb-1" htmlFor="full_name">Full Name</label>
-                <input className="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-lg p-2.5 text-base transition-all outline-none focus:bg-white" id="full_name" placeholder="John Doe" type="text" />
+                <input className="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-lg p-2.5 text-base transition-all outline-none focus:bg-white" id="full_name" placeholder="John Doe" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
               )}
               <div>
                 <label className="block text-sm font-semibold text-on-surface mb-1" htmlFor="email">Email Address</label>
-                <input className="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-lg p-2.5 text-base transition-all outline-none focus:bg-white" id="email" placeholder="hello@artshift.ai" type="email" />
+                <input className="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-lg p-2.5 text-base transition-all outline-none focus:bg-white" id="email" placeholder="hello@artshift.ai" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="relative">
                 <label className="block text-sm font-semibold text-on-surface mb-1" htmlFor="password">Password</label>
-                <input className="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-lg p-2.5 text-base transition-all outline-none focus:bg-white pr-10" id="password" placeholder="••••••••" type={showPassword ? 'text' : 'password'} />
+                <input className="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-lg p-2.5 text-base transition-all outline-none focus:bg-white pr-10" id="password" placeholder="••••••••" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} />
                 <button className="absolute right-2 bottom-2 p-1 text-outline hover:text-primary transition-colors" type="button" onClick={() => setShowPassword(!showPassword)}>
                   <span className="material-symbols-outlined text-[20px]">{showPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
               </div>
+              {mode === 'signup' && (
               <div className="flex items-center gap-1">
-                <input className="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" id="terms" type="checkbox" />
+                <input className="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" id="terms" type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} />
                 <label className="text-xs font-semibold text-on-surface-variant" htmlFor="terms">
                   I agree to the <a href="/terms" className="text-primary hover:underline">Terms of Service</a> and <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>.
                 </label>
               </div>
+              )}
+              {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
               <button className="w-full bg-primary text-on-primary py-3 px-6 rounded-full text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary-container hover:shadow-xl hover:-translate-y-px active:scale-95 transition-all duration-200 mt-2" type="submit">
                 {mode === 'signup' ? 'Create Account' : 'Log In'}
               </button>

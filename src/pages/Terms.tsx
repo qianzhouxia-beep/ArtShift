@@ -146,7 +146,7 @@ export default function Terms() {
                 <p className="text-base leading-relaxed mb-6 opacity-90">Our legal team is here to help you understand how we protect your rights and your data.</p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <a href="/contact" className="bg-surface-container-lowest text-primary px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-opacity-90 transition-all text-center">Contact Legal Team</a>
-                  <a href="/contact" className="border border-on-primary text-on-primary px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-white/10 transition-all text-center">Download PDF</a>
+                  <a href="/contact" className="border border-on-primary text-on-primary px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-white/10 transition-all text-center">Print This Page</a>
                 </div>
               </div>
             </article>
