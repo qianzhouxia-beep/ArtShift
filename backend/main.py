@@ -166,6 +166,43 @@ def get_db():
     conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email)""")
     conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number)""")
 
+    # Users table (for auth)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            name TEXT DEFAULT '',
+            created_at TEXT DEFAULT (datetime('now', 'utc'))
+        )
+    """)
+
+    # Credits purchases table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS credits_purchases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            pack_id TEXT NOT NULL,
+            amount_cents INTEGER NOT NULL,
+            credits INTEGER NOT NULL,
+            status TEXT DEFAULT 'pending',
+            paypal_order_id TEXT,
+            created_at TEXT DEFAULT (datetime('now', 'utc'))
+        )
+    """)
+
+    # Contact messages table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS contact_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            type TEXT DEFAULT 'General Inquiry',
+            message TEXT NOT NULL,
+            created_at TEXT DEFAULT (datetime('now', 'utc'))
+        )
+    """)
+
     conn.commit()
     return conn
 
@@ -336,6 +373,36 @@ def get_waitlist_count(db=None):
     if close:
         db.close()
     return count
+
+
+@app.route("/api/contact", methods=["POST"])
+@limiter.limit("5 per hour")
+def submit_contact():
+    """Save a contact form message."""
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    msg_type = data.get("type", "General Inquiry").strip()
+    message = (data.get("message") or "").strip()
+
+    if not name or not email or not message:
+        return jsonify({"ok": False, "error": "Name, email, and message are required"}), 400
+    if "@" not in email:
+        return jsonify({"ok": False, "error": "Valid email is required"}), 400
+
+    try:
+        db = get_db()
+        db.execute(
+            "INSERT INTO contact_messages (name, email, type, message) VALUES (?, ?, ?, ?)",
+            (name, email, msg_type, message),
+        )
+        db.commit()
+        db.close()
+        logger.info(f"Contact message from {name} ({email})")
+        return jsonify({"ok": True, "message": "Message sent successfully"}), 201
+    except Exception as e:
+        logger.error(f"Contact error: {e}", exc_info=True)
+        return jsonify({"ok": False, "error": "Failed to save message"}), 500
 
 
 @app.route("/api/generate", methods=["POST"])
@@ -764,15 +831,18 @@ def get_products():
         {"id": "hoodie", "name": "Hoodie", "description": "Soft fleece interior, unisex fit",
          "price_from": 44.99, "currency": "USD", "emoji": "🧥",
          "colors": ["charcoal", "black", "forest-green"], "sizes": ["S", "M", "L", "XL", "XXL"], "badge": "Cozy"},
+        {"id": "sweatshirt", "name": "Drop Shoulder Sweatshirt", "description": "American Apparel F496, relaxed fit",
+         "price_from": 39.99, "currency": "USD", "emoji": "🧶",
+         "colors": ["black", "gray", "navy"], "sizes": ["S", "M", "L", "XL"], "badge": None},
         {"id": "mug", "name": "Ceramic Mug", "description": "11oz ceramic, dishwasher & microwave safe",
          "price_from": 22.99, "currency": "USD", "emoji": "☕",
          "colors": ["white", "black"], "badge": None},
-        {"id": "phone-case", "name": "Phone Case", "description": "Snap case, shock-absorbing, all major models",
+        {"id": "phonecase", "name": "Phone Case", "description": "Snap case, shock-absorbing, all major models",
          "price_from": 19.99, "currency": "USD", "emoji": "📱",
          "colors": ["clear", "matte-black"], "badge": None},
-        {"id": "cap", "name": "Baseball Cap", "description": "Adjustable snapback, premium cotton weave",
-         "price_from": 24.99, "currency": "USD", "emoji": "🧢",
-         "colors": ["black", "navy", "gray"], "badge": "New"},
+        {"id": "bag", "name": "Tote Bag", "description": "Cotton tote bag, spacious & durable",
+         "price_from": 24.99, "currency": "USD", "emoji": "🛍️",
+         "colors": ["natural", "black"], "badge": "New"},
     ]
 
     styles = [
@@ -812,14 +882,160 @@ def public_stats():
         "waitlist_count": count + 127,
         "generations_total": gen_count + 2500,
         "countries": 30,
-        "product_types": 5,
+        "product_types": 6,
         "styles_available": 10,
     })
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ORDER MANAGEMENT ENDPOINTS
+# AUTH ENDPOINTS
 # ══════════════════════════════════════════════════════════════════════════════
+
+def _hash_password(password: str) -> str:
+    """Hash password with a random salt. Returns salt$hash."""
+    salt = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    h = hashlib.sha256((salt + password).encode()).hexdigest()
+    return f"{salt}${h}"
+
+
+def _verify_password(password: str, stored: str) -> bool:
+    """Verify a password against stored salt$hash."""
+    if "$" not in stored:
+        return False
+    salt, expected_hash = stored.split("$", 1)
+    h = hashlib.sha256((salt + password).encode()).hexdigest()
+    return h == expected_hash
+
+
+def _generate_token() -> str:
+    """Generate a random session token."""
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=64))
+
+
+@app.route("/auth/signup", methods=["POST"])
+@limiter.limit("10 per hour")
+def auth_signup():
+    """Register a new user account."""
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = (data.get("password") or "").strip()
+
+    if not email or "@" not in email:
+        return jsonify({"error": "Valid email is required"}), 400
+    if not password or len(password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+
+    try:
+        db = get_db()
+        existing = db.execute("SELECT id FROM users WHERE email=?", (email,)).fetchone()
+        if existing:
+            db.close()
+            return jsonify({"error": "Email already registered"}), 409
+
+        pw_hash = _hash_password(password)
+        cursor = db.execute(
+            "INSERT INTO users (email, password_hash) VALUES (?, ?)",
+            (email, pw_hash),
+        )
+        db.commit()
+        user_id = cursor.lastrowid
+        token = _generate_token()
+        db.close()
+
+        logger.info(f"User registered: {email} (id={user_id})")
+        return jsonify({
+            "session": {"access_token": token},
+            "user": {"id": str(user_id), "email": email},
+        }), 201
+
+    except Exception as e:
+        logger.error(f"Signup error: {e}", exc_info=True)
+        return jsonify({"error": "Registration failed. Please try again."}), 500
+
+
+@app.route("/auth/login", methods=["POST"])
+@limiter.limit("20 per hour")
+def auth_login():
+    """Authenticate an existing user."""
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = (data.get("password") or "").strip()
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    try:
+        db = get_db()
+        user = db.execute(
+            "SELECT id, email, password_hash FROM users WHERE email=?",
+            (email,),
+        ).fetchone()
+        db.close()
+
+        if not user or not _verify_password(password, user["password_hash"]):
+            return jsonify({"error": "Invalid email or password"}), 401
+
+        token = _generate_token()
+        logger.info(f"User logged in: {email}")
+        return jsonify({
+            "session": {"access_token": token},
+            "user": {"id": str(user["id"]), "email": user["email"]},
+        })
+
+    except Exception as e:
+        logger.error(f"Login error: {e}", exc_info=True)
+        return jsonify({"error": "Login failed. Please try again."}), 500
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAYMENTS ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+CREDIT_PACKS_MAP = {
+    "starter": {"price": 500, "credits": 10},   # $5 → 10 credits
+    "popular": {"price": 1500, "credits": 35},  # $15 → 35 credits
+    "pro": {"price": 3000, "credits": 80},      # $30 → 80 credits
+}
+
+
+@app.route("/api/payments/create-order", methods=["POST"])
+@limiter.limit("10 per hour")
+def create_payment_order():
+    """
+    Create a credit purchase order.
+    Frontend redirects to approvalUrl to complete payment.
+    (MVP/sandbox: direct success redirect; real PayPal integration later)
+    """
+    data = request.get_json(silent=True) or {}
+    pack_id = (data.get("packId") or "").strip()
+    user_id = data.get("userId")
+
+    pack = CREDIT_PACKS_MAP.get(pack_id)
+    if not pack:
+        return jsonify({"error": "Invalid credit pack"}), 400
+
+    try:
+        db = get_db()
+        cursor = db.execute(
+            "INSERT INTO credits_purchases (user_id, pack_id, amount_cents, credits, status) VALUES (?, ?, ?, ?, 'pending')",
+            (user_id, pack_id, pack["price"], pack["credits"]),
+        )
+        db.commit()
+        purchase_id = cursor.lastrowid
+        db.close()
+
+        logger.info(f"Credit purchase created: id={purchase_id}, pack={pack_id}, user={user_id}")
+
+        # MVP: redirect user back to the site with success indicator
+        # Frontend will check this param and show success message
+        frontend_url = os.environ.get("BASE_URL", "https://artshift.api-tokenmaster.com")
+        approval_url = f"{frontend_url}/studio?credits_purchased={purchase_id}"
+
+        return jsonify({"approvalUrl": approval_url}), 201
+
+    except Exception as e:
+        logger.error(f"Create payment error: {e}", exc_info=True)
+        return jsonify({"error": "Failed to create payment. Please try again."}), 500
 
 @app.route("/api/orders", methods=["POST"])
 @limiter.limit("10 per hour")
@@ -865,7 +1081,8 @@ def create_order():
         # Look up product name
         products = {
             "tshirt": "T-Shirt", "hoodie": "Hoodie", "mug": "Ceramic Mug",
-            "phone-case": "Phone Case", "cap": "Baseball Cap",
+            "sweatshirt": "Drop Shoulder Sweatshirt",
+            "phonecase": "Phone Case", "bag": "Tote Bag",
         }
         product_name = products.get(product_id, product_id)
 

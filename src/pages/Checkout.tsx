@@ -13,19 +13,6 @@ const VALID_PROMO_CODES: Record<string, number> = {
   SHIPFREE: 0,
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────
-
-function formatCardNumber(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 16);
-  return digits.replace(/(\d{4})/g, '$1 ').trim();
-}
-
-function formatExpiry(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 4);
-  if (digits.length >= 3) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  return digits;
-}
-
 // Product slug → Gooten SKU mapping (for order submission)
 const PRODUCT_SKU: Record<string, string> = {
   hoodie: 'Apparel-DTG-Hoodie-Gildan-18500-L-SportGrey-Mens-CF',
@@ -44,8 +31,6 @@ export default function Checkout() {
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState<{ code: string; percent: number } | null>(null);
   const [promoError, setPromoError] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -201,17 +186,6 @@ export default function Checkout() {
     }
   };
 
-  // ── Card submit ────────────────────────────────────────────────────
-  const handleCardSubmit = () => {
-    const newErrors: Record<string, string> = {};
-    if (cardNumber.replace(/\s/g, '').length < 16) newErrors.card = 'Enter a valid 16-digit card number';
-    if (expiry.replace(/\D/g, '').length < 4) newErrors.expiry = 'Enter a valid expiry (MM/YY)';
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
-    // For card, we still submit to Gooten without real payment processing
-    submitOrder();
-  };
-
   // ── Success Screen ─────────────────────────────────────────────────
   if (orderComplete) {
     return (
@@ -340,66 +314,30 @@ export default function Checkout() {
             <section className="bg-surface-container-lowest rounded-xl p-6 md:p-8 shadow-luminous">
               <h2 className="text-headline-md mb-6 text-on-surface">Payment Method</h2>
 
-              {/* PayPal (default & recommended) */}
-              <div className={`rounded-xl p-6 mb-3 transition-colors ${payment === 'paypal' ? 'border-2 border-primary bg-surface/50' : 'border border-outline-variant'}`}>
+              {/* PayPal (default & only) */}
+              <div className="rounded-xl p-6 border-2 border-primary bg-surface/50">
                 <label className="flex items-center gap-3 cursor-pointer">
-                  <input checked={payment === 'paypal'} className="text-primary focus:ring-primary w-5 h-5"
+                  <input checked className="text-primary focus:ring-primary w-5 h-5"
                     name="payment" onChange={() => setPayment('paypal')} type="radio" />
                   <span className="text-label-md font-semibold">PayPal</span>
                   <span className="text-on-surface-variant ml-auto text-sm">Recommended</span>
                 </label>
-                {payment === 'paypal' && (
-                  <div className="mt-5 pt-4 border-t border-outline-variant/30">
-                    <div ref={paypalBtnRef} className="min-h-[40px]" />
-                    <p className="text-label-sm text-on-surface-variant mt-2 text-center">
-                      Secure payment via PayPal. No PayPal account required for card payments.
-                    </p>
-                  </div>
-                )}
+                <div className="mt-5 pt-4 border-t border-outline-variant/30">
+                  <div ref={paypalBtnRef} className="min-h-[40px]" />
+                  <p className="text-label-sm text-on-surface-variant mt-2 text-center">
+                    Secure payment via PayPal. Credit/debit cards also accepted without a PayPal account.
+                  </p>
+                </div>
               </div>
 
-              {/* Credit Card */}
-              <div className={`rounded-xl p-6 mb-3 transition-colors ${payment === 'card' ? 'border-2 border-primary bg-surface/50' : 'border border-outline-variant'}`}>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input checked={payment === 'card'} className="text-primary focus:ring-primary w-5 h-5"
-                    name="payment" onChange={() => setPayment('card')} type="radio" />
+              {/* Credit Card & Apple Pay — coming soon via PayPal guest checkout */}
+              <div className="rounded-xl p-6 border border-outline-variant opacity-60 pointer-events-none">
+                <div className="flex items-center gap-3">
+                  <span className="inline-block w-5 h-5 rounded-full border-2 border-outline-variant" />
                   <span className="text-label-md font-semibold">Credit Card</span>
                   <span className="material-symbols-outlined text-on-surface-variant ml-auto">credit_card</span>
-                </label>
-                {payment === 'card' && (
-                  <div className="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-outline-variant/30">
-                    <div className="col-span-2">
-                      <label className="block text-label-sm mb-1 text-on-surface-variant">Card Number</label>
-                      <div className="relative">
-                        <input className={`w-full bg-[#f1f5f9] border-none rounded-lg p-4 focus:ring-2 focus:ring-primary transition-all text-body-md outline-none ${errors.card ? 'ring-2 ring-red-400' : ''}`}
-                          onChange={(e) => { setCardNumber(formatCardNumber(e.target.value)); setErrors((p) => { const { card, ...r } = p; return r; }); }}
-                          placeholder="0000 0000 0000 0000" type="text" value={cardNumber} />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline">lock</span>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-label-sm mb-1 text-on-surface-variant">Expiry Date</label>
-                      <input className={`w-full bg-[#f1f5f9] border-none rounded-lg p-4 focus:ring-2 focus:ring-primary transition-all text-body-md outline-none ${errors.expiry ? 'ring-2 ring-red-400' : ''}`}
-                        onChange={(e) => { setExpiry(formatExpiry(e.target.value)); setErrors((p) => { const { expiry, ...r } = p; return r; }); }}
-                        placeholder="MM/YY" type="text" value={expiry} />
-                    </div>
-                    <div>
-                      <label className="block text-label-sm mb-1 text-on-surface-variant">CVV</label>
-                      <input className="w-full bg-[#f1f5f9] border-none rounded-lg p-4 focus:ring-2 focus:ring-primary transition-all text-body-md outline-none"
-                        placeholder="123" type="text" />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Apple Pay - info only */}
-              <div className={`rounded-xl p-6 cursor-pointer transition-colors ${payment === 'apple' ? 'border-2 border-primary bg-surface/50' : 'border border-outline-variant'}`}>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input checked={payment === 'apple'} className="text-primary focus:ring-primary w-5 h-5"
-                    name="payment" onChange={() => setPayment('apple')} type="radio" />
-                  <span className="text-label-md font-semibold">Apple Pay</span>
-                  <span className="material-symbols-outlined text-on-surface-variant ml-auto">contactless</span>
-                </label>
+                </div>
+                <p className="text-label-sm text-on-surface-variant mt-2">Pay via PayPal guest checkout — no account required.</p>
               </div>
 
               <div className="mt-6 flex items-center gap-3">
@@ -490,25 +428,11 @@ export default function Checkout() {
                 </div>
 
                 {/* Errors */}
-                {(errors.card || errors.expiry || errors.submit || errors.paypal) && (
+                {(errors.submit || errors.paypal) && (
                   <div className="mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                    {errors.card && <p className="text-red-600 text-label-sm">{errors.card}</p>}
-                    {errors.expiry && <p className="text-red-600 text-label-sm">{errors.expiry}</p>}
                     {errors.submit && <p className="text-red-600 text-label-sm">{errors.submit}</p>}
                     {errors.paypal && <p className="text-red-600 text-label-sm">{errors.paypal}</p>}
                   </div>
-                )}
-
-                {/* CTA - only for card payment; PayPal has its own button above */}
-                {payment === 'card' && (
-                  <button
-                    className="w-full bg-primary text-white py-5 rounded-full text-headline-md flex items-center justify-center gap-3 active:scale-95 transition-all shadow-md shadow-primary/20 hover:bg-primary-container disabled:opacity-50"
-                    onClick={handleCardSubmit}
-                    disabled={submitting}
-                  >
-                    <span className="material-symbols-outlined">{submitting ? 'hourglass' : 'lock'}</span>
-                    {submitting ? 'Processing...' : 'Complete Purchase'}
-                  </button>
                 )}
 
                 {/* Trust Signals */}

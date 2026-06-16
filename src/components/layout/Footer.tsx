@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 
 const footerLinks = [
+  { to: '/studio', label: 'AI Studio' },
+  { to: '/products', label: 'Products' },
   { to: '/about', label: 'About Us' },
   { to: '/faq', label: 'FAQ' },
   { to: '/terms', label: 'Terms of Service' },

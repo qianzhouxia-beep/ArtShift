@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
+
 export default function SignUp() {
   const [mode, setMode] = useState<'signup' | 'login'>('signup');
   const [showPassword, setShowPassword] = useState(false);
@@ -9,8 +11,9 @@ export default function SignUp() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -19,30 +22,37 @@ export default function SignUp() {
       if (!email.trim()) { setError('Please enter your email'); return; }
       if (!password || password.length < 6) { setError('Password must be at least 6 characters'); return; }
       if (!agreeTerms) { setError('Please agree to the Terms of Service'); return; }
-
-      // Save user to localStorage
-      const users = JSON.parse(localStorage.getItem('artshift_users') || '[]');
-      if (users.find((u: any) => u.email === email)) {
-        setError('An account with this email already exists');
-        return;
-      }
-      users.push({ fullName, email, password, createdAt: new Date().toISOString() });
-      localStorage.setItem('artshift_users', JSON.stringify(users));
-      localStorage.setItem('artshift_user', JSON.stringify({ fullName, email }));
-      setRegistered(true);
     } else {
-      // Login mode
       if (!email.trim()) { setError('Please enter your email'); return; }
       if (!password) { setError('Please enter your password'); return; }
+    }
 
-      const users = JSON.parse(localStorage.getItem('artshift_users') || '[]');
-      const user = users.find((u: any) => u.email === email && u.password === password);
-      if (!user) {
-        setError('Invalid email or password');
-        return;
+    setLoading(true);
+    try {
+      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/login';
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Authentication failed');
+
+      // Save session info from backend
+      const token = data.session?.access_token;
+      if (token) {
+        localStorage.setItem('artshift_token', token);
+        localStorage.setItem('artshift_user', JSON.stringify({
+          id: data.user?.id,
+          email: data.user?.email,
+          fullName,
+        }));
       }
-      localStorage.setItem('artshift_user', JSON.stringify({ fullName: user.fullName, email: user.email }));
       setRegistered(true);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -168,8 +178,8 @@ export default function SignUp() {
               </div>
               )}
               {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
-              <button className="w-full bg-primary text-on-primary py-3 px-6 rounded-full text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary-container hover:shadow-xl hover:-translate-y-px active:scale-95 transition-all duration-200 mt-2" type="submit">
-                {mode === 'signup' ? 'Create Account' : 'Log In'}
+              <button className="w-full bg-primary text-on-primary py-3 px-6 rounded-full text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary-container hover:shadow-xl hover:-translate-y-px active:scale-95 transition-all duration-200 mt-2 disabled:opacity-60 disabled:cursor-not-allowed" type="submit" disabled={loading}>
+                {loading ? (mode === 'signup' ? 'Creating...' : 'Signing in...') : (mode === 'signup' ? 'Create Account' : 'Log In')}
               </button>
             </form>
 

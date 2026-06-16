@@ -2,18 +2,37 @@ import { useState } from 'react';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
+
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', type: 'General Inquiry', message: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      setError('Please fill in all fields.');
+      return;
+    }
+    setLoading(true);
+    setError('');
     try {
-      const messages = JSON.parse(localStorage.getItem('artshift_contact') || '[]');
-      messages.unshift({ date: new Date().toISOString() });
-      localStorage.setItem('artshift_contact', JSON.stringify(messages.slice(0, 10)));
-    } catch {}
-    setTimeout(() => setSubmitted(false), 3000);
+      const res = await fetch(`${API_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Failed to send message');
+      setSubmitted(true);
+      setForm({ name: '', email: '', type: 'General Inquiry', message: '' });
+    } catch {
+      setError('Failed to send. Please try again later.');
+    } finally {
+      setLoading(false);
+      setTimeout(() => setSubmitted(false), 4000);
+    }
   };
 
   return (
@@ -104,17 +123,17 @@ export default function Contact() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-on-surface-variant">Full Name</label>
-                    <input className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all outline-none" placeholder="Alex Rivera" type="text" />
+                    <input className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all outline-none" placeholder="Alex Rivera" type="text" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-on-surface-variant">Email Address</label>
-                    <input className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all outline-none" placeholder="alex@example.com" type="email" />
+                    <input className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all outline-none" placeholder="alex@example.com" type="email" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-on-surface-variant">Inquiry Type</label>
                   <div className="relative">
-                    <select className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all appearance-none outline-none">
+                    <select className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all appearance-none outline-none" value={form.type} onChange={(e) => setForm({...form, type: e.target.value})}>
                       <option>General Inquiry</option>
                       <option>Technical Support</option>
                       <option>Artist Partnership</option>
@@ -128,7 +147,7 @@ export default function Contact() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-on-surface-variant">Message</label>
-                  <textarea className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all resize-none outline-none" placeholder="Tell us how we can help..." rows={5} />
+                  <textarea className="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary transition-all resize-none outline-none" placeholder="Tell us how we can help..." rows={5} value={form.message} onChange={(e) => setForm({...form, message: e.target.value})} />
                 </div>
                 <div className="flex items-start gap-3 py-2">
                   <input className="mt-1 rounded text-primary focus:ring-primary border-outline-variant bg-surface" id="consent" type="checkbox" />
@@ -136,11 +155,13 @@ export default function Contact() {
                     I agree to the privacy policy and data processing terms.
                   </label>
                 </div>
+                {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
                 <button
-                  className={`w-full py-4 rounded-xl text-lg font-bold active:scale-[0.98] transition-all ${submitted ? 'bg-secondary text-on-secondary' : 'bg-primary text-on-primary hover:shadow-lg hover:shadow-primary/20'}`}
+                  className={`w-full py-4 rounded-xl text-lg font-bold active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed ${submitted ? 'bg-secondary text-on-secondary' : 'bg-primary text-on-primary hover:shadow-lg hover:shadow-primary/20'}`}
                   type="submit"
+                  disabled={loading}
                 >
-                  {submitted ? (
+                  {loading ? 'Sending...' : submitted ? (
                     <span className="flex items-center justify-center gap-2">
                       <span className="material-symbols-outlined text-[20px]">check_circle</span>
                       Sent Successfully

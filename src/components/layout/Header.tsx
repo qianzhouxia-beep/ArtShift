@@ -50,6 +50,9 @@ export default function Header() {
               <Link to="/checkout" className="p-2 text-on-surface-variant hover:text-primary transition-all" aria-label="Cart">
                 <span className="material-symbols-outlined">shopping_bag</span>
               </Link>
+              <Link to="/signup" className="p-2 text-on-surface-variant hover:text-primary transition-all" aria-label="Sign in">
+                <span className="material-symbols-outlined">login</span>
+              </Link>
               <Link to="/profile" className="p-2 text-on-surface-variant hover:text-primary transition-all">
                 <span className="material-symbols-outlined">account_circle</span>
               </Link>
@@ -113,6 +116,9 @@ export default function Header() {
               <div className="flex gap-6">
                 <Link to="/checkout" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant" aria-label="Cart">
                   <span className="material-symbols-outlined">shopping_bag</span>
+                </Link>
+                <Link to="/signup" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant" aria-label="Sign in">
+                  <span className="material-symbols-outlined">login</span>
                 </Link>
                 <Link to="/profile" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant">
                   <span className="material-symbols-outlined">account_circle</span>
