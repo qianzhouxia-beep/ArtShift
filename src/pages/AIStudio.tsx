@@ -14,7 +14,7 @@ const PRODUCTS = [
   { id: 'hoodie', name: 'Hoodie', icon: 'apparel', price: 84.99 },
   { id: 'sweatshirt', name: 'Sweatshirt', icon: 'checkroom', price: 49.99 },
   { id: 'tshirt', name: 'T-Shirt', icon: 'dry_cleaning', price: 32.00 },
-  { id: 'hat', name: 'Hat', icon: 'flag_filled', price: 39.99 },
+  { id: 'bag', name: 'Tote Bag', icon: 'shopping_bag', price: 39.99 },
   { id: 'mug', name: 'Mug', icon: 'coffee', price: 24.99 },
   { id: 'phonecase', name: 'Phone Case', icon: 'smartphone', price: 45.00 },
 ] as const;
@@ -65,7 +65,7 @@ const MOCKUP_IMAGES: Record<string, string> = {
   hoodie: '/images/products/hoodie.png',
   tshirt: '/images/products/tshirt.png',
   sweatshirt: '/images/products/sweatshirt.png',
-  hat: '/images/products/hat.png',
+  bag: '/images/products/bag.png',
   mug: '/images/products/mug.png',
   phonecase: '/images/products/phonecase.png',
 };

@@ -98,7 +98,7 @@ def _call_api(method: str, path: str, data: dict = None, params: dict = None,
 # Hoodie             | 85 | Gildan 18500 Pullover Hoodie          | Apparel-DTG-Hoodie-Gildan-18500-*-*-*-*
 # Sweatshirt         | 145| American Apparel F496 Drop Shoulder    | Apparel-DTG-Sweatshirt-AA-F496-*-*-*-*
 # T-Shirt            | 40 | Next Level 3900 The Boyfriend Tee     | Apparel-DTG-TShirt-NL-3900-*-*-*-*
-# Cap (Trucker)      | 460| Richardson 113 Foamie Trucker Cap     | (available via headwear API)
+# Cap (Trucker)      | 460| Richardson 113 Foamie Trucker Cap     | (已替换为Tote Bag)
 # Cap (Snapback)     | 459| Richardson 256 Umpqua Snapback Cap    | (available via headwear API)
 # Mug                | 186| Accent Mugs 11oz                      | (available via accessories API)
 # Phone Case         | 57 | Premium Phone Case (multi-brand)      | PremiumPhoneCase-*-*-*
@@ -130,12 +130,12 @@ PRODUCT_MAP = {
         "price": 14.99,
         "available": True,
     },
-    "hat": {
-        "name": "Trucker Cap",
-        "brand": "Richardson 113",
-        "product_id": 460,
-        "base_sku": "",
-        "price": 22.10,
+    "bag": {
+        "name": "Cotton Tote Bag",
+        "brand": "Tote Bags",
+        "product_id": 94,
+        "base_sku": "ToteBag",
+        "price": 15.47,
         "available": True,
     },
     "mug": {

@@ -17,9 +17,9 @@ const PRODUCT_TO_GOOTEN_ID: Record<string, number> = {
   hoodie: 85,       // Gildan 18500 Pullover Hoodie
   sweatshirt: 145,  // American Apparel F496 Drop Shoulder
   tshirt: 40,       // Next Level 3900 Boyfriend Tee
-  hat: 460,         // Richardson 113 Foamie Trucker Cap
+  bag: 94,          // Tote Bags
   mug: 186,         // Accent Mugs 11oz
-  phonecase: 0,     // 待查
+  phonecase: 57,    // Premium Phone Case
 };
 
 const PRODUCT_DATA: Product[] = [
@@ -45,11 +45,11 @@ const PRODUCT_DATA: Product[] = [
     image: '/images/products/tshirt.png',
   },
   {
-    id: 'hat',
-    name: 'Structured 5-Panel',
-    subtitle: 'Adjustable · Twill Finish',
+    id: 'bag',
+    name: 'Cotton Tote Bag',
+    subtitle: 'Everyday Essential · 18" Square',
     price: 39.99,
-    image: '/images/products/hat.png',
+    image: '/images/products/bag.png',
   },
   {
     id: 'phonecase',
