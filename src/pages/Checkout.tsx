@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import { useAuth } from '../context/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || 'sb'; // 'sb' = sandbox
@@ -26,6 +28,8 @@ const PRODUCT_SKU: Record<string, string> = {
 // ── Component ────────────────────────────────────────────────────────
 
 export default function Checkout() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [payment, setPayment] = useState<PaymentMethod>('paypal'); // default to PayPal
   const [savedInfo, setSavedInfo] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -38,14 +42,28 @@ export default function Checkout() {
 
   // Address state
   const [address, setAddress] = useState({
-    fullName: '',
+    fullName: user?.name || '',
     line1: '',
     city: '',
     state: '',
     zip: '',
     country: 'United States',
-    email: '',
+    email: user?.email || '',
   });
+
+  // Redirect to signup if not authenticated (after loading)
+  useEffect(() => {
+    if (!loading && !user) navigate('/signup');
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+  if (!user) return null;
 
   // Cart from localStorage
   const [cartItem] = useState(() => {
@@ -68,6 +86,8 @@ export default function Checkout() {
   // ── Submit order to backend + Gooten ──────────────────────────────
   const submitOrder = async (paypalTransactionId?: string) => {
     try {
+      const token = localStorage.getItem('artshift_token') || '';
+
       // Determine Gooten SKU from product name
       const nameLower = cartItem.name.toLowerCase();
       const productKey = Object.keys(PRODUCT_SKU).find((k) => nameLower.includes(k)) || 'hoodie';
@@ -101,7 +121,7 @@ export default function Checkout() {
 
       const resp = await fetch(`${API_BASE}/api/gooten/orders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
       const data = await resp.json();

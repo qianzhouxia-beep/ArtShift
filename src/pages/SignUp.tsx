@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
 
 export default function SignUp() {
+  const navigate = useNavigate();
+  const { signup, login } = useAuth();
   const [mode, setMode] = useState<'signup' | 'login'>('signup');
   const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState('');
@@ -29,26 +33,15 @@ export default function SignUp() {
 
     setLoading(true);
     try {
-      const endpoint = mode === 'signup' ? '/auth/signup' : '/auth/login';
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Authentication failed');
+      const result = mode === 'signup'
+        ? await signup(email.trim().toLowerCase(), password, fullName.trim())
+        : await login(email.trim().toLowerCase(), password);
 
-      // Save session info from backend
-      const token = data.session?.access_token;
-      if (token) {
-        localStorage.setItem('artshift_token', token);
-        localStorage.setItem('artshift_user', JSON.stringify({
-          id: data.user?.id,
-          email: data.user?.email,
-          fullName,
-        }));
+      if (result.ok) {
+        setRegistered(true);
+      } else {
+        setError(result.error || 'Authentication failed');
       }
-      setRegistered(true);
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {
@@ -72,10 +65,10 @@ export default function SignUp() {
               ? 'Your account has been successfully created. Start creating your AI-powered designs!'
               : 'You\'ve been logged in successfully. Continue your creative journey.'}
           </p>
-          <a href="/studio" className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary-container transition-colors shadow-md">
+          <button onClick={() => navigate('/studio')} className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-primary-container transition-colors shadow-md">
             <span className="material-symbols-outlined">brush</span>
             Start Designing
-          </a>
+          </button>
         </div>
       </div>
     );
@@ -123,9 +116,13 @@ export default function SignUp() {
               <p className="text-base leading-relaxed text-on-surface-variant">{mode === 'signup' ? 'Start your journey into AI-driven fashion.' : 'Log in to continue your creative journey.'}</p>
             </div>
 
-            {/* Social Logins */}
+            {/* Social Logins — Coming Soon */}
             <div className="grid grid-cols-2 gap-2 mb-8">
-              <button className="flex items-center justify-center gap-2 py-2 px-4 border border-outline-variant rounded-lg text-sm font-semibold hover:bg-surface-container transition-colors active:scale-95 duration-200">
+              <button
+                className="flex items-center justify-center gap-2 py-2 px-4 border border-outline-variant rounded-lg text-sm font-semibold hover:bg-surface-container transition-colors active:scale-95 duration-200"
+                onClick={() => alert('Google Sign-In is coming soon! Please use email registration.')}
+                type="button"
+              >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -134,7 +131,11 @@ export default function SignUp() {
                 </svg>
                 <span>Google</span>
               </button>
-              <button className="flex items-center justify-center gap-2 py-2 px-4 border border-outline-variant rounded-lg text-sm font-semibold hover:bg-surface-container transition-colors active:scale-95 duration-200">
+              <button
+                className="flex items-center justify-center gap-2 py-2 px-4 border border-outline-variant rounded-lg text-sm font-semibold hover:bg-surface-container transition-colors active:scale-95 duration-200"
+                onClick={() => alert('Apple Sign-In is coming soon! Please use email registration.')}
+                type="button"
+              >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C4.31 16.92 3.65 11.23 6.64 8.72c1.47-1.24 2.87-1.34 4.07-.63.92.54 1.48.56 2.45.02 1.4-.78 3.12-.91 4.3.49-2.92 1.62-2.43 5.48.43 6.63-.56 1.48-1.3 2.94-2.24 5.05zM12.03 7.25c-.13-2.05 1.57-3.9 3.51-4.25.32 2.37-2.01 4.39-3.51 4.25z" />
                 </svg>

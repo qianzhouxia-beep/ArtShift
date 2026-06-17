@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const navLinks = [
   { to: '/gallery', label: 'Gallery' },
@@ -10,6 +11,7 @@ const navLinks = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -50,12 +52,20 @@ export default function Header() {
               <Link to="/checkout" className="p-2 text-on-surface-variant hover:text-primary transition-all" aria-label="Cart">
                 <span className="material-symbols-outlined">shopping_bag</span>
               </Link>
-              <Link to="/signup" className="p-2 text-on-surface-variant hover:text-primary transition-all" aria-label="Sign in">
-                <span className="material-symbols-outlined">login</span>
-              </Link>
-              <Link to="/profile" className="p-2 text-on-surface-variant hover:text-primary transition-all">
-                <span className="material-symbols-outlined">account_circle</span>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/profile" className="p-2 text-on-surface-variant hover:text-primary transition-all" title={user.email}>
+                    <span className="material-symbols-outlined">account_circle</span>
+                  </Link>
+                  <button onClick={logout} className="p-2 text-on-surface-variant hover:text-error transition-all" aria-label="Sign out" title="Sign out">
+                    <span className="material-symbols-outlined">logout</span>
+                  </button>
+                </>
+              ) : (
+                <Link to="/signup" className="p-2 text-on-surface-variant hover:text-primary transition-all" aria-label="Sign in">
+                  <span className="material-symbols-outlined">login</span>
+                </Link>
+              )}
             </div>
             <Link
               to="/studio"
@@ -117,12 +127,20 @@ export default function Header() {
                 <Link to="/checkout" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant" aria-label="Cart">
                   <span className="material-symbols-outlined">shopping_bag</span>
                 </Link>
-                <Link to="/signup" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant" aria-label="Sign in">
-                  <span className="material-symbols-outlined">login</span>
-                </Link>
-                <Link to="/profile" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant">
-                  <span className="material-symbols-outlined">account_circle</span>
-                </Link>
+                {user ? (
+                  <>
+                    <Link to="/profile" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant" title={user.email}>
+                      <span className="material-symbols-outlined">account_circle</span>
+                    </Link>
+                    <button onClick={() => { logout(); setMobileOpen(false); }} className="p-2 text-on-surface-variant" aria-label="Sign out">
+                      <span className="material-symbols-outlined">logout</span>
+                    </button>
+                  </>
+                ) : (
+                  <Link to="/signup" onClick={() => setMobileOpen(false)} className="p-2 text-on-surface-variant" aria-label="Sign in">
+                    <span className="material-symbols-outlined">login</span>
+                  </Link>
+                )}
               </div>
             </nav>
             <div className="p-6 border-t border-outline-variant/30">

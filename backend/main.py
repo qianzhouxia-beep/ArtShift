@@ -173,6 +173,7 @@ def get_db():
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             name TEXT DEFAULT '',
+            token TEXT DEFAULT '',
             created_at TEXT DEFAULT (datetime('now', 'utc'))
         )
     """)
@@ -912,6 +913,37 @@ def _generate_token() -> str:
     return ''.join(random.choices(string.ascii_letters + string.digits, k=64))
 
 
+def _get_user_by_token(token: str) -> dict | None:
+    """Get user row by token. Returns None if not found."""
+    if not token:
+        return None
+    try:
+        db = get_db()
+        user = db.execute("SELECT id, email, name FROM users WHERE token=? AND token != ''", (token,)).fetchone()
+        db.close()
+        return row_to_dict(user) if user else None
+    except Exception:
+        return None
+
+
+def require_auth(f):
+    """Decorator: verify Bearer token for user-authenticated endpoints."""
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+        else:
+            token = request.headers.get("X-User-Token", "")  # fallback
+        user = _get_user_by_token(token)
+        if not user:
+            return jsonify({"error": "Authentication required"}), 401
+        request.current_user = user
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route("/auth/signup", methods=["POST"])
 @limiter.limit("10 per hour")
 def auth_signup():
@@ -919,6 +951,7 @@ def auth_signup():
     data = request.get_json(silent=True) or {}
     email = (data.get("email") or "").strip().lower()
     password = (data.get("password") or "").strip()
+    name = (data.get("name") or "").strip()
 
     if not email or "@" not in email:
         return jsonify({"error": "Valid email is required"}), 400
@@ -933,19 +966,19 @@ def auth_signup():
             return jsonify({"error": "Email already registered"}), 409
 
         pw_hash = _hash_password(password)
+        token = _generate_token()
         cursor = db.execute(
-            "INSERT INTO users (email, password_hash) VALUES (?, ?)",
-            (email, pw_hash),
+            "INSERT INTO users (email, password_hash, name, token) VALUES (?, ?, ?, ?)",
+            (email, pw_hash, name, token),
         )
         db.commit()
         user_id = cursor.lastrowid
-        token = _generate_token()
         db.close()
 
         logger.info(f"User registered: {email} (id={user_id})")
         return jsonify({
             "session": {"access_token": token},
-            "user": {"id": str(user_id), "email": email},
+            "user": {"id": str(user_id), "email": email, "name": name},
         }), 201
 
     except Exception as e:
@@ -967,24 +1000,101 @@ def auth_login():
     try:
         db = get_db()
         user = db.execute(
-            "SELECT id, email, password_hash FROM users WHERE email=?",
+            "SELECT id, email, password_hash, name FROM users WHERE email=?",
             (email,),
         ).fetchone()
-        db.close()
 
         if not user or not _verify_password(password, user["password_hash"]):
+            db.close()
             return jsonify({"error": "Invalid email or password"}), 401
 
         token = _generate_token()
+        db.execute("UPDATE users SET token=? WHERE id=?", (token, user["id"]))
+        db.commit()
+        db.close()
+
         logger.info(f"User logged in: {email}")
         return jsonify({
             "session": {"access_token": token},
-            "user": {"id": str(user["id"]), "email": user["email"]},
+            "user": {"id": str(user["id"]), "email": user["email"], "name": user["name"] or ""},
         })
 
     except Exception as e:
         logger.error(f"Login error: {e}", exc_info=True)
         return jsonify({"error": "Login failed. Please try again."}), 500
+
+
+@app.route("/auth/verify", methods=["GET"])
+def auth_verify():
+    """Verify session token and return current user info."""
+    user = _get_user_by_token(
+        (request.headers.get("Authorization") or "").removeprefix("Bearer ")
+    )
+    if not user:
+        return jsonify({"authenticated": False}), 401
+    return jsonify({"authenticated": True, "user": user})
+
+
+@app.route("/auth/logout", methods=["POST"])
+def auth_logout():
+    """Clear user's session token."""
+    user = _get_user_by_token(
+        (request.headers.get("Authorization") or "").removeprefix("Bearer ")
+    )
+    if user:
+        try:
+            db = get_db()
+            db.execute("UPDATE users SET token='' WHERE id=?", (int(user["id"]),))
+            db.commit()
+            db.close()
+        except Exception as e:
+            logger.error(f"Logout error: {e}")
+    return jsonify({"ok": True})
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# USER PROFILE ENDPOINTS (authenticated)
+# ══════════════════════════════════════════════════════════════════════════════
+
+@app.route("/api/me", methods=["GET"])
+@require_auth
+def get_me():
+    """Get current user profile including credit balance."""
+    user = request.current_user
+    try:
+        db = get_db()
+        # Sum credits from purchases, minus any used
+        row = db.execute(
+            "SELECT COALESCE(SUM(credits), 0) as total FROM credits_purchases WHERE user_id=? AND status='completed'",
+            (int(user["id"]),),
+        ).fetchone()
+        credits = row["total"] if row else 0
+        db.close()
+        return jsonify({"user": {**user, "credits": credits}})
+    except Exception as e:
+        logger.error(f"Get profile error: {e}", exc_info=True)
+        return jsonify({"user": {**user, "credits": 0}})
+
+
+@app.route("/api/me/orders", methods=["GET"])
+@require_auth
+def get_my_orders():
+    """Get current user's orders."""
+    user = request.current_user
+    try:
+        db = get_db()
+        rows = db.execute(
+            "SELECT * FROM orders WHERE customer_email=? ORDER BY id DESC LIMIT 50",
+            (user["email"],),
+        ).fetchall()
+        db.close()
+        return jsonify({
+            "ok": True,
+            "orders": [row_to_dict(r) for r in rows],
+        })
+    except Exception as e:
+        logger.error(f"Get my orders error: {e}", exc_info=True)
+        return jsonify({"ok": False, "error": "Failed to fetch orders"}), 500
 
 
 # ══════════════════════════════════════════════════════════════════════════════
