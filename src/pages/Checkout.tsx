@@ -67,7 +67,6 @@ export default function Checkout() {
 
   // ── Submit order to backend + Gooten ──────────────────────────────
   const submitOrder = async (paypalTransactionId?: string) => {
-    setSubmitting(true);
     try {
       // Determine Gooten SKU from product name
       const nameLower = cartItem.name.toLowerCase();
@@ -128,8 +127,6 @@ export default function Checkout() {
       }
     } catch (err: any) {
       setErrors({ submit: err.message || 'Network error' });
-    } finally {
-      setSubmitting(false);
     }
   };
 
