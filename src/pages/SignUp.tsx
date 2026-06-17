@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://artshift-backend.zeabur.app/api';
-
 export default function SignUp() {
   const navigate = useNavigate();
   const { signup, login } = useAuth();
