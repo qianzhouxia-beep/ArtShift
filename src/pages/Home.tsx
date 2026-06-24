@@ -70,14 +70,12 @@ export default function Home() {
                         className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-sm md:text-base font-bold shadow-lg"
                         style={{
                           backgroundColor: step.active
-                            ? step.num === 1 ? '#8B5CF6'
-                            : step.num === 2 ? '#06B6D4'
+                            ? (step.num === 1 ? '#8B5CF6' : step.num === 2 ? '#06B6D4' : '#E5E7EB')
                             : '#E5E7EB',
                           color: step.active ? '#FFFFFF' : '#6B7280',
                           border: step.active ? 'none' : '1px solid #D1D5DB',
                           boxShadow: step.active ? '0 4px 12px rgba(139,92,246,0.35)' : 'none',
                         }}
-                      >
                       >
                         {step.num}
                       </div>
