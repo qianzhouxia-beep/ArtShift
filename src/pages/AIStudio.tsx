@@ -18,7 +18,7 @@ interface GootenProduct {
   category: string; category_name: string; icon: string;
   price: number; requires_model: boolean; default_model: string | null;
   print_placement: string; colors: GootenColor[];
-  sizes: string[]; models: string[];
+  sizes: string[]; models: string[]; image_url?: string;
 }
 
 interface CatalogSummary {
@@ -26,6 +26,7 @@ interface CatalogSummary {
   icon: string; price: number;
   color_count: number; size_count: number; model_count: number;
   default_model: string | null; requires_model: boolean;
+  image_url: string;
 }
 
 interface StyleOption { id: string; name: string; image: string; }
@@ -651,7 +652,7 @@ export default function AIStudio() {
                     >
                       <div className="w-full aspect-[4/3] rounded-xl bg-surface-container-lowest overflow-hidden mb-3 flex items-center justify-center p-2">
                         <img
-                          src={PRODUCT_THUMBNAILS[p.id] || `/images/products/${p.id}.svg`}
+                          src={p.image_url || PRODUCT_THUMBNAILS[p.id] || `/images/products/${p.id}.svg`}
                           alt={p.name}
                           className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                         />
@@ -683,7 +684,7 @@ export default function AIStudio() {
                 <div className="mt-8 p-5 sm:p-6 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col sm:flex-row gap-6 items-center">
                   <div className="w-40 h-52 shrink-0 bg-surface-container-lowest rounded-xl flex items-center justify-center overflow-hidden">
                     <img
-                      src={PRODUCT_THUMBNAILS[selectedProduct] || `/images/products/${selectedProduct}.svg`}
+                      src={currentProduct.image_url || PRODUCT_THUMBNAILS[selectedProduct] || `/images/products/${selectedProduct}.svg`}
                       alt={currentProduct.name}
                       className="w-full h-full object-contain p-2"
                     />
