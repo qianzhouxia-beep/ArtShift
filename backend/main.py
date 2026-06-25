@@ -162,9 +162,21 @@ def get_db():
             updated_at TEXT DEFAULT (datetime('now', 'utc'))
         )
     """)
+    # Schema migrations (safe add-column for existing SQLite databases)
+    for col_sql in [
+        "ALTER TABLE orders ADD COLUMN gooten_order_id TEXT",
+        "ALTER TABLE orders ADD COLUMN ship_carrier TEXT",
+        "ALTER TABLE orders ADD COLUMN tracking_url TEXT",
+    ]:
+        try:
+            conn.execute(col_sql)
+        except sqlite3.OperationalError:
+            pass  # column already exists
+
     conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status)""")
     conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(customer_email)""")
     conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number)""")
+    conn.execute("""CREATE INDEX IF NOT EXISTS idx_orders_gooten_id ON orders(gooten_order_id)""")
 
     # Users table (for auth)
     conn.execute("""
