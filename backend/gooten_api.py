@@ -26,6 +26,10 @@ import logging
 import sqlite3
 import requests
 from flask import Blueprint, request, jsonify
+from gooten_catalog import (
+    PRODUCT_CATALOG, get_product_by_id, get_products_by_category,
+    get_all_categories, get_catalog_summary, COLOR_HEX_MAP
+)
 
 # ── Config ─────────────────────────────────────────────────────────────────
 GOOTEN_RECIPE_ID = os.environ.get("GOOTEN_RECIPE_ID", "2c9ed314-da42-4c32-9c0e-c1705aa501c3")
@@ -185,6 +189,41 @@ def gooten_products():
             entry["note"] = info["note"]
         result.append(entry)
     return jsonify({"ok": True, "data": result})
+
+
+# ── Catalog API (curated product data with real Gooten colors/sizes) ──────
+
+@bp.route("/api/gooten/catalog", methods=["GET"])
+def gooten_catalog():
+    """
+    Return curated ArtShift product catalog with real Gooten variant data.
+    Query params:
+      ?summary=true  — lightweight listing (no colors/sizes/models)
+      ?category=apparel  — filter by category
+    """
+    summary = request.args.get("summary", "").lower() in ("1", "true", "yes")
+    category = request.args.get("category", "").strip()
+
+    if summary:
+        items = get_catalog_summary()
+        if category:
+            items = [i for i in items if i["category"] == category]
+        return jsonify({"ok": True, "data": items, "categories": get_all_categories()})
+
+    catalog = PRODUCT_CATALOG
+    if category:
+        catalog = get_products_by_category(category)
+
+    return jsonify({"ok": True, "data": catalog, "categories": get_all_categories()})
+
+
+@bp.route("/api/gooten/catalog/<product_id>", methods=["GET"])
+def gooten_catalog_product(product_id):
+    """Return full details for a single product by slug (e.g. 'hoodie')."""
+    product = get_product_by_id(product_id)
+    if not product:
+        return jsonify({"ok": False, "error": f"Product not found: {product_id}"}), 404
+    return jsonify({"ok": True, "data": product})
 
 
 @bp.route("/api/gooten/variants", methods=["GET"])
