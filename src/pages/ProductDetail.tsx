@@ -24,6 +24,7 @@ interface ProductDetail {
   requires_model: boolean;
   default_model: string | null;
   print_placement: string;
+  image_url?: string;
   colors: GootenColor[];
   sizes: string[];
   models: string[];
@@ -110,7 +111,7 @@ export default function ProductDetail() {
     setTimeout(() => setAddedToCart(false), 2500);
   };
 
-  const image = productId ? PRODUCT_IMAGE[productId] : null;
+  const image = product?.image_url || (productId ? PRODUCT_IMAGE[productId] : null);
 
   // ── Loading ──
   if (loading) {
