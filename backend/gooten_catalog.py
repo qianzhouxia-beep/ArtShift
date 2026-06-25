@@ -203,6 +203,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "2000 Fine Jersey Short Sleeve Crew Neck",
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/05/Next-Level-7200_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Black", "hex": "#111111"}, {"name": "White", "hex": "#FFFFFF"},
             {"name": "Navy", "hex": "#1B2A4A"}, {"name": "Midnight Navy", "hex": "#0F1A3A"},
@@ -237,6 +238,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "18500 Pullover Hoodie",
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Lane-Seven-16001_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Black", "hex": "#111111"}, {"name": "White", "hex": "#FFFFFF"},
             {"name": "Navy", "hex": "#1B2A4A"}, {"name": "Classic Navy", "hex": "#1E3A5F"},
@@ -268,6 +270,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "F496 Drop Shoulder Pullover",
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Lane-Seven-16005_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Black", "hex": "#111111"}, {"name": "White", "hex": "#FFFFFF"},
             {"name": "Jet Black", "hex": "#0D0D0D"}, {"name": "Arctic White", "hex": "#FAFAFA"},
@@ -308,6 +311,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "3480 Jersey Tank",
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Comfort-Colors-9360_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Black", "hex": "#111111"}, {"name": "White", "hex": "#FFFFFF"},
             {"name": "Navy", "hex": "#1B2A4A"}, {"name": "Red", "hex": "#CC0000"},
@@ -356,6 +360,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "3501 Jersey Long Sleeve Tee",
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Next-Level-3501_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Black", "hex": "#111111"}, {"name": "White", "hex": "#FFFFFF"},
             {"name": "Navy", "hex": "#1B2A4A"}, {"name": "Red", "hex": "#CC0000"},
@@ -398,6 +403,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "AL3000 Unisex Recycled Cotton Oversized Tee",
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Bella+Canvas-3001CVC_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Black", "hex": "#111111"}, {"name": "White", "hex": "#FFFFFF"},
             {"name": "Deep Black", "hex": "#0A0A0A"}, {"name": "Cream", "hex": "#FFFDD0"},
@@ -433,6 +439,7 @@ PRODUCT_CATALOG = [
         "requires_model": False,
         "default_model": None,
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Richardson-113_Catalog_Photo_01-270x270.png",
         "colors": [
             {"name": "White / Navy / Red", "hex": "#FFFFFF"},
             {"name": "White / Navy", "hex": "#FFFFFF"},
@@ -458,6 +465,7 @@ PRODUCT_CATALOG = [
         "requires_model": False,
         "default_model": None,
         "print_placement": "front",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Richardson-256_Catalog_Photo_01-270x270.png",
         "colors": [
             {"name": "Dark Orange Black", "hex": "#FF8C00"},
             {"name": "Red White", "hex": "#CC0000"},
@@ -485,6 +493,7 @@ PRODUCT_CATALOG = [
         "requires_model": False,
         "default_model": None,
         "print_placement": "wrap",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Accent-Mug-11oz_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "White / Black Accent", "hex": "#FFFFFF"},
             {"name": "White / Blue Accent", "hex": "#FFFFFF"},
@@ -516,6 +525,7 @@ PRODUCT_CATALOG = [
         "requires_model": False,
         "default_model": None,
         "print_placement": "full",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Q-Tees-QTB_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Natural Cotton", "hex": "#F5F0E8"},
         ],
@@ -536,6 +546,7 @@ PRODUCT_CATALOG = [
         "requires_model": True,
         "default_model": "iPhone 15 Pro",
         "print_placement": "full",
+        "image_url": "https://www.gooten.com/wp-content/uploads/2025/04/Premium-Phone-Case_Catalog_Photo_01-270x315.png",
         "colors": [
             {"name": "Glossy Finish", "hex": "#F5F5F5"},
         ],
@@ -598,5 +609,6 @@ def get_catalog_summary() -> list:
             "model_count": len(p["models"]),
             "default_model": p.get("default_model"),
             "requires_model": p.get("requires_model", False),
+            "image_url": p.get("image_url", ""),
         })
     return result
