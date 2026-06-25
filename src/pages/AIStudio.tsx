@@ -266,7 +266,7 @@ export default function AIStudio() {
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState('cyberpunk');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [_generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [designImage, setDesignImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
