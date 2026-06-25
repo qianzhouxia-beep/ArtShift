@@ -394,8 +394,6 @@ export default function AIStudio() {
 
       // Draw print area guide
       const area = PRINT_AREAS[selectedProduct] || PRINT_AREAS.hoodie;
-      const printScaleX = (canvasW * scale) / 400;
-      const printScaleY = (canvasH * scale) / 500;
       // We need to map SVG viewBox (400x500) coords to canvas coords
       const svg2canvas = (vx: number, vy: number) => ({
         x: canvasW / 2 - (200 - vx) * (canvasW * scale / 400),
