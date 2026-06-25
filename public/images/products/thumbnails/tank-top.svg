@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="16" fill="#F5F3FF"/>
+  <!-- Tank top body -->
+  <path d="M35 28 L30 40 L32 42 L32 100 L88 100 L88 42 L90 40 L85 28" stroke="#6D28D9" stroke-width="2.5" stroke-linejoin="round" fill="#EEE9FF"/>
+  <!-- Collar -->
+  <path d="M40 28 C40 18 60 15 60 15 C60 15 80 18 80 28" stroke="#6D28D9" stroke-width="2.5" fill="none"/>
+  <!-- Armholes -->
+  <path d="M35 28 L25 55 L30 58 L38 38" stroke="#6D28D9" stroke-width="2" fill="#D8CFF7"/>
+  <path d="M85 28 L95 55 L90 58 L82 38" stroke="#6D28D9" stroke-width="2" fill="#D8CFF7"/>
+  <!-- Bottom hem -->
+  <path d="M32 100 L88 100" stroke="#6D28D9" stroke-width="2"/>
+  <!-- Label -->
+  <text x="60" y="50" text-anchor="middle" font-family="sans-serif" font-size="6.5" fill="#9E87E0" font-weight="600">3480 Jersey</text>
+</svg>

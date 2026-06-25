@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="16" fill="#FEF3C7"/>
+  <!-- Oversized tee body -->
+  <path d="M32 25 L25 42 L26 100 L94 100 L95 42 L88 25" stroke="#D97706" stroke-width="2.5" stroke-linejoin="round" fill="#FDE68A"/>
+  <!-- Collar -->
+  <path d="M38 25 C38 10 60 5 60 5 C60 5 82 10 82 25" stroke="#D97706" stroke-width="2.5" fill="none"/>
+  <!-- Wide sleeves -->
+  <path d="M32 25 L16 40 L18 90 L26 88 L28 38" stroke="#D97706" stroke-width="2" fill="#FCD34D"/>
+  <path d="M88 25 L104 40 L102 90 L94 88 L92 38" stroke="#D97706" stroke-width="2" fill="#FCD34D"/>
+  <!-- Bottom hem -->
+  <path d="M26 100 L94 100" stroke="#D97706" stroke-width="2"/>
+  <!-- "Oversized" label -->
+  <text x="60" y="62" text-anchor="middle" font-family="sans-serif" font-size="6" fill="#A46A0A" font-weight="600">OVERSIZED FIT</text>
+</svg>

@@ -32,13 +32,13 @@ const PRODUCT_IMAGE: Record<string, string> = {
   hoodie: '/images/products/hoodie.svg',
   sweatshirt: '/images/products/sweatshirt.svg',
   mug: '/images/products/mug.svg',
-  'tote-bag': '/images/products/bag.png',
+  'tote-bag': '/images/products/thumbnails/tote-bag.svg',
   'phone-case': '/images/products/phonecase.svg',
-  'tank-top': '',
-  'long-sleeve': '',
-  'oversized-tee': '',
-  'trucker-cap': '/images/products/hat.svg',
-  'snapback-cap': '/images/products/hat.svg',
+  'tank-top': '/images/products/thumbnails/tank-top.svg',
+  'long-sleeve': '/images/products/thumbnails/long-sleeve.svg',
+  'oversized-tee': '/images/products/thumbnails/oversized-tee.svg',
+  'trucker-cap': '/images/products/thumbnails/trucker-cap.svg',
+  'snapback-cap': '/images/products/thumbnails/snapback-cap.svg',
 };
 
 // ── Category display helpers ───────────────────────────────────────────────

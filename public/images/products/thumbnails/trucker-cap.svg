@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="16" fill="#ECFDF5"/>
+  <!-- Trucker cap -->
+  <!-- Crown front -->
+  <path d="M30 48 L30 65 C30 85 50 98 60 98 C70 98 90 85 90 65 L90 48" stroke="#059669" stroke-width="2.5" stroke-linejoin="round" fill="#D1FAE5"/>
+  <!-- Visor/brim -->
+  <path d="M25 48 C10 55 5 65 10 72 C14 75 30 68 40 56" stroke="#059669" stroke-width="2.5" fill="#047857"/>
+  <!-- Top panel -->
+  <path d="M30 48 L60 28 L90 48" stroke="#059669" stroke-width="2.5" fill="#A7F3D0"/>
+  <!-- Mesh back -->
+  <path d="M90 48 L90 65 C90 85 70 98 60 98" stroke="#059669" stroke-width="1.5" fill="#6EE7B7" opacity="0.6"/>
+  <!-- Button on top -->
+  <circle cx="60" cy="28" r="3" fill="#059669"/>
+</svg>

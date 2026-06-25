@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="16" fill="#FDF2F8"/>
+  <!-- Snapback cap -->
+  <!-- Crown front -->
+  <path d="M30 48 L30 65 C30 85 50 98 60 98 C70 98 90 85 90 65 L90 48" stroke="#DB2777" stroke-width="2.5" stroke-linejoin="round" fill="#FCE7F3"/>
+  <!-- Flat brim -->
+  <path d="M22 45 C15 48 10 52 10 55 C10 58 28 48 35 42" stroke="#DB2777" stroke-width="2.5" fill="none"/>
+  <path d="M22 45 C15 48 10 52 10 55 L18 58 L28 50 Z" fill="#BE185D"/>
+  <!-- Top panel -->
+  <path d="M30 48 L60 26 L90 48" stroke="#DB2777" stroke-width="2.5" fill="#F9A8D4"/>
+  <!-- Button -->
+  <circle cx="60" cy="26" r="3" fill="#DB2777"/>
+  <!-- Snapback closure -->
+  <rect x="58" y="90" width="4" height="14" rx="1.5" fill="#F472B6"/>
+</svg>

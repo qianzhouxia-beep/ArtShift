@@ -47,6 +47,21 @@ interface StyleOption {
   image: string;
 }
 
+// ── Product thumbnail mapping ─────────────────────────────────────────────
+const PRODUCT_THUMBNAILS: Record<string, string> = {
+  'tshirt':        '/images/products/tshirt.svg',
+  'hoodie':        '/images/products/hoodie.svg',
+  'sweatshirt':    '/images/products/sweatshirt.svg',
+  'tank-top':      '/images/products/thumbnails/tank-top.svg',
+  'long-sleeve':   '/images/products/thumbnails/long-sleeve.svg',
+  'oversized-tee': '/images/products/thumbnails/oversized-tee.svg',
+  'trucker-cap':   '/images/products/thumbnails/trucker-cap.svg',
+  'snapback-cap':  '/images/products/thumbnails/snapback-cap.svg',
+  'mug':           '/images/products/mug.svg',
+  'tote-bag':      '/images/products/thumbnails/tote-bag.svg',
+  'phone-case':    '/images/products/phonecase.svg',
+};
+
 // ── Static Style options (unchanged — they're AI generation styles) ──────
 
 const STYLES: StyleOption[] = [
@@ -484,22 +499,24 @@ export default function AIStudio() {
                     <button
                       key={p.id}
                       onClick={() => setSelectedProduct(p.id)}
-                      className={`product-btn flex flex-col items-center p-3.5 rounded-xl transition-all duration-300 border-2 ${
+                      className={`product-btn flex flex-col items-center p-2.5 rounded-xl transition-all duration-300 border-2 ${
                         selectedProduct === p.id
-                          ? 'border-vivid-purple bg-vivid-purple/5 shadow-sm'
-                          : 'border-outline-variant/20 hover:border-vivid-purple/50'
+                          ? 'border-vivid-purple bg-vivid-purple/5 shadow-sm ring-1 ring-vivid-purple/20'
+                          : 'border-outline-variant/20 hover:border-vivid-purple/40 hover:bg-surface-container-low'
                       }`}
                     >
-                      <span
-                        className={`material-symbols-outlined text-xl mb-1.5 ${
-                          selectedProduct === p.id ? 'text-vivid-purple' : 'text-on-surface-variant'
-                        }`}
-                      >
-                        {p.icon || 'checkroom'}
-                      </span>
+                      {/* Thumbnail image */}
+                      <div className="w-full aspect-[4/3] rounded-lg bg-surface-container-lowest overflow-hidden mb-2 flex items-center justify-center">
+                        <img
+                          src={PRODUCT_THUMBNAILS[p.id] || `/images/products/${p.id}.svg`}
+                          alt={p.name}
+                          className="w-full h-full object-contain p-1"
+                          loading="lazy"
+                        />
+                      </div>
                       <span
                         className={`text-[11px] font-semibold leading-tight text-center ${
-                          selectedProduct === p.id ? 'text-vivid-purple' : 'text-on-surface-variant'
+                          selectedProduct === p.id ? 'text-vivid-purple' : 'text-on-surface'
                         }`}
                       >
                         {p.name}
