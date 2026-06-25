@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import AIStudio from './pages/AIStudio';
 import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import Gallery from './pages/Gallery';
 import About from './pages/About';
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/studio" element={<AIStudio />} />
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/products" element={<Products />} />
+      <Route path="/products/:productId" element={<ProductDetail />} />
       <Route path="/about" element={<About />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/terms" element={<Terms />} />

@@ -173,15 +173,252 @@ def printful_order_detail(order_id: int):
 @bp.route("/api/printful/mockup", methods=["POST"])
 def printful_generate_mockup():
     """
-    Generate product mockup (requires Printful Files API).
-    Request body: { "product_id": 123, "image_url": "https://..." }
+    Generate product mockup using Printful Mockup Generator API.
+    
+    Flow:
+    1. Map ArtShift product slug → Printful product ID
+    2. Find matching variant by color
+    3. Create mockup generation task
+    4. Poll for completion (up to 30s)
+    5. Return mockup URL
+    
+    Request body: {
+      "product_slug": "tshirt",
+      "color": "Black",
+      "size": "M",
+      "image_url": "https://...",
+      "placement": "front"
+    }
     """
+    import time as time_mockup
+    
     data = request.get_json(silent=True) or {}
-    result = call_printful_api("/mockups", method="POST", data=data)
-    if result["ok"]:
-        return jsonify(result["data"]), 201
-    else:
-        return jsonify(result), 502
+    product_slug = data.get("product_slug", "").strip()
+    color = data.get("color", "Black").strip()
+    size = data.get("size", "M").strip()
+    image_url = data.get("image_url", "").strip()
+    placement = data.get("placement", "front").strip()
+    
+    if not product_slug:
+        return jsonify({"ok": False, "error": "product_slug is required"}), 400
+    if not image_url:
+        return jsonify({"ok": False, "error": "image_url is required"}), 400
+    
+    # ── Step 0: Map ArtShift slug → Printful product + variant ──
+    mapping = get_printful_product_mapping(product_slug)
+    if not mapping:
+        return jsonify({"ok": False, "error": f"No Printful mapping for: {product_slug}"}), 400
+    
+    printful_product_id = mapping["product_id"]
+    
+    # ── Step 1: Find matching variant by color ──
+    variant_id = find_variant_by_color(printful_product_id, color, size)
+    if not variant_id:
+        # Fallback: use default variant from mapping
+        variant_id = mapping.get("default_variant_id")
+        if not variant_id:
+            return jsonify({"ok": False, "error": f"No variant found for {color}/{size}"}), 400
+    
+    logger.info(f"[Printful Mockup] product={printful_product_id}, variant={variant_id}, color={color}")
+    
+    # ── Step 2: Create mockup task ──
+    mockup_data = {
+        "variant_ids": [variant_id],
+        "format": "png",
+        "files": [
+            {
+                "placement": placement,
+                "image_url": image_url,
+                "position": {
+                    "area_width": 1800,
+                    "area_height": 2400,
+                    "width": 1800,
+                    "height": 2400,
+                    "top": 0,
+                    "left": 0,
+                    "limit_to_print_area": True
+                }
+            }
+        ]
+    }
+    
+    create_result = call_printful_api(
+        f"/mockup-generator/create-task/{printful_product_id}",
+        method="POST",
+        data=mockup_data
+    )
+    
+    if not create_result["ok"]:
+        logger.error(f"[Printful Mockup] Create task failed: {create_result}")
+        return jsonify({"ok": False, "error": create_result.get("error", "Mockup generation failed"), "phase": "create_task"}), 502
+    
+    task_key = create_result["data"].get("task_key")
+    if not task_key:
+        return jsonify({"ok": False, "error": "No task_key in response", "phase": "create_task"}), 502
+    
+    logger.info(f"[Printful Mockup] Task created: {task_key}")
+    
+    # ── Step 3: Poll for completion ──
+    max_wait = 30
+    poll_interval = 2
+    waited = 0
+    
+    while waited < max_wait:
+        time_mockup.sleep(poll_interval)
+        waited += poll_interval
+        
+        task_result = call_printful_api(f"/mockup-generator/task?task_key={task_key}")
+        
+        if not task_result["ok"]:
+            logger.warning(f"[Printful Mockup] Poll failed: {task_result}")
+            continue
+        
+        status = task_result["data"].get("status", "")
+        logger.info(f"[Printful Mockup] Task status: {status} ({waited}s)")
+        
+        if status == "completed":
+            mockups = task_result["data"].get("mockups", [])
+            if mockups:
+                mockup_url = mockups[0].get("mockup_url")
+                # Prefer the extra[0].url which is often higher quality
+                extra = mockups[0].get("extra", [])
+                if extra:
+                    mockup_url = extra[0].get("url", mockup_url)
+                
+                logger.info(f"[Printful Mockup] Completed: {mockup_url}")
+                return jsonify({
+                    "ok": True,
+                    "data": {
+                        "mockup_url": mockup_url,
+                        "task_key": task_key,
+                        "product_id": printful_product_id,
+                        "variant_id": variant_id
+                    }
+                }), 200
+            else:
+                return jsonify({"ok": False, "error": "No mockups in completed task", "phase": "poll"}), 502
+        
+        elif status == "failed":
+            error_msg = task_result["data"].get("error", "Unknown error")
+            return jsonify({"ok": False, "error": error_msg, "phase": "poll"}), 502
+    
+    # Timeout
+    return jsonify({
+        "ok": False,
+        "error": "Mockup generation timed out",
+        "task_key": task_key,
+        "phase": "poll"
+    }), 504
+
+
+# ── Product Mapping (ArtShift slug → Printful product) ──
+
+PRINTFUL_PRODUCT_MAP = {
+    "tshirt": {
+        "product_id": 71,
+        "name": "Bella+Canvas 3001 Unisex Staple T-Shirt",
+        "default_variant_id": 4018,  # Black/L
+    },
+    "hoodie": {
+        "product_id": 294,
+        "name": "Bella+Canvas 3719 Unisex Pullover Hoodie",
+        "default_variant_id": 9229,  # Black/L
+    },
+    "sweatshirt": {
+        "product_id": 318,
+        "name": "Champion S149 Crewneck Sweatshirt",
+        "default_variant_id": 9661,  # Black/L
+    },
+    "tank-top": {
+        "product_id": 248,
+        "name": "Bella+Canvas 3480 Men's Staple Tank Top",
+        "default_variant_id": 8631,  # Black/L
+    },
+    "long-sleeve": {
+        "product_id": 356,
+        "name": "Bella+Canvas 3501 Unisex Long Sleeve Tee",
+        "default_variant_id": 10096,  # Black/L
+    },
+    "oversized-tee": {
+        "product_id": 71,
+        "name": "Bella+Canvas 3001 (Oversized)",
+        "default_variant_id": 4018,
+    },
+    "trucker-cap": {
+        "product_id": 596,
+        "name": "Flexfit 6511 Closed-Back Trucker Cap",
+        "default_variant_id": 15403,  # Black/One size
+    },
+    "snapback-cap": {
+        "product_id": 77,
+        "name": "Otto Cap 125-978 Snapback",
+        "default_variant_id": 4468,  # Black/One size
+    },
+    "mug": {
+        "product_id": 403,
+        "name": "White Ceramic Mug 11oz",
+        "default_variant_id": 11051,  # Black/11oz
+    },
+    "tote-bag": {
+        "product_id": 641,
+        "name": "AS Colour 1001 Cotton Tote Bag",
+        "default_variant_id": 16287,  # Black/One size
+    },
+    "phone-case": {
+        "product_id": 683,
+        "name": "Tough Case for iPhone",
+        "default_variant_id": 16892,  # iPhone 11 Pro Max
+    },
+}
+
+
+def get_printful_product_mapping(slug: str):
+    """Get Printful product mapping for an ArtShift product slug."""
+    return PRINTFUL_PRODUCT_MAP.get(slug)
+
+
+# ── Variant cache (in-memory, per-process) ──
+_variant_cache: dict = {}
+
+
+def find_variant_by_color(product_id: int, color_name: str, size: str = "M"):
+    """
+    Find a Printful variant ID matching the given color and approximate size.
+    Queries the Printful Products API and caches variants per product.
+    """
+    cache_key = f"product_{product_id}"
+    
+    if cache_key not in _variant_cache:
+        result = call_printful_api(f"/products/{product_id}")
+        if not result["ok"]:
+            logger.warning(f"[Printful] Failed to fetch variants for product {product_id}")
+            return None
+        _variant_cache[cache_key] = result["data"].get("variants", [])
+    
+    variants = _variant_cache[cache_key]
+    color_lower = color_name.strip().lower()
+    size_lower = size.strip().lower()
+    
+    # Exact match: color + size
+    for v in variants:
+        v_color = (v.get("color") or "").strip().lower()
+        v_size = (v.get("size") or "").strip().lower()
+        if v_color == color_lower and v_size == size_lower:
+            return v["id"]
+    
+    # Partial match: color only
+    for v in variants:
+        v_color = (v.get("color") or "").strip().lower()
+        if v_color == color_lower:
+            return v["id"]
+    
+    # Fuzzy match: color in name
+    for v in variants:
+        v_color = (v.get("color") or "").strip().lower()
+        if color_lower in v_color or v_color in color_lower:
+            return v["id"]
+    
+    return None
 
 
 @bp.route("/api/printful/webhook", methods=["POST"])

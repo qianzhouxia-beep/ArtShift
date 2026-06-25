@@ -114,6 +114,10 @@ export default function AIStudio() {
   const [error, setError] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
+  // ── Printful-quality mockup ──
+  const [mockupImage, setMockupImage] = useState<string | null>(null);
+  const [isGeneratingMockup, setIsGeneratingMockup] = useState(false);
+
   // ── Product variant selections ──
   const [selectedColor, setSelectedColor] = useState<GootenColor>({ name: 'Black', hex: '#111111' });
   const [selectedSize, setSelectedSize] = useState<string>('M');
@@ -140,9 +144,10 @@ export default function AIStudio() {
     fetchProductDetails(selectedProduct);
   }, [selectedProduct]);
 
-  // ── Reset design when product or image changes ──
+  // ── Reset design and mockup when product or image changes ──
   useEffect(() => {
     setDesignState({ x: 50, y: 50, scale: 1.0, rotation: 0 });
+    setMockupImage(null);
   }, [selectedProduct, generatedImage]);
 
   // ══════════════════════════════════════════════════════════════════════
@@ -244,6 +249,7 @@ export default function AIStudio() {
     setError(null);
     setIsGenerating(true);
     setGeneratedImage(null);
+    setMockupImage(null);
 
     const isImg2Img = !!uploadedImage;
     const endpoint = isImg2Img
@@ -261,12 +267,20 @@ export default function AIStudio() {
       });
       const data = await res.json();
       if (data.success) {
+        let imageBase64 = '';
         if (data.base64Images?.[0]) {
-          setGeneratedImage(data.base64Images[0]);
+          imageBase64 = data.base64Images[0];
         } else if (data.imageUrl) {
-          setGeneratedImage(data.imageUrl);
+          imageBase64 = data.imageUrl;
         } else if (data.images?.[0]) {
-          setGeneratedImage(data.images[0]);
+          imageBase64 = data.images[0];
+        }
+
+        if (imageBase64) {
+          setGeneratedImage(imageBase64);
+          // After generation, trigger mockup fetch
+          setIsGeneratingMockup(true);
+          fetchMockup(imageBase64).finally(() => setIsGeneratingMockup(false));
         }
       } else {
         setError(data.error || 'Generation failed. Please try again.');
@@ -277,7 +291,67 @@ export default function AIStudio() {
     } finally {
       setIsGenerating(false);
     }
-  }, [prompt, selectedStyle, uploadedImage]);
+  }, [prompt, selectedStyle, uploadedImage, selectedProduct, selectedColor, selectedSize, selectedModel]);
+
+  // Upload image to backend, get public URL, then try Printful mockup (→ Gooten → SVG fallback)
+  const fetchMockup = async (base64Image: string) => {
+    try {
+      // Step 1: Upload design to get a public URL
+      const uploadRes = await fetch(`${API_BASE}/api/upload-design`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image }),
+      });
+      const uploadJson = await uploadRes.json();
+      if (!uploadJson.ok) {
+        console.warn('Upload failed, using SVG fallback:', uploadJson.error);
+        return;
+      }
+      const publicUrl = uploadJson.url;
+
+      // Step 2: Try Printful Mockup Generator (photorealistic 3D rendering)
+      const printfulRes = await fetch(`${API_BASE}/api/printful/mockup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_slug: selectedProduct,
+          color: selectedColor?.name || 'Black',
+          size: selectedSize,
+          image_url: publicUrl,
+          placement: 'front',
+        }),
+      });
+      const printfulJson = await printfulRes.json();
+      if (printfulJson.ok && printfulJson.data?.mockup_url) {
+        setMockupImage(printfulJson.data.mockup_url);
+        console.log('Printful mockup generated:', printfulJson.data.mockup_url);
+        return;
+      }
+      console.warn('Printful mockup failed, trying Gooten:', printfulJson.error || 'no mockup_url');
+
+      // Step 3: Fallback to Gooten preview API
+      const previewRes = await fetch(`${API_BASE}/api/gooten/preview`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: selectedProduct,
+          color: selectedColor?.name || 'Black',
+          size: selectedSize,
+          model: selectedModel || undefined,
+          image_url: publicUrl,
+        }),
+      });
+      const previewJson = await previewRes.json();
+      if (previewJson.ok && previewJson.data?.image_url) {
+        setMockupImage(previewJson.data.image_url);
+        console.log('Gooten mockup generated:', previewJson.data.image_url);
+      } else {
+        console.warn('Gooten preview failed, SVG fallback stays:', previewJson.error || 'no image_url');
+      }
+    } catch (err) {
+      console.error('Mockup fetch error:', err);
+    }
+  };
 
   // ══════════════════════════════════════════════════════════════════════
   // Drag to position
@@ -562,8 +636,30 @@ export default function AIStudio() {
           <div className="relative w-full max-w-lg lg:max-w-2xl aspect-[4/5] max-h-[70vh] flex items-center justify-center">
             <div className="relative w-[85%] max-w-[420px] aspect-[4/5] rounded-2xl shadow-2xl overflow-hidden bg-surface-container-low canvas-glow transition-all duration-700">
 
-              {/* ── SVG Mockup ── */}
-              {hasSvgMockup ? (
+              {/* ── Mockup Preview: Gooten API or SVG fallback ── */}
+              {mockupImage ? (
+                /* ── Gooten-generated product mockup ── */
+                <div className="relative w-full h-full flex items-center justify-center bg-surface-container-lowest">
+                  <img
+                    src={mockupImage}
+                    alt={`${currentProduct?.name || 'Product'} mockup`}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                  {isGeneratingMockup && (
+                    <div className="absolute inset-0 bg-surface/30 backdrop-blur-sm flex items-center justify-center">
+                      <div className="glass-panel px-4 py-2 rounded-full flex items-center gap-2">
+                        <div className="flex space-x-1">
+                          <div className="w-1.5 h-1.5 bg-vivid-purple rounded-full animate-bounce" style={{ animationDelay: '0s' }}/>
+                          <div className="w-1.5 h-1.5 bg-vivid-purple rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}/>
+                          <div className="w-1.5 h-1.5 bg-vivid-purple rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}/>
+                        </div>
+                        <span className="text-[10px] font-semibold text-vivid-purple">Generating mockup...</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : hasSvgMockup ? (
+                /* ── SVG fallback mockup ── */
                 <svg
                   ref={svgRef as any}
                   viewBox="0 0 400 500"

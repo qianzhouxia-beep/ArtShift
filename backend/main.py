@@ -314,6 +314,47 @@ def serve_static(filename):
 # API ENDPOINTS
 # ══════════════════════════════════════════════════════════════════════════════
 
+@app.route("/api/upload-design", methods=["POST"])
+def upload_design():
+    """
+    Accept base64 design image, save to static/generated/, return public URL.
+    POST body: { image: "data:image/png;base64,..." }
+    Returns: { ok: true, url: "https://.../static/generated/design_xxx.png" }
+    """
+    body = request.get_json(silent=True) or {}
+    base64_str = body.get("image", "")
+
+    if not base64_str:
+        return jsonify({"ok": False, "error": "image (base64 data URI) is required"}), 400
+
+    # Parse base64 data URI
+    import re
+    import base64
+    header_match = re.match(r'data:image/(\w+);base64,(.+)', base64_str)
+    if not header_match:
+        # Try plain base64
+        try:
+            img_bytes = base64.b64decode(base64_str)
+            ext = "png"
+        except Exception:
+            return jsonify({"ok": False, "error": "Invalid base64 image format"}), 400
+    else:
+        ext = header_match.group(1)
+        img_bytes = base64.b64decode(header_match.group(2))
+
+    # Save to static/generated/
+    gen_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "generated")
+    os.makedirs(gen_dir, exist_ok=True)
+    fname = f"design_{int(time.time())}_{random.randint(1000, 9999)}.{ext}"
+    fpath = os.path.join(gen_dir, fname)
+    with open(fpath, "wb") as f:
+        f.write(img_bytes)
+
+    public_url = f"{BASE_URL}/static/generated/{fname}"
+    logger.info(f"Uploaded design: {fname} -> {public_url}")
+    return jsonify({"ok": True, "url": public_url, "filename": fname})
+
+
 @app.route("/api/health", methods=["GET"])
 def health_check():
     """Health check endpoint for monitoring"""

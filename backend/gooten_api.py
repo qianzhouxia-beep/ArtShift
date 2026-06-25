@@ -264,25 +264,95 @@ def gooten_variants():
 @bp.route("/api/gooten/preview", methods=["POST"])
 def gooten_preview():
     """
-    Generate a product preview (mockup) image for a given SKU + design image URL.
-    POST body: { sku, image_url, template? }
-    Returns: { ok: true, data: { ImageUrl: "..." } }
+    Enhanced: auto-select SKU from product + color + size + model, then generate mockup.
+    POST body: { product_id: "hoodie", color: "Black", size: "M", model?: "18500...", image_url: "https://..." }
+    OR directly: { sku: "...", image_url: "https://..." }
+    Returns: { ok: true, data: { image_url: "..." } }
     """
     body = request.get_json(silent=True) or {}
-    sku = body.get("sku", "").strip()
-    image_url = body.get("image_url", "").strip()
-    if not sku or not image_url:
-        return jsonify({"ok": False, "error": "sku and image_url are required"}), 400
 
-    payload = {
-        "SKU": sku,
-        "Images": [{"Image": {"Url": image_url}}],
+    # Direct SKU mode
+    sku = body.get("sku", "").strip()
+    if sku:
+        image_url = body.get("image_url", "").strip()
+        if not image_url:
+            return jsonify({"ok": False, "error": "image_url is required"}), 400
+        payload = {"SKU": sku, "Images": [{"Image": {"Url": image_url}}]}
+        result = _call_api("POST", "/api/v/5/source/api/productpreview/", data=payload)
+        if result.get("ok"):
+            images = result.get("data", {}).get("Images", [])
+            result["data"] = {"image_url": images[0].get("Url", "") if images else ""}
+        return jsonify(result)
+
+    # Auto-SKU mode: product_id + color + size + model
+    product_id = body.get("product_id", "").strip()
+    color_name = body.get("color", "").strip()
+    size = body.get("size", "").strip()
+    model_name = body.get("model", "").strip()
+    image_url = body.get("image_url", "").strip()
+
+    if not product_id or not image_url:
+        return jsonify({"ok": False, "error": "product_id and image_url are required"}), 400
+
+    # Look up product in catalog
+    from gooten_catalog import get_product_by_id
+    product = get_product_by_id(product_id)
+    if not product:
+        return jsonify({"ok": False, "error": f"Unknown product: {product_id}"}), 404
+
+    # Fetch variants from Gooten API to find matching SKU
+    params = {
+        "productId": str(product["gooten_product_id"]),
+        "countryCode": body.get("country", "US"),
+        "currencyCode": body.get("currency", "USD"),
+        "page": "1",
+        "pageSize": "500",
     }
+    var_result = _call_api("GET", "/api/v/5/source/api/productvariants/", params=params)
+    if not var_result.get("ok"):
+        return jsonify({"ok": False, "error": f"Failed to fetch variants: {var_result.get('error')}"}), 500
+
+    variants = var_result.get("data", {}).get("ProductVariants", [])
+
+    # Logic: find a variant that matches color + size + model
+    # Priority: all three → color+size → color only → first variant
+    def variant_priority(v):
+        opts = v.get("Options", [])
+        opt_dict = {o["Name"]: o["Value"] for o in opts}
+        score = 0
+        if color_name and opt_dict.get("Color", "") == color_name:
+            score += 100
+        if size and opt_dict.get("Size", "") == size:
+            score += 10
+        if model_name and opt_dict.get("Model", opt_dict.get("Style", "")) == model_name:
+            score += 5
+        # Prefer "Center Front" or "Center Back" placement
+        placement = opt_dict.get("Print Placement", "")
+        if "Center Front" in placement:
+            score += 1
+        return score
+
+    if variants:
+        variants.sort(key=variant_priority, reverse=True)
+        best_variant = variants[0]
+        best_sku = best_variant.get("Sku", "")
+        best_opts = {o["Name"]: o["Value"] for o in best_variant.get("Options", [])}
+        logger.info(
+            f"[Gooten Preview] Auto-selected SKU: {best_sku} "
+            f"Color={best_opts.get('Color','?')} Size={best_opts.get('Size','?')} "
+            f"Model={best_opts.get('Model','?')} Placement={best_opts.get('Print Placement','?')}"
+        )
+    else:
+        return jsonify({"ok": False, "error": "No variants found for this product"}), 404
+
+    payload = {"SKU": best_sku, "Images": [{"Image": {"Url": image_url}}]}
     result = _call_api("POST", "/api/v/5/source/api/productpreview/", data=payload)
     if result.get("ok"):
         images = result.get("data", {}).get("Images", [])
-        image_url_out = images[0].get("Url", "") if images else ""
-        result["data"] = {"image_url": image_url_out}
+        result["data"] = {
+            "image_url": images[0].get("Url", "") if images else "",
+            "sku_used": best_sku,
+        }
     return jsonify(result)
 
 
