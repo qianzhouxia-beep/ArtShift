@@ -53,14 +53,6 @@ const CATEGORY_ICONS: Record<string, string> = {
   tech: 'smartphone',
 };
 
-const CATEGORY_NAMES: Record<string, string> = {
-  apparel: 'Apparel',
-  headwear: 'Headwear',
-  drinkware: 'Drinkware',
-  bags: 'Bags',
-  tech: 'Tech',
-};
-
 export default function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
   const [product, setProduct] = useState<ProductDetail | null>(null);

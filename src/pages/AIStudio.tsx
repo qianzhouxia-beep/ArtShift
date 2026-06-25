@@ -62,8 +62,6 @@ const STYLES: StyleOption[] = [
 // These are hand-drawn SVG approximations. Products not in this map use 
 // a generic display with the design overlaid.
 
-type SvgProductId = 'hoodie' | 'sweatshirt' | 'tshirt' | 'tank-top' | 'long-sleeve' | 'oversized-tee' | 'trucker-cap' | 'snapback-cap' | 'mug' | 'phone-case' | 'tote-bag';
-
 const HAS_SVG_MOCKUP: Set<string> = new Set([
   'hoodie', 'sweatshirt', 'tshirt', 'tank-top', 'long-sleeve',
   'oversized-tee', 'trucker-cap', 'snapback-cap', 'mug', 'phone-case', 'tote-bag',
