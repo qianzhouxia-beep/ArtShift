@@ -374,8 +374,8 @@ def gooten_submit_order():
         item_img = items[0].get("image_url", "") if items else ""
         db.execute("""
             INSERT INTO orders (order_number, customer_email, product_id, product_name, price, quantity,
-                                design_url, shipping_address, status, payment_status, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                design_url, shipping_address, status, payment_status, notes, gooten_order_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             gooten_order_id or f"PENDING-{int(time.time())}",
             shipping.get("email", ""),
@@ -388,6 +388,7 @@ def gooten_submit_order():
             "submitted" if result.get("ok") else "failed",
             "paid" if body.get("paypal_order_id") else "pending",
             f"Gooten test={is_test} ref={body.get('reference', '')}",
+            gooten_order_id or "",
         ))
         db.commit()
         db.close()
@@ -424,32 +425,77 @@ def gooten_list_orders():
 
 # ── Webhook ───────────────────────────────────────────────────────────────
 
-@bp.route("/api/gooten/webhook", methods=["POST"])
+@bp.route("/api/gooten/webhook", methods=["GET", "POST"])
 def gooten_webhook():
     """
     Receive shipment / order status updates from Gooten.
-    Updates local order status and tracking info.
+    Gooten sends POST with nested JSON body:
+      { Id, NiceId, Items: [{Status, TrackingNumber, ...}] }
+    Also appends ?orderid= to the URL on each call.
+    Returns 200 OK to acknowledge receipt.
     """
+    # GET: used by Gooten's "Test" button to verify URL reachability
+    if request.method == "GET":
+        logger.info("[Gooten Webhook] GET test ping received")
+        return jsonify({"ok": True, "message": "Gooten webhook endpoint is alive"}), 200
+
     body = request.get_json(silent=True) or {}
-    event_type = body.get("EventType", body.get("event_type", "unknown"))
-    order_id = body.get("OrderId", body.get("order_id", ""))
-    tracking = body.get("TrackingNumber", body.get("tracking_number", ""))
-    status = body.get("Status", "").lower()
-    logger.info(f"[Gooten Webhook] Order {order_id} -> {event_type} (status={status})")
+
+    # Gooten webhook payload structure: top-level Id, nested Items array
+    gooten_order_id = body.get("Id", "") or body.get("NiceId", "")
+    # Also capture orderid from query param (Gooten appends ?orderid=xxx)
+    qs_order_id = request.args.get("orderid", "")
+
+    # Extract status & tracking from first item in Items array
+    items = body.get("Items", [])
+    status = ""
+    tracking = ""
+    ship_carrier = ""
+    tracking_url = ""
+    if items:
+        first_item = items[0]
+        status = (first_item.get("Status", "") or "").lower()
+        tracking = first_item.get("TrackingNumber", "") or ""
+        ship_carrier = first_item.get("ShipCarrierName", "") or ""
+        tracking_url = first_item.get("TrackingUrl", "") or ""
+
+    effective_order_id = qs_order_id or gooten_order_id
+    logger.info(
+        f"[Gooten Webhook] Order {effective_order_id} "
+        f"gooten_id={gooten_order_id} qs_id={qs_order_id} "
+        f"status={status} tracking={tracking} carrier={ship_carrier}"
+    )
 
     try:
         db = get_db()
-        if status:
-            db.execute("UPDATE orders SET status=?, updated_at=datetime('now','utc') WHERE order_number=?", (status, order_id))
-        if tracking:
-            db.execute("UPDATE orders SET tracking_number=?, updated_at=datetime('now','utc') WHERE order_number=?", (tracking, order_id))
+        # Match by gooten_order_id first, then fallback to order_number
+        updated = 0
+        if gooten_order_id:
+            cur = db.execute(
+                "UPDATE orders SET status=?, tracking_number=?, ship_carrier=?, "
+                "tracking_url=?, gooten_order_id=COALESCE(gooten_order_id,?), "
+                "updated_at=datetime('now','utc') WHERE gooten_order_id=? OR order_number=?",
+                (status, tracking, ship_carrier, tracking_url,
+                 gooten_order_id, gooten_order_id, gooten_order_id)
+            )
+            updated = cur.rowcount
+        if updated == 0 and effective_order_id:
+            db.execute(
+                "UPDATE orders SET status=?, tracking_number=?, ship_carrier=?, "
+                "tracking_url=?, updated_at=datetime('now','utc') "
+                "WHERE order_number=?",
+                (status, tracking, ship_carrier, tracking_url, effective_order_id)
+            )
         db.commit()
         db.close()
-        logger.info(f"[Gooten Webhook] Updated order {order_id}: status={status} tracking={tracking}")
+        logger.info(
+            f"[Gooten Webhook] Updated order {effective_order_id}: "
+            f"status={status} tracking={tracking} rows={updated}"
+        )
     except Exception as e:
         logger.error(f"[Gooten Webhook] DB update failed: {e}")
 
-    return jsonify({"ok": True, "received": event_type}), 200
+    return jsonify({"ok": True, "received": "order_status"}), 200
 
 
 # ── My Orders (user-facing) ───────────────────────────────────────────────
