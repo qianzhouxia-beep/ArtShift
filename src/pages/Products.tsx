@@ -19,6 +19,7 @@ interface CatalogItem {
   model_count: number;
   default_model: string | null;
   requires_model: boolean;
+  image_url: string;
 }
 
 interface CategoryInfo {
@@ -90,7 +91,7 @@ export default function Products() {
 
   // ── Product image helper ──
   const getProductImage = (product: CatalogItem): string | null => {
-    return PRODUCT_IMAGE[product.id] || null;
+    return product.image_url || PRODUCT_IMAGE[product.id] || null;
   };
 
   // ── Subtitle helper ──
