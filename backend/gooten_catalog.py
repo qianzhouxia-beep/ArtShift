@@ -9,6 +9,8 @@ Last updated: 2026-06-17
 Source: Gooten ProductVariants API (api.print.io)
 """
 
+import os
+
 # ── Color Name → Hex Mapping ──────────────────────────────────────────────
 # Gooten API returns color names but not hex codes.
 # This mapping covers the most common colors across all products.
@@ -595,6 +597,8 @@ def get_all_categories() -> list:
 
 def get_catalog_summary() -> list:
     """Return catalog without heavy fields (for listing)."""
+    # Use env-based backend URL so images resolve correctly
+    _backend_base = os.environ.get("ARTSHIFT_BACKEND_URL", "")
     result = []
     for p in PRODUCT_CATALOG:
         result.append({
@@ -609,6 +613,6 @@ def get_catalog_summary() -> list:
             "model_count": len(p["models"]),
             "default_model": p.get("default_model"),
             "requires_model": p.get("requires_model", False),
-            "image_url": p.get("image_url", ""),
+            "image_url": f"{_backend_base}/api/gooten/image/{p['id']}" if _backend_base else f"/api/gooten/image/{p['id']}",
         })
     return result
