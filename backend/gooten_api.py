@@ -25,7 +25,10 @@ import json
 import logging
 import sqlite3
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file, Response
+import hashlib
+import tempfile
+import os.path as _osp
 from gooten_catalog import (
     PRODUCT_CATALOG, get_product_by_id, get_products_by_category,
     get_all_categories, get_catalog_summary, COLOR_HEX_MAP
@@ -223,6 +226,9 @@ def gooten_catalog_product(product_id):
     product = get_product_by_id(product_id)
     if not product:
         return jsonify({"ok": False, "error": f"Product not found: {product_id}"}), 404
+    # Override image_url with our proxy
+    _backend_base = os.environ.get("ARTSHIFT_BACKEND_URL", "")
+    product["image_url"] = f"{_backend_base}/api/gooten/image/{product_id}" if _backend_base else f"/api/gooten/image/{product_id}"
     return jsonify({"ok": True, "data": product})
 
 
@@ -651,3 +657,84 @@ def gooten_health():
         country_count = len(result.get("data", {}).get("Countries", []))
         return jsonify({"ok": True, "message": f"Connected. {country_count} countries available."})
     return jsonify({"ok": False, "error": result.get("error", "Unknown")})
+
+
+# ── Image Proxy ───────────────────────────────────────────────────────────
+# Cache directory for proxied Gooten images
+_IMAGE_CACHE_DIR = os.path.join(os.path.dirname(__file__), "_image_cache")
+os.makedirs(_IMAGE_CACHE_DIR, exist_ok=True)
+
+# Known working image URLs for each product (verified accessible)
+_PRODUCT_IMAGES = {
+    "tshirt":      "https://www.gooten.com/wp-content/uploads/2025/05/Next-Level-7200_Catalog_Photo_01-270x315.png",
+    "hoodie":      "https://www.gooten.com/wp-content/uploads/2025/04/Lane-Seven-16001_Catalog_Photo_01-270x315.png",
+    "sweatshirt":  "https://www.gooten.com/wp-content/uploads/2025/04/Lane-Seven-16005_Catalog_Photo_01-270x315.png",
+    "tank-top":    "https://www.gooten.com/wp-content/uploads/2025/04/Comfort-Colors-9360_Catalog_Photo_01-270x315.png",
+    "long-sleeve": "https://www.gooten.com/wp-content/uploads/2025/04/Next-Level-3501_Catalog_Photo_01-270x315.png",
+    "oversized-tee":"https://www.gooten.com/wp-content/uploads/2025/04/Bella+Canvas-3001CVC_Catalog_Photo_01-270x315.png",
+    "trucker-cap": "https://www.gooten.com/wp-content/uploads/2025/04/Richardson-113_Catalog_Photo_01-270x315.png",
+    "snapback-cap": "https://www.gooten.com/wp-content/uploads/2025/04/Richardson-256_Catalog_Photo_01-270x315.png",
+    "mug":         "https://www.gooten.com/wp-content/uploads/2025/04/Accent-Mug-11oz_Catalog_Photo_01-270x315.png",
+    "tote-bag":    "https://www.gooten.com/wp-content/uploads/2025/04/Q-Tees-QTB_Catalog_Photo_01-270x315.png",
+    "phone-case":  "https://www.gooten.com/wp-content/uploads/2025/04/Premium-Phone-Case_Catalog_Photo_01-270x315.png",
+}
+
+
+@bp.route("/api/gooten/image/<product_id>", methods=["GET"])
+def gooten_product_image(product_id):
+    """Proxy Gooten product images with proper headers and caching.
+
+    Usage: GET /api/gooten/image/tshirt
+    Returns the product photo as an image with caching headers.
+    Falls back to a placeholder SVG if the remote image is unavailable.
+    """
+    # Look up URL for this product_id
+    url = _PRODUCT_IMAGES.get(product_id)
+    if not url:
+        return jsonify({"ok": False, "error": f"Unknown product: {product_id}"}), 404
+
+    # Generate cache key from URL
+    cache_key = hashlib.md5(url.encode()).hexdigest() + ".png"
+    cache_path = _osp.join(_IMAGE_CACHE_DIR, cache_key)
+
+    # Return cached file if it exists and is recent (< 24h)
+    if _osp.exists(cache_path):
+        age = time.time() - _osp.getmtime(cache_path)
+        if age < 86400:  # 24 hours
+            return send_file(cache_path, mimetype='image/png')
+
+    # Fetch from Gooten with proper Referer header
+    try:
+        resp = requests.get(url, timeout=15,
+                           headers={
+                               "Referer": "https://www.gooten.com/",
+                               "User-Agent": "ArtShift/1.0 (https://artshift.api-tokenmaster.com)",
+                           })
+        if resp.status_code == 200 and len(resp.content) > 1000:
+            # Save to cache
+            with open(cache_path, 'wb') as f:
+                f.write(resp.content)
+            return Response(resp.content, mimetype=resp.headers.get('Content-Type', 'image/png'),
+                          headers={"Cache-Control": "public, max-age=86400"})
+        else:
+            logger.warning(f"Gooten image {product_id} returned status {resp.status_code}, size={len(resp.content)}")
+            return _placeholder_svg(product_id), 200, {'Content-Type': 'image/svg+xml'}
+    except Exception as e:
+        logger.error(f"Failed to fetch Gooten image for {product_id}: {e}")
+        return _placeholder_svg(product_id), 200, {'Content-Type': 'image/svg+xml'}
+
+
+def _placeholder_svg(product_id: str) -> str:
+    """Generate a simple placeholder SVG with product name."""
+    p = get_product_by_id(product_id)
+    name = p["name"] if p else product_id.replace("-", " ").title()
+    icon = p.get("icon", "category") if p else "category"
+
+    svg = (
+        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">'
+        '<rect width="400" height="400" fill="#f8f9fa" rx="12"/>'
+        '<text x="200" y="180" text-anchor="middle" font-family="sans-serif" font-size="48" fill="#89AACC">&#' + str(0x1F4BC if icon == 'checkroom' else 0x1F455) + ';</text>'
+        f'<text x="200" y="230" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#666">{name}</text>'
+        '</svg>'
+    )
+    return svg
